@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(winget install:*)",
+      "Bash(ngrok config add-authtoken:*)",
+      "Bash(clawdbot pairing approve:*)",
+      "Bash(clawdbot auth login:*)",
+      "Bash(clawdbot --help:*)",
+      "Bash(findstr:*)",
+      "Bash(clawdbot configure:*)",
+      "Bash(clawdbot gateway restart:*)",
+      "Bash(setx:*)",
+      "Bash(clawdbot doctor:*)",
+      "Bash(codex login:*)",
+      "WebFetch(domain:youtu.be)",
+      "WebFetch(domain:www.youtube.com)",
+      "WebSearch",
+      "Bash(git init:*)",
+      "Bash(gh auth status:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

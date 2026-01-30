@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 7 - 配對與測試</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow: hidden; color: #333; }
+        .nav-bar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; z-index: 10000; }
+        .nav-title { font-size: 22px; font-weight: 700; color: #fff; }
+        .nav-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+        .nav-btn { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.4); }
+        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.25); color: white; width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); font-size: 24px; cursor: pointer; z-index: 9000; display: flex; align-items: center; justify-content: center; }
+        .prev-arrow { left: 30px; } .next-arrow { right: 30px; }
+        .nav-arrow:disabled { opacity: 0.3; }
+        .slide { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); display: none; align-items: center; justify-content: center; padding: 40px; }
+        .slide.active { display: flex; }
+        .content-card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); padding: 50px; max-width: 1200px; width: 95%; max-height: 88vh; overflow-y: auto; }
+        h1 { color: #667eea; font-size: 48px; margin-bottom: 24px; text-align: center; }
+        h2 { color: #764ba2; font-size: 36px; margin-bottom: 30px; border-bottom: 3px solid #667eea; padding-bottom: 12px; }
+        p, li { font-size: 20px; line-height: 1.8; color: #444; margin-bottom: 12px; }
+        code { background: #f0f2f5; padding: 3px 8px; border-radius: 6px; font-family: 'Consolas', monospace; color: #d63384; font-weight: 600; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 12px; margin: 20px 0; font-size: 16px; }
+        .box { padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 6px solid; font-size: 18px; }
+        .info { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
+        .success { background: #d4edda; border-color: #28a745; color: #155724; }
+        .warning { background: #fff3cd; border-color: #ffc107; color: #856404; }
+        .highlight { background: linear-gradient(120deg, #667eea 0%, #764ba2 100%); padding: 4px 12px; border-radius: 6px; font-weight: bold; color: white; }
+        .step-box { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); padding: 25px; border-radius: 15px; margin: 20px 0; border: 2px solid rgba(102, 126, 234, 0.3); }
+        .step-number { display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: white; width: 40px; height: 40px; border-radius: 50%; text-align: center; line-height: 40px; font-weight: bold; margin-right: 15px; }
+        .indicators { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 4000; padding: 10px 25px; background: rgba(0,0,0,0.3); border-radius: 30px; }
+        .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; }
+        .dot.active { background: #fff; transform: scale(1.3); }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-title">✅ Part 7 - 配對與測試</div>
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-btn">🏠 首頁</a>
+            <a href="Part6_設定Webhook.html" class="nav-btn">⬅️ 上一章</a>
+            <a href="Part8_常見問題.html" class="nav-btn">下一章 ➡️</a>
+            <button class="nav-btn" onclick="toggleFullscreen()">🖥️ 全螢幕</button>
+            <a href="https://www.facebook.com/?locale=zh_TW" target="_blank" class="nav-btn">📘 FB</a>
+            <a href="https://www.youtube.com/@Liang-yt02" target="_blank" class="nav-btn">🎥 YT</a>
+            <a href="https://www.facebook.com/groups/2754139931432955?locale=zh_TW" target="_blank" class="nav-btn">👥 3A</a>
+        </div>
+    </div>
+
+    <div class="slide-container">
+        <div class="slide active">
+            <div class="content-card" style="text-align: center;">
+                <span style="font-size: 80px;">✅</span>
+                <h1>Part 7: 配對與測試</h1>
+                <h2 style="border: none; font-size: 28px; color: #666;">讓龍蝦認識你的 LINE 帳號</h2>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>📱 第一步：加機器人好友</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>在 LINE Developers 的 <strong>Messaging API</strong> 頁面</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>找到 <strong>QR code</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>用手機打開 LINE，點右上角的 <strong>加好友</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">4</span>點 <strong>行動條碼</strong>，掃描電腦上的 QR code</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">5</span>加機器人為好友</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>💬 第二步：傳訊息給機器人</h2>
+                <p>用手機 LINE 對機器人說：</p>
+                <pre>你好</pre>
+                <h3>機器人會回覆配對碼：</h3>
+                <pre>Clawdbot/Moltbot: access not configured.
+Your lineUserId: Uxxxxxxxxxxxxxxxx
+Pairing code: ABC123
+Ask the bot owner to approve with:
+clawdbot pairing approve line &lt;code&gt;</pre>
+                <div class="box info">
+                    記下那個 <strong>Pairing code</strong>（例如 <code>ABC123</code>）
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>🔓 第三步：批准配對</h2>
+                <p>回到電腦的 PowerShell（不是 ngrok 那個視窗），輸入：</p>
+                <pre>clawdbot pairing approve line ABC123</pre>
+                <p>（把 <code>ABC123</code> 換成你收到的配對碼）</p>
+                <div class="box success">
+                    會顯示 <code>Approved line sender Uxxxxxxxx</code>。
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>🧪 第四步：測試</h2>
+                <p>再用 LINE 傳一次訊息：</p>
+                <pre>你好</pre>
+                <div class="box success">
+                    <strong>🎉 機器人應該會正常回覆了！</strong>
+                </div>
+                <div class="box info">
+                    如果機器人有回應你，恭喜！安裝成功！<br>
+                    你可以問它任何問題，它會用 AI 回答你！
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card" style="text-align: center;">
+                <span style="font-size: 100px;">🎊</span>
+                <h2 style="border: none; font-size: 42px;">恭喜！安裝完成！</h2>
+                <p style="font-size: 24px; margin: 30px 0;">你已經成功安裝了 Clawdbot/Moltbot！</p>
+                <p style="font-size: 20px;">現在可以透過 LINE 跟你的 AI 龍蝦聊天了！</p>
+                <div style="display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap;">
+                    <a href="Part8_常見問題.html" style="font-size: 18px; padding: 20px 35px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);">
+                        ➡️ Part 8：常見問題與指令表
+                    </a>
+                    <a href="Part9_生活學習應用.html" style="font-size: 18px; padding: 20px 35px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);">
+                        📚 Part 9：生活與學習應用
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="nav-arrow prev-arrow" id="prevBtn" onclick="changeSlide(-1)">❮</button>
+    <button class="nav-arrow next-arrow" id="nextBtn" onclick="changeSlide(1)">❯</button>
+    <div class="indicators" id="indicatorContainer"></div>
+
+    <script>
+        let currentSlide = 0; const slides = document.querySelectorAll('.slide'); const totalSlides = slides.length;
+        function init() { createIndicators(); showSlide(0); document.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') changeSlide(-1); if (e.key === 'ArrowRight') changeSlide(1); }); }
+        function createIndicators() { const c = document.getElementById('indicatorContainer'); slides.forEach((_, i) => { const d = document.createElement('div'); d.className = 'dot'; d.onclick = () => goToSlide(i); c.appendChild(d); }); }
+        function showSlide(i) { if (i < 0) i = 0; if (i >= totalSlides) i = totalSlides - 1; slides.forEach(s => s.classList.remove('active')); slides[i].classList.add('active'); currentSlide = i; document.querySelectorAll('.dot').forEach((d, j) => d.classList.toggle('active', j === i)); document.getElementById('prevBtn').disabled = i === 0; document.getElementById('nextBtn').disabled = i === totalSlides - 1; }
+        function changeSlide(d) { showSlide(currentSlide + d); }
+        function goToSlide(i) { showSlide(i); }
+        function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+        init();
+    </script>
+</body>
+</html>

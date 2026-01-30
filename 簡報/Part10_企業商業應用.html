@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 10 - 企業與商業應用</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow: hidden; color: #333; }
+        .nav-bar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; z-index: 10000; }
+        .nav-title { font-size: 22px; font-weight: 700; color: #fff; }
+        .nav-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+        .nav-btn { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.4); }
+        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.25); color: white; width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); font-size: 24px; cursor: pointer; z-index: 9000; display: flex; align-items: center; justify-content: center; }
+        .prev-arrow { left: 30px; } .next-arrow { right: 30px; }
+        .nav-arrow:disabled { opacity: 0.3; }
+        .slide { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); display: none; align-items: center; justify-content: center; padding: 40px; }
+        .slide.active { display: flex; }
+        .content-card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); padding: 40px; max-width: 1200px; width: 95%; max-height: 88vh; overflow-y: auto; }
+        h1 { color: #667eea; font-size: 48px; margin-bottom: 24px; text-align: center; }
+        h2 { color: #764ba2; font-size: 32px; margin-bottom: 20px; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+        h3 { color: #667eea; font-size: 22px; margin: 15px 0 10px 0; }
+        p { font-size: 18px; line-height: 1.7; color: #444; margin-bottom: 10px; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 12px; margin: 10px 0; font-size: 14px; white-space: pre-wrap; overflow-x: auto; }
+        .box { padding: 15px; border-radius: 12px; margin: 15px 0; border-left: 6px solid; font-size: 16px; }
+        .info { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
+        .success { background: #d4edda; border-color: #28a745; color: #155724; }
+        .warning { background: #fff3cd; border-color: #ffc107; color: #856404; }
+        .highlight { background: linear-gradient(120deg, #667eea 0%, #764ba2 100%); padding: 4px 12px; border-radius: 6px; font-weight: bold; color: white; }
+        .example-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
+        .example-card { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); padding: 20px; border-radius: 15px; border: 2px solid rgba(102, 126, 234, 0.3); }
+        .indicators { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 4000; padding: 10px 25px; background: rgba(0,0,0,0.3); border-radius: 30px; }
+        .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; }
+        .dot.active { background: #fff; transform: scale(1.3); }
+        .footer-section { background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 20px; margin-top: 30px; text-align: center; }
+        .footer-links { display: flex; justify-content: center; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-title">💼 Part 10 - 企業與商業應用</div>
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-btn">🏠 首頁</a>
+            <a href="Part9_生活學習應用.html" class="nav-btn">⬅️ 上一章</a>
+            <button class="nav-btn" onclick="toggleFullscreen()">🖥️ 全螢幕</button>
+            <a href="https://www.facebook.com/?locale=zh_TW" target="_blank" class="nav-btn">📘 FB</a>
+            <a href="https://www.youtube.com/@Liang-yt02" target="_blank" class="nav-btn">🎥 YT</a>
+            <a href="https://www.facebook.com/groups/2754139931432955?locale=zh_TW" target="_blank" class="nav-btn">👥 3A</a>
+        </div>
+    </div>
+
+    <div class="slide-container">
+        <div class="slide active">
+            <div class="content-card" style="text-align: center;">
+                <span style="font-size: 80px;">💼</span>
+                <h1>Part 10: 企業與商業應用</h1>
+                <h2 style="border: none; font-size: 28px; color: #666;">想當老闆？龍蝦幫你搞定商業大小事！</h2>
+                <div style="margin-top: 30px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+                    <span class="highlight">市場分析</span>
+                    <span class="highlight">商業計畫</span>
+                    <span class="highlight">數據分析</span>
+                    <span class="highlight">客服回覆</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>📊 情境 11：市場分析</h2>
+                <h3>你說：</h3>
+                <pre>幫我分析台灣手搖飲料市場，包括市場規模、主要競爭者、消費者趨勢</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>📊 台灣手搖飲料市場分析報告
+
+【市場規模】
+- 年營業額：約 900 億新台幣
+- 店家數量：超過 25,000 家
+- 年成長率：約 5-8%
+
+【主要競爭者】
+1. 五十嵐 - 市佔率約 12%，主打平價
+2. 清心福全 - 市佔率約 10%，深耕南部
+3. CoCo 都可 - 國際化品牌
+4. 迷客夏 - 鮮奶茶定位
+5. 可不可 - 社群行銷強</pre>
+                <div class="box success">創業前的功課，龍蝦幫你做好初步分析！</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>📝 情境 12：商業計畫書</h2>
+                <h3>你說：</h3>
+                <pre>幫我寫一份簡單的商業計畫書大綱，我想開一家寵物美容店</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>🐾 寵物美容店商業計畫書大綱
+
+一、執行摘要
+- 事業名稱：[毛小孩沙龍]
+- 服務內容：寵物洗澡、美容、造型
+- 預估投資：約 80-150 萬
+
+二、市場分析
+- 台灣寵物數量超過 300 萬隻
+- 寵物美容市場年成長 15%
+
+三、服務項目與定價
+| 服務 | 小型犬 | 中型犬 | 大型犬 |
+| 基礎洗澡 | 500 | 700 | 1000 |
+| 全套美容 | 800 | 1200 | 1800 |</pre>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>📧 情境 13：商業郵件</h2>
+                <h3>你說：</h3>
+                <pre>幫我寫一封英文郵件給國外客戶，告訴他們出貨會延遲一週，要很有禮貌</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>Subject: Shipping Update - Order #12345
+
+Dear Mr. Johnson,
+
+I am writing to inform you about a slight delay with your order.
+
+Due to unexpected high demand, your shipment will be delayed by approximately one week. The new estimated delivery date is February 15, 2026.
+
+We sincerely apologize for any inconvenience. To express our appreciation for your patience, we would like to offer you a 10% discount on your next order.
+
+Best regards,
+[Your Name]</pre>
+                <div class="box success">專業的商業郵件，還附中文翻譯！</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>📈 情境 14：數據分析</h2>
+                <h3>你說：</h3>
+                <pre>我的網站上個月有 5000 個訪客，300 個人註冊，50 個人付費，每人平均消費 800 元。幫我分析這些數據</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>📈 網站數據分析報告
+
+【關鍵指標計算】
+- 訪客數：5,000 人
+- 總營收：50 × 800 = 40,000 元
+
+【轉換率分析】
+1. 訪客→註冊 轉換率：300 ÷ 5000 = 6% ✅ 良好
+2. 註冊→付費 轉換率：50 ÷ 300 = 16.7% ✅ 優秀
+
+【建議行動】
+1. 優化註冊頁面，減少填寫欄位
+2. 加入社群帳號一鍵註冊
+3. 提供首次註冊優惠</pre>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>💬 情境 15：客服回覆</h2>
+                <h3>你說：</h3>
+                <pre>有客人抱怨說商品有瑕疵要退貨，幫我寫一個專業又有誠意的回覆</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>親愛的顧客您好：
+
+非常感謝您的來信，首先對於您收到的商品有瑕疵，我們深感抱歉。
+
+【處理方案】請您選擇以下任一方式：
+
+方案 A：全額退款
+- 退回商品後 3 個工作天內退款
+
+方案 B：換貨
+- 我們將優先為您寄出全新商品
+- 並附上小禮物表達歉意
+
+方案 C：部分退款
+- 若您願意保留商品，我們可退還 30% 金額
+
+再次為此次購物體驗不佳致歉。
+
+[公司名稱] 客服團隊</pre>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>更多企業應用</h2>
+                <div class="example-grid">
+                    <div class="example-card">
+                        <h3>👔 面試準備</h3>
+                        <p>「我要面試行銷企劃工作，幫我準備可能會被問的問題和回答」</p>
+                    </div>
+                    <div class="example-card">
+                        <h3>📜 合約審查</h3>
+                        <p>「幫我看這段合約條款有沒有問題」</p>
+                    </div>
+                    <div class="example-card">
+                        <h3>💰 投資分析</h3>
+                        <p>「我有 10 萬元想投資，風險承受度中等，幫我分析選項」</p>
+                    </div>
+                    <div class="example-card">
+                        <h3>📊 做簡報</h3>
+                        <p>「幫我設計一個 5 頁的公司簡報大綱」</p>
+                    </div>
+                    <div class="example-card">
+                        <h3>🔍 程式碼審查</h3>
+                        <p>「幫我看這段程式碼有沒有問題」</p>
+                    </div>
+                    <div class="example-card">
+                        <h3>📋 會議記錄</h3>
+                        <p>「幫我把這段會議內容整理成重點」</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>💡 跟龍蝦聊天的小技巧</h2>
+                <div class="example-grid">
+                    <div class="example-card">
+                        <h3>1. 說清楚你要什麼</h3>
+                        <p>❌ 不好：「幫我寫作業」</p>
+                        <p>✅ 好：「幫我寫一篇 300 字的讀書心得，書名是《乞丐乾爹》」</p>
+                    </div>
+                    <div class="example-card">
+                        <h3>2. 可以請它改</h3>
+                        <p>「再短一點」「用更簡單的話說」「加一些例子」</p>
+                    </div>
+                    <div class="example-card">
+                        <h3>3. 可以追問</h3>
+                        <p>「為什麼？」「可以再解釋清楚一點嗎？」「還有其他方法嗎？」</p>
+                    </div>
+                    <div class="example-card">
+                        <h3>4. 設定角色</h3>
+                        <p>「假裝你是老師」「用小學生聽得懂的話解釋」</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card" style="text-align: center;">
+                <span style="font-size: 100px;">🎊</span>
+                <h1 style="font-size: 42px;">恭喜完成所有課程！</h1>
+                <p style="font-size: 22px; margin: 30px 0;">你已經學會如何安裝和使用 Clawdbot/Moltbot 龍蝦機器人了！</p>
+
+                <div class="footer-section" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2)); margin-top: 40px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">👨‍🏫 作者資訊</h3>
+                    <p style="font-size: 20px;"><strong>曾慶良（阿亮老師）</strong></p>
+                    <p>AI 教育推廣者 | 3A科技研究社 創辦人</p>
+                    <div class="footer-links">
+                        <a href="https://www.facebook.com/?locale=zh_TW" target="_blank" class="nav-btn">📘 Facebook</a>
+                        <a href="https://www.youtube.com/@Liang-yt02" target="_blank" class="nav-btn">🎥 YouTube</a>
+                        <a href="https://www.facebook.com/groups/2754139931432955?locale=zh_TW" target="_blank" class="nav-btn">👥 3A 社團</a>
+                    </div>
+                </div>
+
+                <div class="box warning" style="margin-top: 30px; text-align: left;">
+                    <strong>📜 授權聲明</strong><br>
+                    © 2026 阿亮老師 版權所有<br>
+                    本專案僅供「阿亮老師課程學員」學習使用。<br>
+                    禁止修改、轉傳、散布或商業使用。
+                </div>
+
+                <a href="index.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);">
+                    🏠 回到課程首頁
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <button class="nav-arrow prev-arrow" id="prevBtn" onclick="changeSlide(-1)">❮</button>
+    <button class="nav-arrow next-arrow" id="nextBtn" onclick="changeSlide(1)">❯</button>
+    <div class="indicators" id="indicatorContainer"></div>
+
+    <script>
+        let currentSlide = 0; const slides = document.querySelectorAll('.slide'); const totalSlides = slides.length;
+        function init() { createIndicators(); showSlide(0); document.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') changeSlide(-1); if (e.key === 'ArrowRight') changeSlide(1); }); }
+        function createIndicators() { const c = document.getElementById('indicatorContainer'); slides.forEach((_, i) => { const d = document.createElement('div'); d.className = 'dot'; d.onclick = () => goToSlide(i); c.appendChild(d); }); }
+        function showSlide(i) { if (i < 0) i = 0; if (i >= totalSlides) i = totalSlides - 1; slides.forEach(s => s.classList.remove('active')); slides[i].classList.add('active'); currentSlide = i; document.querySelectorAll('.dot').forEach((d, j) => d.classList.toggle('active', j === i)); document.getElementById('prevBtn').disabled = i === 0; document.getElementById('nextBtn').disabled = i === totalSlides - 1; }
+        function changeSlide(d) { showSlide(currentSlide + d); }
+        function goToSlide(i) { showSlide(i); }
+        function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 9 - 生活與學習應用</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow: hidden; color: #333; }
+        .nav-bar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; z-index: 10000; }
+        .nav-title { font-size: 22px; font-weight: 700; color: #fff; }
+        .nav-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+        .nav-btn { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.4); }
+        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.25); color: white; width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); font-size: 24px; cursor: pointer; z-index: 9000; display: flex; align-items: center; justify-content: center; }
+        .prev-arrow { left: 30px; } .next-arrow { right: 30px; }
+        .nav-arrow:disabled { opacity: 0.3; }
+        .slide { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); display: none; align-items: center; justify-content: center; padding: 40px; }
+        .slide.active { display: flex; }
+        .content-card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); padding: 40px; max-width: 1200px; width: 95%; max-height: 88vh; overflow-y: auto; }
+        h1 { color: #667eea; font-size: 48px; margin-bottom: 24px; text-align: center; }
+        h2 { color: #764ba2; font-size: 32px; margin-bottom: 20px; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+        h3 { color: #667eea; font-size: 22px; margin: 15px 0 10px 0; }
+        p { font-size: 18px; line-height: 1.7; color: #444; margin-bottom: 10px; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 12px; margin: 10px 0; font-size: 15px; white-space: pre-wrap; }
+        .box { padding: 15px; border-radius: 12px; margin: 15px 0; border-left: 6px solid; font-size: 16px; }
+        .info { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
+        .success { background: #d4edda; border-color: #28a745; color: #155724; }
+        .highlight { background: linear-gradient(120deg, #667eea 0%, #764ba2 100%); padding: 4px 12px; border-radius: 6px; font-weight: bold; color: white; }
+        .example-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-top: 20px; }
+        .example-card { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); padding: 20px; border-radius: 15px; border: 2px solid rgba(102, 126, 234, 0.3); }
+        .indicators { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 4000; padding: 10px 25px; background: rgba(0,0,0,0.3); border-radius: 30px; }
+        .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; }
+        .dot.active { background: #fff; transform: scale(1.3); }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-title">📚 Part 9 - 生活與學習應用</div>
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-btn">🏠 首頁</a>
+            <a href="Part8_常見問題.html" class="nav-btn">⬅️ 上一章</a>
+            <a href="Part10_企業商業應用.html" class="nav-btn">下一章 ➡️</a>
+            <button class="nav-btn" onclick="toggleFullscreen()">🖥️ 全螢幕</button>
+            <a href="https://www.facebook.com/?locale=zh_TW" target="_blank" class="nav-btn">📘 FB</a>
+            <a href="https://www.youtube.com/@Liang-yt02" target="_blank" class="nav-btn">🎥 YT</a>
+            <a href="https://www.facebook.com/groups/2754139931432955?locale=zh_TW" target="_blank" class="nav-btn">👥 3A</a>
+        </div>
+    </div>
+
+    <div class="slide-container">
+        <div class="slide active">
+            <div class="content-card" style="text-align: center;">
+                <span style="font-size: 80px;">📚</span>
+                <h1>Part 9: 生活與學習應用</h1>
+                <h2 style="border: none; font-size: 28px; color: #666;">龍蝦可以幫你做什麼？</h2>
+                <div style="margin-top: 30px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+                    <span class="highlight">查資料</span>
+                    <span class="highlight">寫文章</span>
+                    <span class="highlight">翻譯</span>
+                    <span class="highlight">解數學</span>
+                    <span class="highlight">想點子</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>🔍 情境 1：幫你查資料</h2>
+                <h3>你說：</h3>
+                <pre>幫我查一下今天的科技新聞，整理成 5 個重點</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>好的，以下是今天的 5 則科技新聞重點：
+1. 蘋果發表新款 iPhone 17，搭載 A20 晶片
+2. Google 推出新版 Gemini 3.0，支援更長對話
+3. 台積電宣布 1 奈米製程研發進度
+4. Meta 發表新款 VR 頭盔，重量減輕 30%
+5. 微軟 Copilot 新增程式碼自動修復功能</pre>
+                <div class="box success">不用自己一個一個網站看，龍蝦幫你整理好！</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>✍️ 情境 2：幫你寫文章</h2>
+                <h3>你說：</h3>
+                <pre>幫我寫一篇 200 字的自我介紹，我是一個國小老師，喜歡用科技教學</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>大家好，我是一位熱愛教育的國小老師。
+
+在課堂上，我喜歡運用各種科技工具，讓學習變得更有趣。
+無論是互動式白板、教育 App，還是線上遊戲化學習平台，
+我都樂於嘗試，希望能激發學生的學習熱情。
+
+我相信科技可以讓教育更生動、更有效率。
+看到學生眼中閃爍的光芒，就是我最大的成就感。</pre>
+                <div class="box success">幾秒鐘就寫好一篇文章，還可以請它修改！</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>🌐 情境 3：幫你翻譯</h2>
+                <h3>你說：</h3>
+                <pre>把這段翻成英文：今天天氣很好，我們去公園玩吧！</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>The weather is great today. Let's go to the park!</pre>
+                <h3>你還可以說：</h3>
+                <pre>再幫我翻成日文</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>今日はいい天気ですね。公園に遊びに行きましょう！</pre>
+                <div class="box success">隨時隨地翻譯，支援各種語言！</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>🔢 情境 4：幫你解數學題</h2>
+                <h3>你說：</h3>
+                <pre>一個長方形的長是 12 公分，寬是 8 公分，請問面積和周長是多少？</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>讓我來幫你算！
+
+長方形的面積 = 長 × 寬 = 12 × 8 = 96 平方公分
+
+長方形的周長 = (長 + 寬) × 2 = (12 + 8) × 2 = 40 公分
+
+答案：
+- 面積：96 平方公分
+- 周長：40 公分</pre>
+                <div class="box success">不只給答案，還會教你怎麼算！</div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>💡 情境 5：幫你想點子</h2>
+                <h3>你說：</h3>
+                <pre>我要辦班級慶生會，給我 5 個有趣的活動點子</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>好的！以下是 5 個有趣的班級慶生會活動：
+
+1. 🎂 DIY 蛋糕裝飾
+   準備小蛋糕和各種裝飾材料，讓大家發揮創意
+
+2. 🎮 分組競賽遊戲
+   例如猜謎、比手畫腳、記憶大考驗
+
+3. 🎁 交換禮物
+   設定金額上限，用抽籤的方式交換
+
+4. 📸 拍照打卡區
+   準備有趣的道具，讓大家拍照留念
+
+5. 🎤 才藝表演時間
+   讓壽星和同學上台表演</pre>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>🗺️ 情境 6：幫你規劃行程</h2>
+                <h3>你說：</h3>
+                <pre>我週末要去台中玩一天，幫我規劃行程，要有吃的和玩的</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>台中一日遊行程規劃：
+
+🌅 早上
+09:00 - 出發前往台中
+10:30 - 抵達「審計新村」逛文創市集
+12:00 - 午餐：「宮原眼科」吃冰淇淋 + 周邊小吃
+
+🌞 下午
+14:00 - 「國家歌劇院」參觀拍照
+15:30 - 「勤美誠品綠園道」散步逛街
+17:00 - 「逢甲夜市」提早去吃晚餐
+
+🌙 晚上
+19:00 - 「高美濕地」看夕陽
+20:30 - 回程</pre>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>更多應用範例</h2>
+                <div class="example-grid">
+                    <div class="example-card">
+                        <h3>📝 檢查文章</h3>
+                        <p>「幫我檢查這段文字有沒有錯字」</p>
+                    </div>
+                    <div class="example-card">
+                        <h3>🤔 解釋概念</h3>
+                        <p>「什麼是人工智慧？用小學生聽得懂的方式解釋」</p>
+                    </div>
+                    <div class="example-card">
+                        <h3>🗣️ 練習英文</h3>
+                        <p>「我想練習英文，假裝你是餐廳服務生」</p>
+                    </div>
+                    <div class="example-card">
+                        <h3>💻 寫程式</h3>
+                        <p>「寫一個 Python 程式，計算 1 加到 100」</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card" style="text-align: center;">
+                <span style="font-size: 80px;">💼</span>
+                <h2 style="border: none;">想看更多進階應用？</h2>
+                <p style="font-size: 20px;">接下來看看企業與商業的應用範例！</p>
+                <a href="Part10_企業商業應用.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);">
+                    ➡️ Part 10：企業與商業應用
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <button class="nav-arrow prev-arrow" id="prevBtn" onclick="changeSlide(-1)">❮</button>
+    <button class="nav-arrow next-arrow" id="nextBtn" onclick="changeSlide(1)">❯</button>
+    <div class="indicators" id="indicatorContainer"></div>
+
+    <script>
+        let currentSlide = 0; const slides = document.querySelectorAll('.slide'); const totalSlides = slides.length;
+        function init() { createIndicators(); showSlide(0); document.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') changeSlide(-1); if (e.key === 'ArrowRight') changeSlide(1); }); }
+        function createIndicators() { const c = document.getElementById('indicatorContainer'); slides.forEach((_, i) => { const d = document.createElement('div'); d.className = 'dot'; d.onclick = () => goToSlide(i); c.appendChild(d); }); }
+        function showSlide(i) { if (i < 0) i = 0; if (i >= totalSlides) i = totalSlides - 1; slides.forEach(s => s.classList.remove('active')); slides[i].classList.add('active'); currentSlide = i; document.querySelectorAll('.dot').forEach((d, j) => d.classList.toggle('active', j === i)); document.getElementById('prevBtn').disabled = i === 0; document.getElementById('nextBtn').disabled = i === totalSlides - 1; }
+        function changeSlide(d) { showSlide(currentSlide + d); }
+        function goToSlide(i) { showSlide(i); }
+        function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 2 - 安裝基礎環境</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow: hidden; color: #333; }
+        .nav-bar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; z-index: 10000; }
+        .nav-title { font-size: 22px; font-weight: 700; color: #fff; }
+        .nav-buttons { display: flex; gap: 12px; }
+        .nav-btn { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.4); transform: translateY(-2px); }
+        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.25); color: white; width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); font-size: 24px; cursor: pointer; z-index: 9000; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+        .nav-arrow:hover { background: rgba(255,255,255,0.5); transform: translateY(-50%) scale(1.1); }
+        .prev-arrow { left: 30px; }
+        .next-arrow { right: 30px; }
+        .nav-arrow:disabled { opacity: 0.3; cursor: not-allowed; }
+        .slide-container { width: 100%; height: 100vh; padding-top: 60px; position: relative; }
+        .slide { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); display: none; align-items: center; justify-content: center; padding: 40px; opacity: 0; transition: opacity 0.4s ease; }
+        .slide.active { display: flex; opacity: 1; }
+        .content-card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); padding: 50px; max-width: 1200px; width: 95%; max-height: 88vh; overflow-y: auto; }
+        h1 { color: #667eea; font-size: 48px; margin-bottom: 24px; text-align: center; }
+        h2 { color: #764ba2; font-size: 36px; margin-bottom: 30px; border-bottom: 3px solid #667eea; padding-bottom: 12px; }
+        h3 { color: #667eea; font-size: 24px; margin: 25px 0 15px 0; }
+        p, li { font-size: 20px; line-height: 1.8; color: #444; margin-bottom: 12px; }
+        ul, ol { margin-left: 30px; margin-bottom: 20px; }
+        code { background: #f0f2f5; padding: 3px 8px; border-radius: 6px; font-family: 'Consolas', monospace; color: #d63384; font-weight: 600; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 12px; overflow-x: auto; margin: 20px 0; font-size: 18px; line-height: 1.6; font-family: 'Consolas', monospace; }
+        .box { padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 6px solid; font-size: 18px; }
+        .info { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
+        .success { background: #d4edda; border-color: #28a745; color: #155724; }
+        .warning { background: #fff3cd; border-color: #ffc107; color: #856404; }
+        .highlight { background: linear-gradient(120deg, #667eea 0%, #764ba2 100%); padding: 4px 12px; border-radius: 6px; font-weight: bold; color: white; }
+        .step-box { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); padding: 25px; border-radius: 15px; margin: 20px 0; border: 2px solid rgba(102, 126, 234, 0.3); }
+        .step-number { display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: white; width: 40px; height: 40px; border-radius: 50%; text-align: center; line-height: 40px; font-weight: bold; margin-right: 15px; }
+        .indicators { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 4000; padding: 10px 25px; background: rgba(0,0,0,0.3); border-radius: 30px; }
+        .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; }
+        .dot.active { background: #fff; transform: scale(1.3); }
+        @media (max-width: 768px) { .content-card { padding: 25px; } h1 { font-size: 32px; } h2 { font-size: 26px; } p, li { font-size: 16px; } pre { font-size: 14px; } }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-title">⚙️ Part 2 - 安裝基礎環境</div>
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-btn">🏠 首頁</a>
+            <a href="Part1_認識龍蝦與準備工作.html" class="nav-btn">⬅️ 上一章</a>
+            <a href="Part3_安裝Clawdbot/Moltbot.html" class="nav-btn">下一章 ➡️</a>
+            <button class="nav-btn" onclick="toggleFullscreen()">🖥️ 全螢幕</button>
+            <a href="https://www.facebook.com/?locale=zh_TW" target="_blank" class="nav-btn">📘 FB</a>
+            <a href="https://www.youtube.com/@Liang-yt02" target="_blank" class="nav-btn">🎥 YT</a>
+            <a href="https://www.facebook.com/groups/2754139931432955?locale=zh_TW" target="_blank" class="nav-btn">👥 3A</a>
+        </div>
+    </div>
+
+    <div class="slide-container">
+        <!-- Slide 1: 封面 -->
+        <div class="slide active">
+            <div class="content-card" style="text-align: center;">
+                <span style="font-size: 80px;">⚙️</span>
+                <h1>Part 2: 安裝基礎環境</h1>
+                <h2 style="border: none; font-size: 28px; color: #666;">安裝 nvm 和 Node.js</h2>
+                <div style="margin-top: 40px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                    <span class="highlight">nvm-windows</span>
+                    <span class="highlight">Node.js 24</span>
+                    <span class="highlight">PowerShell</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: 什麼是 nvm -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>🤔 什麼是 nvm？</h2>
+                <p><strong>nvm</strong> = Node Version Manager（Node 版本管理器）</p>
+                <p>它可以幫你管理電腦上的 Node.js 版本。</p>
+                <div class="box info">
+                    <strong>為什麼需要它？</strong><br>
+                    不同的程式可能需要不同版本的 Node.js。<br>
+                    有了 nvm，你可以輕鬆切換不同版本！
+                </div>
+                <div class="box success">
+                    <strong>簡單說：</strong> nvm 就像一個「版本切換器」，讓你想用哪個版本就用哪個版本！
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: 下載 nvm -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📥 第一步：下載 nvm</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>打開瀏覽器</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>進入這個網址：</p>
+                    <pre>https://github.com/coreybutler/nvm-windows/releases</pre>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>往下滑，找到 <strong>Assets</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">4</span>點 <code>nvm-setup.exe</code> 下載</p>
+                </div>
+                <div class="box warning">
+                    <strong>注意：</strong> 要下載的是 <code>nvm-setup.exe</code>，不是其他檔案喔！
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: 安裝 nvm -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>🔧 第二步：安裝 nvm</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>打開剛剛下載的 <code>nvm-setup.exe</code></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>一直按 <strong>Next</strong>（下一步）</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>按 <strong>Install</strong>（安裝）</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">4</span>等它跑完，按 <strong>Finish</strong>（完成）</p>
+                </div>
+                <div class="box success">
+                    <strong>✅ 安裝很簡單，基本上就是一直按「下一步」！</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: 確認 nvm 安裝 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>✅ 第三步：確認 nvm 安裝成功</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>按下鍵盤的 <code>Windows 鍵 + R</code></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>輸入 <code>powershell</code>，按 Enter</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>在 PowerShell 視窗輸入：</p>
+                    <pre>nvm version</pre>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">4</span>如果看到版本號（例如 <code>1.2.2</code>），就代表成功了！</p>
+                </div>
+                <div class="box info">
+                    <strong>💡 小提示：</strong> 如果顯示「找不到指令」，試試看關掉 PowerShell 重新開一個。
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: 開啟管理員 PowerShell -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>🔑 第四步：開啟管理員 PowerShell</h2>
+                <p>接下來要安裝 Node.js，需要用<strong>系統管理員</strong>身分。</p>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>點 <strong>開始</strong>（左下角的 Windows 圖示）</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>搜尋 <code>PowerShell</code></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>在 <strong>Windows PowerShell</strong> 上面 <strong>按右鍵</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">4</span>選 <strong>以系統管理員身分執行</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">5</span>如果跳出詢問視窗，按 <strong>是</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: 安裝 Node.js -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📦 第五步：安裝 Node.js 24 版</h2>
+                <p>在 PowerShell 視窗輸入這行，然後按 Enter：</p>
+                <pre>nvm install 24</pre>
+                <p>等它下載完成，會顯示 <code>Installation complete</code>。</p>
+                <div class="box info">
+                    <strong>這會需要一點時間，</strong>大約 1-3 分鐘，耐心等待！
+                </div>
+                <h3>接著切換到 Node.js 24 版</h3>
+                <p>輸入這行，按 Enter：</p>
+                <pre>nvm use 24</pre>
+                <p>會顯示 <code>Now using node v24.x.x</code>。</p>
+            </div>
+        </div>
+
+        <!-- Slide 8: 確認 Node.js 安裝 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>✅ 第六步：確認 Node.js 安裝成功</h2>
+                <p>輸入這兩行（一行一行輸入，每輸入一行按一次 Enter）：</p>
+                <pre>node -v
+npm -v</pre>
+                <p>你應該看到類似這樣：</p>
+                <pre>v24.13.0
+11.6.4</pre>
+                <div class="box success">
+                    <strong>🎉 看到版本號就代表成功了！</strong><br>
+                    Node.js 和 npm 都安裝好了！
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: 完成 -->
+        <div class="slide">
+            <div class="content-card" style="text-align: center;">
+                <span style="font-size: 80px;">🎉</span>
+                <h2 style="border: none;">Part 2 完成！</h2>
+                <p style="font-size: 24px;">你已經成功安裝了：</p>
+                <div style="display: flex; justify-content: center; gap: 30px; margin: 30px 0; flex-wrap: wrap;">
+                    <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ nvm</span>
+                    <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ Node.js 24</span>
+                    <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ npm</span>
+                </div>
+                <p style="font-size: 20px;">接下來前往下一章安裝 Clawdbot/Moltbot！</p>
+                <a href="Part3_安裝Clawdbot/Moltbot.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);">
+                    ➡️ Part 3：安裝 Clawdbot/Moltbot
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <button class="nav-arrow prev-arrow" id="prevBtn" onclick="changeSlide(-1)">❮</button>
+    <button class="nav-arrow next-arrow" id="nextBtn" onclick="changeSlide(1)">❯</button>
+    <div class="indicators" id="indicatorContainer"></div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        function init() { createIndicators(); showSlide(0); document.addEventListener('keydown', handleKeydown); }
+        function handleKeydown(e) { if (e.key === 'ArrowLeft') changeSlide(-1); if (e.key === 'ArrowRight') changeSlide(1); }
+        function createIndicators() { const container = document.getElementById('indicatorContainer'); slides.forEach((_, index) => { const dot = document.createElement('div'); dot.className = 'dot'; dot.onclick = () => goToSlide(index); container.appendChild(dot); }); }
+        function showSlide(index) { if (index < 0) index = 0; if (index >= totalSlides) index = totalSlides - 1; slides.forEach(slide => slide.classList.remove('active')); slides[index].classList.add('active'); currentSlide = index; document.querySelectorAll('.dot').forEach((dot, idx) => { dot.classList.toggle('active', idx === index); }); document.getElementById('prevBtn').disabled = currentSlide === 0; document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1; }
+        function changeSlide(direction) { showSlide(currentSlide + direction); }
+        function goToSlide(index) { showSlide(index); }
+        function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else if (document.exitFullscreen) document.exitFullscreen(); }
+        init();
+    </script>
+</body>
+</html>

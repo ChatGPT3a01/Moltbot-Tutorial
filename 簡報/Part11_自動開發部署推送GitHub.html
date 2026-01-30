@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 11 - 自動開發 + 部署 + 推送 GitHub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            color: #333;
+        }
+
+        .nav-bar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            z-index: 10000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .nav-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .nav-buttons { display: flex; gap: 12px; }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.25);
+            color: white;
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.4);
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 9000;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-arrow:hover {
+            background: rgba(255,255,255,0.5);
+            transform: translateY(-50%) scale(1.1);
+        }
+        .prev-arrow { left: 30px; }
+        .next-arrow { right: 30px; }
+        .nav-arrow:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .slide-container {
+            width: 100%;
+            height: 100vh;
+            padding-top: 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .slide {
+            position: absolute;
+            top: 60px; left: 0;
+            width: 100%;
+            height: calc(100vh - 60px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 10;
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+            z-index: 20;
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            padding: 60px;
+            max-width: 1400px;
+            width: 95%;
+            max-height: 88vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        h1 { color: #11998e; font-size: 56px; margin-bottom: 24px; text-align: center; }
+        h2 { color: #0f8a7e; font-size: 38px; margin-bottom: 35px; border-bottom: 3px solid #11998e; padding-bottom: 12px; }
+        h3 { color: #11998e; font-size: 26px; margin: 30px 0 15px 0; }
+        p, li { font-size: 20px; line-height: 1.8; color: #444; margin-bottom: 15px; }
+        code { background: #e8f5e9; padding: 3px 8px; border-radius: 6px; font-family: 'Consolas', monospace; color: #2e7d32; font-weight: 600; font-size: 0.95em; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 25px; border-radius: 12px; overflow-x: auto; margin: 25px 0; font-size: 18px; line-height: 1.6; font-family: 'Consolas', monospace; }
+        .box { padding: 25px; border-radius: 12px; margin: 25px 0; border-left: 6px solid; font-size: 20px; }
+        .info { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
+        .warning { background: #fff3cd; border-color: #ffc107; color: #856404; }
+        .success { background: #d4edda; border-color: #28a745; color: #155724; }
+        .highlight { background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%); padding: 2px 6px; border-radius: 4px; font-weight: bold; color: #004d40; }
+
+        .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-top: 30px; }
+        .concept-card { background: #f8f9fa; padding: 25px; border-radius: 15px; border: 1px solid #e9ecef; transition: transform 0.3s; }
+        .concept-card:hover { transform: translateY(-8px); border-color: #11998e; }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 20px;
+            margin-right: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 18px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: left;
+        }
+        th {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .indicators { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 4000; padding: 10px 25px; background: rgba(0,0,0,0.3); border-radius: 30px; backdrop-filter: blur(5px); }
+        .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; transition: all 0.3s; }
+        .dot.active { background: #38ef7d; transform: scale(1.3); }
+
+        .emoji-large { font-size: 80px; margin-bottom: 20px; display: block; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="nav-bar">
+        <div class="nav-title">Part 11 - 自動開發 + 部署 + 推送 GitHub</div>
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-btn">&#127968; 首頁</a>
+            <button class="nav-btn" onclick="toggleFullscreen()">&#128421; 全螢幕</button>
+        </div>
+    </div>
+
+    <div class="slide-container">
+
+        <!-- Slide 1: 封面 -->
+        <div class="slide active">
+            <div class="content-card" style="text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <span class="emoji-large">&#128640;</span>
+                <h4 style="color: #38ef7d; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;">Advanced Deployment</h4>
+                <h1>自動開發 + 部署 + 推送 GitHub</h1>
+                <h2 style="border: none; font-weight: normal; font-size: 28px; color: #666; max-width: 800px;">
+                    讓 Claude Code 幫你自動完成開發、版本控制與部署
+                </h2>
+                <div style="margin-top: 40px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                    <span class="highlight">Git</span>
+                    <span class="highlight">GitHub CLI</span>
+                    <span class="highlight">Plan Mode</span>
+                    <span class="highlight">GitHub Actions</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: 學習目標 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>&#127919; 本單元學習地圖</h2>
+                <p>這是一個進階的部署方式，讓你的開發流程更自動化、更專業！</p>
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <h3>&#129302; 自動開發</h3>
+                        <p>使用 Claude Code 的 Plan 模式，讓 AI 幫你規劃並執行開發任務</p>
+                    </div>
+                    <div class="concept-card">
+                        <h3>&#128230; 版本控制</h3>
+                        <p>使用 Git 追蹤程式碼變更，<code>/commit</code> 快速提交</p>
+                    </div>
+                    <div class="concept-card">
+                        <h3>&#128640; 推送 GitHub</h3>
+                        <p>使用 GitHub CLI 建立儲存庫、推送代碼、建立 PR</p>
+                    </div>
+                    <div class="concept-card">
+                        <h3>&#9881;&#65039; 自動部署</h3>
+                        <p>設定 GitHub Actions，每次推送自動執行測試與部署</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: 事前準備 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>&#128221; 事前準備</h2>
+                <p>在開始之前，請確認你有以下項目：</p>
+                <table>
+                    <tr>
+                        <th>項目</th>
+                        <th>說明</th>
+                        <th>狀態</th>
+                    </tr>
+                    <tr>
+                        <td><strong>GitHub 帳號</strong></td>
+                        <td>用來存放程式碼的雲端平台</td>
+                        <td>&#9744; 待確認</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Git 已安裝</strong></td>
+                        <td>版本控制工具</td>
+                        <td>&#9744; 待安裝</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Claude Code 已安裝</strong></td>
+                        <td>就是你剛裝好的龍蝦！</td>
+                        <td>&#9745; 已完成</td>
+                    </tr>
+                </table>
+                <div class="box info">
+                    <strong>&#128161; 小提示：</strong>如果你還沒有 GitHub 帳號，請先到 <code>github.com</code> 免費註冊一個！
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: 安裝 Git -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>&#128187; 安裝 Git</h2>
+                <p>Git 是程式設計師必備的版本控制工具。</p>
+
+                <h3><span class="step-number">1</span>開啟 PowerShell，輸入安裝指令</h3>
+                <pre>winget install Git.Git</pre>
+
+                <h3><span class="step-number">2</span>安裝完成後，關掉 PowerShell 再重新開一個</h3>
+                <p>這是為了讓系統載入新的環境變數。</p>
+
+                <h3><span class="step-number">3</span>確認安裝成功</h3>
+                <pre>git --version</pre>
+
+                <div class="box success">
+                    看到類似 <code>git version 2.47.1.windows.1</code> 就代表成功了！
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: 設定 Git 基本資訊 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>&#128100; 設定 Git 基本資訊</h2>
+                <p>讓 Git 知道你是誰，這些資訊會出現在你的提交記錄中。</p>
+
+                <h3>設定你的名字</h3>
+                <pre>git config --global user.name "你的名字"</pre>
+
+                <h3>設定你的 Email</h3>
+                <pre>git config --global user.email "你的email@example.com"</pre>
+
+                <div class="box warning">
+                    <strong>&#9888;&#65039; 注意：</strong>請把「你的名字」和「你的email@example.com」換成你自己的資訊！
+                </div>
+
+                <h3>確認設定</h3>
+                <pre>git config --list</pre>
+            </div>
+        </div>
+
+        <!-- Slide 6: 安裝 GitHub CLI -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>&#128225; 安裝 GitHub CLI</h2>
+                <p>GitHub CLI 讓你可以用指令操作 GitHub，不用開瀏覽器！</p>
+
+                <h3><span class="step-number">1</span>安裝 GitHub CLI</h3>
+                <pre>winget install GitHub.cli</pre>
+
+                <h3><span class="step-number">2</span>關掉 PowerShell 再重新開一個</h3>
+
+                <h3><span class="step-number">3</span>確認安裝成功</h3>
+                <pre>gh --version</pre>
+
+                <div class="box success">
+                    看到類似 <code>gh version 2.65.0</code> 就代表成功了！
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: 登入 GitHub -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>&#128274; 登入 GitHub</h2>
+                <p>讓 GitHub CLI 連結到你的 GitHub 帳號。</p>
+
+                <h3>執行登入指令</h3>
+                <pre>gh auth login</pre>
+
+                <h3>依序回答問題：</h3>
+                <table>
+                    <tr>
+                        <th>問題</th>
+                        <th>選擇</th>
+                    </tr>
+                    <tr>
+                        <td>What account do you want to log into?</td>
+                        <td><code>GitHub.com</code></td>
+                    </tr>
+                    <tr>
+                        <td>What is your preferred protocol?</td>
+                        <td><code>HTTPS</code></td>
+                    </tr>
+                    <tr>
+                        <td>Authenticate Git with your GitHub credentials?</td>
+                        <td><code>Yes</code></td>
+                    </tr>
+                    <tr>
+                        <td>How would you like to authenticate?</td>
+                        <td><code>Login with a web browser</code></td>
+                    </tr>
+                </table>
+
+                <div class="box info">
+                    瀏覽器會自動打開，登入你的 GitHub 帳號，輸入畫面上的驗證碼即可！
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Claude Code 自動開發 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>&#129302; 使用 Claude Code 自動開發</h2>
+                <p>現在可以讓 Claude Code 幫你自動開發並推送到 GitHub！</p>
+
+                <h3>方法一：從頭建立新項目</h3>
+                <p>進入 Claude Code 互動模式，然後說：</p>
+                <pre>幫我建立一個 Node.js 的 Hello World 專案，
+初始化 Git，
+建立 GitHub 儲存庫，
+然後推送上去</pre>
+
+                <h3>方法二：推送現有項目</h3>
+                <pre>把 D:\MyProject 這個專案推送到 GitHub，
+幫我建立儲存庫，名稱叫 my-awesome-project</pre>
+
+                <div class="box success">
+                    Claude 會自動完成：建立檔案 &#8594; git init &#8594; gh repo create &#8594; git push
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Plan 模式 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>&#128203; 使用 Plan 模式（推薦）</h2>
+                <p>Plan 模式讓你先看 Claude 的計畫，確認後再執行，更安全！</p>
+
+                <h3>進入 Plan 模式的方法</h3>
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <h3>方法一：快捷鍵</h3>
+                        <p>在 Claude Code 中連按兩次<br><code>Shift + Tab</code></p>
+                    </div>
+                    <div class="concept-card">
+                        <h3>方法二：直接說</h3>
+                        <p>「進入 plan 模式，幫我規劃...」</p>
+                    </div>
+                </div>
+
+                <h3>Plan 模式的優點</h3>
+                <ul>
+                    <li>&#10004; 先看計畫，確認沒問題再執行</li>
+                    <li>&#10004; 避免 Claude 做錯事情</li>
+                    <li>&#10004; 適合比較複雜的任務</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 10: 快速提交與 PR -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>&#9889; 快速提交與建立 PR</h2>
+                <p>Claude Code 有內建的快速指令，讓版本控制超簡單！</p>
+
+                <table>
+                    <tr>
+                        <th>你想做的事</th>
+                        <th>Claude Code 指令</th>
+                        <th>說明</th>
+                    </tr>
+                    <tr>
+                        <td>提交代碼</td>
+                        <td><code>/commit</code></td>
+                        <td>自動產生提交訊息並 commit</td>
+                    </tr>
+                    <tr>
+                        <td>提交並推送</td>
+                        <td><code>/commit</code> 然後說「push」</td>
+                        <td>commit + push 到 GitHub</td>
+                    </tr>
+                    <tr>
+                        <td>建立 Pull Request</td>
+                        <td><code>/pr</code></td>
+                        <td>自動建立 PR</td>
+                    </tr>
+                </table>
+
+                <div class="box info">
+                    <strong>&#128161; 小技巧：</strong>你也可以說「幫我建立一個 PR，標題是『新增登入功能』」
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: GitHub Actions -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>&#9881;&#65039; 安裝 GitHub Actions（自動部署）</h2>
+                <p>讓每次推送代碼時自動執行測試和部署！</p>
+
+                <h3>方法一：使用內建指令</h3>
+                <pre>/install-github-action</pre>
+
+                <h3>方法二：直接跟 Claude 說</h3>
+                <pre>幫我設定 GitHub Actions，
+每次 push 時自動執行測試</pre>
+
+                <div class="box success">
+                    Claude 會幫你建立 <code>.github/workflows/</code> 資料夾和設定檔！
+                </div>
+
+                <h3>GitHub Actions 可以做什麼？</h3>
+                <ul>
+                    <li>&#128269; 自動執行測試</li>
+                    <li>&#128230; 自動建置專案</li>
+                    <li>&#128640; 自動部署到伺服器</li>
+                    <li>&#128172; 自動發送通知</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 12: 完整流程範例 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>&#127919; 完整流程範例</h2>
+                <p>以下是一個完整的自動開發 + 部署流程：</p>
+
+                <h3><span class="step-number">1</span>啟動 Claude Code</h3>
+                <pre>clawdbot</pre>
+
+                <h3><span class="step-number">2</span>進入 Plan 模式</h3>
+                <p>連按兩次 <code>Shift + Tab</code></p>
+
+                <h3><span class="step-number">3</span>描述你要做的事</h3>
+                <pre>幫我建立一個簡單的網站專案：
+1. 使用 HTML + CSS + JavaScript
+2. 有一個首頁顯示「Hello World」
+3. 初始化 Git
+4. 建立 GitHub 儲存庫（公開）
+5. 設定 GitHub Pages 自動部署
+6. 推送代碼</pre>
+
+                <h3><span class="step-number">4</span>確認計畫後輸入「執行」</h3>
+
+                <h3><span class="step-number">5</span>完成！</h3>
+                <p>Claude 會給你 GitHub 儲存庫網址和網站網址！</p>
+            </div>
+        </div>
+
+        <!-- Slide 13: Git 指令對照表 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>&#128218; 常用 Git 指令對照表</h2>
+                <table>
+                    <tr>
+                        <th>你想做的事</th>
+                        <th>跟 Claude 說</th>
+                        <th>或直接輸入指令</th>
+                    </tr>
+                    <tr>
+                        <td>初始化 Git</td>
+                        <td>「初始化 Git」</td>
+                        <td><code>git init</code></td>
+                    </tr>
+                    <tr>
+                        <td>查看狀態</td>
+                        <td>「Git 狀態」</td>
+                        <td><code>git status</code></td>
+                    </tr>
+                    <tr>
+                        <td>加入所有檔案</td>
+                        <td>「加入所有修改」</td>
+                        <td><code>git add .</code></td>
+                    </tr>
+                    <tr>
+                        <td>提交</td>
+                        <td><code>/commit</code></td>
+                        <td><code>git commit -m "訊息"</code></td>
+                    </tr>
+                    <tr>
+                        <td>推送</td>
+                        <td>「推送到 GitHub」</td>
+                        <td><code>git push</code></td>
+                    </tr>
+                    <tr>
+                        <td>建立 PR</td>
+                        <td><code>/pr</code></td>
+                        <td><code>gh pr create</code></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Slide 14: 常見問題 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>&#128295; 常見問題與解決方法</h2>
+
+                <h3>問題 1：Permission denied</h3>
+                <div class="box warning">
+                    <strong>錯誤訊息：</strong><code>Permission denied (publickey)</code><br><br>
+                    <strong>解決方法：</strong>重新執行 GitHub 登入<br>
+                    <pre style="background: #fff; color: #333; padding: 10px;">gh auth login</pre>
+                </div>
+
+                <h3>問題 2：Repository not found</h3>
+                <div class="box warning">
+                    <strong>解決方法：</strong>確認儲存庫名稱正確，或重新建立<br>
+                    <pre style="background: #fff; color: #333; padding: 10px;">gh repo create 儲存庫名稱 --public</pre>
+                </div>
+
+                <h3>問題 3：Push 被拒絕</h3>
+                <div class="box warning">
+                    <strong>解決方法：</strong>先拉取再推送<br>
+                    <pre style="background: #fff; color: #333; padding: 10px;">git pull --rebase
+git push</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: 小技巧 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>&#128161; 進階小技巧</h2>
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <h3>&#128736; 同時開多個視窗</h3>
+                        <p>讓不同的 Claude 做不同的事<br>例如：一個寫代碼，一個跑測試</p>
+                    </div>
+                    <div class="concept-card">
+                        <h3>&#128276; 開啟系統通知</h3>
+                        <p>Claude 完成工作時會通知你<br>不用一直盯著螢幕</p>
+                    </div>
+                    <div class="concept-card">
+                        <h3>&#128640; 使用 teleport</h3>
+                        <p>在終端和網頁端之間傳送進度<br><code>clawdbot --teleport</code></p>
+                    </div>
+                    <div class="concept-card">
+                        <h3>&#9889; Auto-accept 模式</h3>
+                        <p>讓 Claude 自動執行，不用一直按確認<br>適合你已經很信任 Claude 的情況</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: 總結 -->
+        <div class="slide">
+            <div class="content-card" style="text-align: center;">
+                <span class="emoji-large">&#127881;</span>
+                <h2 style="border: none;">Part 11 完成！</h2>
+                <p style="font-size: 24px; max-width: 800px; margin: 30px auto;">
+                    你已經學會了如何使用 Claude Code 進行自動開發、版本控制和部署！
+                </p>
+
+                <div class="concept-grid" style="max-width: 900px; margin: 40px auto;">
+                    <div class="concept-card">
+                        <h3>&#128230; Git</h3>
+                        <p>版本控制，追蹤每次修改</p>
+                    </div>
+                    <div class="concept-card">
+                        <h3>&#128225; GitHub CLI</h3>
+                        <p>用指令操作 GitHub</p>
+                    </div>
+                    <div class="concept-card">
+                        <h3>&#128203; Plan 模式</h3>
+                        <p>先規劃再執行，更安全</p>
+                    </div>
+                    <div class="concept-card">
+                        <h3>&#9881;&#65039; GitHub Actions</h3>
+                        <p>自動化測試與部署</p>
+                    </div>
+                </div>
+
+                <div class="box success" style="max-width: 600px; margin: 30px auto;">
+                    現在你可以像專業開發者一樣，<br>讓 AI 幫你完成整個開發流程！
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <button class="nav-arrow prev-arrow" id="prevBtn" onclick="changeSlide(-1)">&#10094;</button>
+    <button class="nav-arrow next-arrow" id="nextBtn" onclick="changeSlide(1)">&#10095;</button>
+
+    <div class="indicators" id="indicatorContainer"></div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function init() {
+            createIndicators();
+            showSlide(0);
+            updateButtons();
+            document.addEventListener('keydown', handleKeydown);
+        }
+
+        function handleKeydown(e) {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        }
+
+        function createIndicators() {
+            const container = document.getElementById('indicatorContainer');
+            container.innerHTML = '';
+            slides.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                dot.onclick = () => goToSlide(index);
+                container.appendChild(dot);
+            });
+        }
+
+        function showSlide(index) {
+            if (index < 0) index = 0;
+            if (index >= totalSlides) index = totalSlides - 1;
+
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[index].classList.add('active');
+            currentSlide = index;
+
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === index);
+            });
+
+            updateButtons();
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        function goToSlide(index) {
+            showSlide(index);
+        }
+
+        function updateButtons() {
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
