@@ -23,7 +23,8 @@
       "Bash(gh api:*)",
       "Bash(git push)",
       "Bash(git rm:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(grep:*)"
     ]
   }
 }
