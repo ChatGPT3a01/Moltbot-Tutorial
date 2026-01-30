@@ -34,7 +34,6 @@
 
 ### 📖 我要學習
 - [📺 線上簡報入口](https://chatgpt3a01.github.io/Moltbot-Tutorial/簡報/index.html)
-- [📄 完整教學文件](龍蝦佈署教學.md)
 
 </td>
 <td width="50%" valign="top">
