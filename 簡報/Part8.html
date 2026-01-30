@@ -161,6 +161,12 @@ nvm use 24</pre>
         <div class="slide">
             <div class="content-card">
                 <h2>🔄 關閉與重新啟動</h2>
+                <div class="box info">
+                    <strong>📋 快速指令摘要（每次開機都要做）：</strong><br>
+                    <code>clawdbot gateway start</code> → 第一個視窗<br>
+                    <code>ngrok http 18789</code> → 第二個視窗<br>
+                    然後更新 LINE Webhook URL！
+                </div>
                 <h3>要關閉的時候</h3>
                 <ol>
                     <li>在 ngrok 的視窗按 <code>Ctrl + C</code></li>
@@ -170,7 +176,9 @@ nvm use 24</pre>
                 <ol>
                     <li>開 PowerShell，輸入：<code>clawdbot gateway start</code></li>
                     <li>開另一個 PowerShell，輸入：<code>ngrok http 18789</code></li>
-                    <li><strong>重要！</strong>去 LINE Developers 更新 Webhook URL（因為 ngrok 網址會變）</li>
+                    <li><strong>重要！</strong>用指令開啟 LINE Developers：<br>
+                        <code>start https://developers.line.biz/</code><br>
+                        更新 Webhook URL（因為 ngrok 網址會變）</li>
                 </ol>
             </div>
         </div>

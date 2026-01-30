@@ -24,7 +24,10 @@
       "Bash(git push)",
       "Bash(git rm:*)",
       "Bash(dir:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(for f in D:/Moltbot/簡報/Part*.html)",
+      "Bash(do grep -o \"<title>.*</title>\" \"$f\")",
+      "Bash(done)"
     ]
   }
 }
