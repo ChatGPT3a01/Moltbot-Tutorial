@@ -17,7 +17,13 @@
       "WebSearch",
       "Bash(git init:*)",
       "Bash(gh auth status:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(gh repo create:*)",
+      "Bash(gh api:*)",
+      "Bash(git push)",
+      "Bash(git rm:*)",
+      "Bash(dir:*)"
     ]
   }
 }
