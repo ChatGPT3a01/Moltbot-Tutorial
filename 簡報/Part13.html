@@ -98,6 +98,9 @@
         <div class="slide">
             <div class="content-card">
                 <h2>📥 從 GitHub 安裝</h2>
+                <div class="box warning">
+                    <strong>⚠️ 系統需求：</strong>Node.js ≥22、pnpm（建議使用 pnpm）
+                </div>
                 <div class="step-box">
                     <p><span class="step-number">1</span><strong>Clone 倉庫</strong></p>
                     <pre>git clone https://github.com/openclaw/openclaw.git
@@ -105,15 +108,16 @@ cd openclaw</pre>
                 </div>
                 <div class="step-box">
                     <p><span class="step-number">2</span><strong>安裝依賴</strong></p>
-                    <pre>npm install</pre>
+                    <pre>pnpm install</pre>
                 </div>
                 <div class="step-box">
-                    <p><span class="step-number">3</span><strong>建置專案</strong></p>
-                    <pre>npm run build</pre>
+                    <p><span class="step-number">3</span><strong>建置 UI 與專案</strong></p>
+                    <pre>pnpm ui:build
+pnpm build</pre>
                 </div>
                 <div class="step-box">
-                    <p><span class="step-number">4</span><strong>全域安裝（可選）</strong></p>
-                    <pre>npm link</pre>
+                    <p><span class="step-number">4</span><strong>執行初始化設定</strong></p>
+                    <pre>openclaw onboard --install-daemon</pre>
                 </div>
             </div>
         </div>
@@ -124,17 +128,21 @@ cd openclaw</pre>
                 <h2>🔧 開發模式</h2>
                 <p>如果你想修改程式碼並即時測試：</p>
                 <div class="step-box">
-                    <h3>啟動開發模式</h3>
-                    <pre>npm run dev</pre>
-                    <p>這會啟動監視模式，任何程式碼變更都會自動重新編譯。</p>
+                    <h3>啟動開發模式（監視 TS 變更）</h3>
+                    <pre>pnpm gateway:watch</pre>
+                    <p>這會啟動監視模式，任何 TypeScript 變更都會自動重新編譯。</p>
+                </div>
+                <div class="step-box">
+                    <h3>直接執行 TypeScript（不需建置）</h3>
+                    <pre>pnpm openclaw onboard --install-daemon</pre>
                 </div>
                 <div class="step-box">
                     <h3>執行測試</h3>
-                    <pre>npm test</pre>
+                    <pre>pnpm test</pre>
                 </div>
                 <div class="step-box">
                     <h3>程式碼檢查</h3>
-                    <pre>npm run lint</pre>
+                    <pre>pnpm lint</pre>
                 </div>
                 <div class="box success">
                     <strong>貢獻程式碼</strong>：歡迎提交 Pull Request！請先閱讀 CONTRIBUTING.md。
@@ -186,14 +194,14 @@ openclaw update --channel stable</pre>
                 </div>
                 <div class="step-box">
                     <h3>切換版本通道</h3>
-                    <pre># 穩定版（推薦）
+                    <pre># 穩定版（推薦）- npm 標籤: latest
 openclaw update --channel stable
 
-# 測試版（有新功能但可能不穩定）
+# 測試版（有新功能但可能不穩定）- npm 標籤: beta
 openclaw update --channel beta
 
-# 開發版（最新但可能有 bug）
-openclaw update --channel nightly</pre>
+# 開發版（main 分支最新代碼）- npm 標籤: dev
+openclaw update --channel dev</pre>
                 </div>
             </div>
         </div>
