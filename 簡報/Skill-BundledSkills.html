@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw 官方內建 Skills 總覽</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 { font-size: 42px; margin-bottom: 15px; text-shadow: 0 2px 15px rgba(0,0,0,0.5); }
+        .header p { font-size: 18px; opacity: 0.85; margin-bottom: 20px; }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .nav-link {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.3); }
+
+        .category-section {
+            background: rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+        .category-icon { font-size: 36px; }
+        .category-title { font-size: 26px; font-weight: 700; }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .skill-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .skill-card:hover {
+            transform: translateY(-5px);
+            background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .skill-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .skill-emoji { font-size: 28px; }
+        .skill-name { font-size: 18px; font-weight: 700; color: #fff; }
+
+        .skill-desc {
+            font-size: 14px;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .skill-tag {
+            background: rgba(102, 126, 234, 0.3);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #a8c0ff;
+        }
+        .skill-tag.required {
+            background: rgba(245, 87, 108, 0.3);
+            color: #ffb3c1;
+        }
+
+        .info-box {
+            background: rgba(33, 150, 243, 0.2);
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            border-radius: 0 15px 15px 0;
+            margin: 30px 0;
+        }
+        .info-box h3 { margin-bottom: 10px; color: #64b5f6; }
+        .info-box p { color: rgba(255,255,255,0.85); line-height: 1.7; }
+        .info-box code {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+        }
+
+        .stat-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.4), rgba(118, 75, 162, 0.4));
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .stat-number { font-size: 36px; font-weight: 700; }
+        .stat-label { font-size: 14px; opacity: 0.8; }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 28px; }
+            .skills-grid { grid-template-columns: 1fr; }
+            .stat-cards { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🦞 OpenClaw 官方內建 Skills</h1>
+            <p>龍蝦的超強技能庫，涵蓋各種實用功能</p>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">🏠 首頁</a>
+                <a href="Skill-Generator.html" class="nav-link">⚡ Skill 生成器</a>
+                <a href="Skill-DiskAudit.html" class="nav-link">📁 磁碟盤點</a>
+                <a href="Skill-GoogleDrive.html" class="nav-link">☁️ 雲端上傳</a>
+            </div>
+        </div>
+
+        <!-- 統計卡片 -->
+        <div class="stat-cards">
+            <div class="stat-card">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">官方 Skills</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">8</div>
+                <div class="stat-label">主要分類</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">免費</div>
+                <div class="stat-label">開箱即用</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">∞</div>
+                <div class="stat-label">可自訂擴展</div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3>💡 如何使用這些 Skills？</h3>
+            <p>
+                大部分官方 Skills 已內建於 OpenClaw，只要對龍蝦說相關指令就會自動啟用。<br>
+                例如：「查天氣」、「上傳到 GitHub」、「產生圖片」等。<br>
+                部分 Skill 需要額外設定 API Key 或安裝工具，詳見各 Skill 說明。
+            </p>
+        </div>
+
+        <!-- 通訊與社群 -->
+        <div class="category-section">
+            <div class="category-header">
+                <span class="category-icon">💬</span>
+                <span class="category-title">通訊與社群</span>
+            </div>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">📱</span>
+                        <span class="skill-name">iMsg (iMessage)</span>
+                    </div>
+                    <div class="skill-desc">透過 iMessage 傳送和接收訊息（僅 macOS）</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">macOS only</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">💬</span>
+                        <span class="skill-name">Slack</span>
+                    </div>
+                    <div class="skill-desc">與 Slack 工作區互動，發送訊息、管理頻道</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">需要 API Token</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🎮</span>
+                        <span class="skill-name">Discord</span>
+                    </div>
+                    <div class="skill-desc">Discord 機器人整合，管理伺服器和頻道</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">需要 Bot Token</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">📞</span>
+                        <span class="skill-name">Voice Call</span>
+                    </div>
+                    <div class="skill-desc">語音通話功能支援</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">語音</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🫧</span>
+                        <span class="skill-name">BlueBubbles</span>
+                    </div>
+                    <div class="skill-desc">在非 Apple 裝置上使用 iMessage</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">跨平台</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">📲</span>
+                        <span class="skill-name">WaCLI (WhatsApp)</span>
+                    </div>
+                    <div class="skill-desc">WhatsApp CLI 整合</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">即時通訊</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 開發與程式 -->
+        <div class="category-section">
+            <div class="category-header">
+                <span class="category-icon">💻</span>
+                <span class="category-title">開發與程式</span>
+            </div>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🐙</span>
+                        <span class="skill-name">GitHub</span>
+                    </div>
+                    <div class="skill-desc">使用 gh CLI 管理 Issues、PR、CI/CD 等 GitHub 功能</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">需要 gh CLI</span>
+                        <span class="skill-tag">版本控制</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🤖</span>
+                        <span class="skill-name">Coding Agent</span>
+                    </div>
+                    <div class="skill-desc">自動化程式開發代理</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">AI 輔助</span>
+                        <span class="skill-tag">自動化</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🖥️</span>
+                        <span class="skill-name">tmux</span>
+                    </div>
+                    <div class="skill-desc">終端機多工管理</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">Linux/macOS</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🔧</span>
+                        <span class="skill-name">Skill Creator</span>
+                    </div>
+                    <div class="skill-desc">快速建立、驗證和打包新 Skill</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">開發工具</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">📊</span>
+                        <span class="skill-name">Model Usage</span>
+                    </div>
+                    <div class="skill-desc">查詢 AI 模型使用量和統計</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">監控</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI 與生成 -->
+        <div class="category-section">
+            <div class="category-header">
+                <span class="category-icon">🤖</span>
+                <span class="category-title">AI 與生成</span>
+            </div>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🖼️</span>
+                        <span class="skill-name">OpenAI Image Gen</span>
+                    </div>
+                    <div class="skill-desc">使用 DALL-E / GPT-Image 批次生成圖片，支援多種模型和格式</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">需要 OPENAI_API_KEY</span>
+                        <span class="skill-tag">圖片生成</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🎤</span>
+                        <span class="skill-name">OpenAI Whisper API</span>
+                    </div>
+                    <div class="skill-desc">語音轉文字（雲端 API 版本）</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">需要 OPENAI_API_KEY</span>
+                        <span class="skill-tag">語音識別</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🎙️</span>
+                        <span class="skill-name">OpenAI Whisper (本機)</span>
+                    </div>
+                    <div class="skill-desc">語音轉文字（本機離線版本）</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">離線可用</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">💎</span>
+                        <span class="skill-name">Gemini</span>
+                    </div>
+                    <div class="skill-desc">Google Gemini AI 整合</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">需要 API Key</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🗣️</span>
+                        <span class="skill-name">Sherpa-ONNX TTS</span>
+                    </div>
+                    <div class="skill-desc">本機文字轉語音</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">離線可用</span>
+                        <span class="skill-tag">TTS</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🍌</span>
+                        <span class="skill-name">Nano Banana Pro</span>
+                    </div>
+                    <div class="skill-desc">輕量級圖片生成</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">圖片</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 生產力工具 -->
+        <div class="category-section">
+            <div class="category-header">
+                <span class="category-icon">📝</span>
+                <span class="category-title">生產力工具</span>
+            </div>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">📝</span>
+                        <span class="skill-name">Notion</span>
+                    </div>
+                    <div class="skill-desc">Notion API 整合：建立頁面、管理資料庫、新增區塊</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">需要 NOTION_API_KEY</span>
+                        <span class="skill-tag">筆記</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">💎</span>
+                        <span class="skill-name">Obsidian</span>
+                    </div>
+                    <div class="skill-desc">Obsidian 筆記整合</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">Markdown</span>
+                        <span class="skill-tag">本機</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🐻</span>
+                        <span class="skill-name">Bear Notes</span>
+                    </div>
+                    <div class="skill-desc">Bear 筆記 App 整合（macOS/iOS）</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">macOS only</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🍎</span>
+                        <span class="skill-name">Apple Notes</span>
+                    </div>
+                    <div class="skill-desc">Apple 備忘錄整合</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">macOS only</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">⏰</span>
+                        <span class="skill-name">Apple Reminders</span>
+                    </div>
+                    <div class="skill-desc">Apple 提醒事項整合</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">macOS only</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">✅</span>
+                        <span class="skill-name">Things (Mac)</span>
+                    </div>
+                    <div class="skill-desc">Things 3 待辦事項整合</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">macOS only</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">📋</span>
+                        <span class="skill-name">Trello</span>
+                    </div>
+                    <div class="skill-desc">Trello 看板管理</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">需要 API Key</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">📄</span>
+                        <span class="skill-name">Nano PDF</span>
+                    </div>
+                    <div class="skill-desc">PDF 文件處理</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">文件</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">📧</span>
+                        <span class="skill-name">Himalaya (Email)</span>
+                    </div>
+                    <div class="skill-desc">CLI 郵件客戶端</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">郵件</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 生活與娛樂 -->
+        <div class="category-section">
+            <div class="category-header">
+                <span class="category-icon">🎵</span>
+                <span class="category-title">生活與娛樂</span>
+            </div>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🌤️</span>
+                        <span class="skill-name">Weather</span>
+                    </div>
+                    <div class="skill-desc">查詢天氣預報（不需要 API Key）</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">免費</span>
+                        <span class="skill-tag">wttr.in</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🎵</span>
+                        <span class="skill-name">Spotify Player</span>
+                    </div>
+                    <div class="skill-desc">控制 Spotify 播放</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">需要 Spotify Premium</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🔊</span>
+                        <span class="skill-name">Sonos CLI</span>
+                    </div>
+                    <div class="skill-desc">控制 Sonos 音響</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">智慧家居</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">💡</span>
+                        <span class="skill-name">OpenHue</span>
+                    </div>
+                    <div class="skill-desc">控制 Philips Hue 智慧燈泡</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">智慧家居</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🎤</span>
+                        <span class="skill-name">SongSee</span>
+                    </div>
+                    <div class="skill-desc">識別正在播放的歌曲</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">音樂識別</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">📍</span>
+                        <span class="skill-name">Local Places</span>
+                    </div>
+                    <div class="skill-desc">搜尋附近的地點（餐廳、景點等）</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">需要 Google API</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🍔</span>
+                        <span class="skill-name">Food Order</span>
+                    </div>
+                    <div class="skill-desc">外送訂餐整合</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">生活</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🗺️</span>
+                        <span class="skill-name">GoPlaces</span>
+                    </div>
+                    <div class="skill-desc">地點導航與搜尋</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">導航</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🎬</span>
+                        <span class="skill-name">GIF Grep</span>
+                    </div>
+                    <div class="skill-desc">搜尋和分享 GIF 動圖</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">娛樂</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 媒體與圖像 -->
+        <div class="category-section">
+            <div class="category-header">
+                <span class="category-icon">📸</span>
+                <span class="category-title">媒體與圖像</span>
+            </div>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">📷</span>
+                        <span class="skill-name">CamSnap</span>
+                    </div>
+                    <div class="skill-desc">擷取攝影機畫面</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">相機</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">👀</span>
+                        <span class="skill-name">Peekaboo</span>
+                    </div>
+                    <div class="skill-desc">螢幕截圖與監控</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">截圖</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🎬</span>
+                        <span class="skill-name">Video Frames</span>
+                    </div>
+                    <div class="skill-desc">從影片中擷取畫格</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">需要 ffmpeg</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🎨</span>
+                        <span class="skill-name">Canvas</span>
+                    </div>
+                    <div class="skill-desc">圖形繪製與編輯</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">圖形</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 系統與安全 -->
+        <div class="category-section">
+            <div class="category-header">
+                <span class="category-icon">🔐</span>
+                <span class="category-title">系統與安全</span>
+            </div>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🔑</span>
+                        <span class="skill-name">1Password</span>
+                    </div>
+                    <div class="skill-desc">1Password CLI 整合，管理密碼和機密</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">需要 1Password CLI</span>
+                        <span class="skill-tag">密碼管理</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🩺</span>
+                        <span class="skill-name">Healthcheck</span>
+                    </div>
+                    <div class="skill-desc">系統健康檢查</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">監控</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">📜</span>
+                        <span class="skill-name">Session Logs</span>
+                    </div>
+                    <div class="skill-desc">對話記錄管理</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">日誌</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">📝</span>
+                        <span class="skill-name">Summarize</span>
+                    </div>
+                    <div class="skill-desc">文件和內容摘要</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">AI</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">📰</span>
+                        <span class="skill-name">Blog Watcher</span>
+                    </div>
+                    <div class="skill-desc">監控網站和部落格更新</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">監控</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🦞</span>
+                        <span class="skill-name">ClawHub</span>
+                    </div>
+                    <div class="skill-desc">OpenClaw Skill 市集</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">官方</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 其他工具 -->
+        <div class="category-section">
+            <div class="category-header">
+                <span class="category-icon">🔧</span>
+                <span class="category-title">其他工具</span>
+            </div>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🐦</span>
+                        <span class="skill-name">Bird (Twitter/X)</span>
+                    </div>
+                    <div class="skill-desc">Twitter/X 社群媒體整合</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag required">需要 API Key</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🎮</span>
+                        <span class="skill-name">GOG</span>
+                    </div>
+                    <div class="skill-desc">GOG 遊戲平台整合</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">遊戲</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🔮</span>
+                        <span class="skill-name">Oracle</span>
+                    </div>
+                    <div class="skill-desc">Oracle 資料庫整合</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">資料庫</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">📦</span>
+                        <span class="skill-name">MCPorter</span>
+                    </div>
+                    <div class="skill-desc">MCP 伺服器遷移工具</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">工具</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🛒</span>
+                        <span class="skill-name">OrderCLI</span>
+                    </div>
+                    <div class="skill-desc">訂單管理 CLI</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">電商</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">🔵</span>
+                        <span class="skill-name">BluCLI</span>
+                    </div>
+                    <div class="skill-desc">藍牙裝置管理</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">藍牙</span>
+                    </div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-emoji">8️⃣</span>
+                        <span class="skill-name">EightCTL</span>
+                    </div>
+                    <div class="skill-desc">Eight Sleep 智慧床墊控制</div>
+                    <div class="skill-tags">
+                        <span class="skill-tag">智慧家居</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3>🚀 想要更多功能？</h3>
+            <p>
+                使用 <a href="Skill-Generator.html" style="color: #64b5f6;">Skill 生成器</a> 建立你自己的自訂 Skill！<br>
+                或參考官方 Skill 格式，手動撰寫 <code>SKILL.md</code> 和腳本檔案。<br><br>
+                Skill 目錄位置：<code>~/.openclaw/workspace/skills/你的skill名稱/</code>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

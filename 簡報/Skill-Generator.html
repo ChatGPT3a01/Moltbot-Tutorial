@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Skill 生成器</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .header h1 { font-size: 42px; margin-bottom: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .header p { font-size: 18px; opacity: 0.9; }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .nav-link {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.4); }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        @media (max-width: 1000px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.98);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .panel h2 {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .form-group small {
+            display: block;
+            color: #888;
+            margin-top: 5px;
+            font-size: 13px;
+        }
+
+        .template-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .template-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .template-card:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .template-card.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: white;
+        }
+        .template-card .icon { font-size: 32px; margin-bottom: 8px; }
+        .template-card .name { font-size: 13px; font-weight: 600; }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 20px rgba(102,126,234,0.4);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102,126,234,0.5);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .preview-section {
+            margin-top: 20px;
+        }
+        .preview-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .preview-tab {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+        .preview-tab.active {
+            background: #1e1e1e;
+            color: #fff;
+        }
+        .preview-content {
+            background: #1e1e1e;
+            border-radius: 0 12px 12px 12px;
+            padding: 20px;
+            max-height: 400px;
+            overflow: auto;
+        }
+        .preview-content pre {
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            margin: 0;
+        }
+        .preview-content .comment { color: #6a9955; }
+        .preview-content .keyword { color: #569cd6; }
+        .preview-content .string { color: #ce9178; }
+        .preview-content .variable { color: #9cdcfe; }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .checkbox-group label {
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 0 10px 10px 0;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #0d47a1;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            border-radius: 0 10px 10px 0;
+            margin: 20px 0;
+            color: #155724;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ OpenClaw Skill 生成器</h1>
+            <p>自訂你的龍蝦技能，一鍵下載使用</p>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">🏠 首頁</a>
+                <a href="Skill-DiskAudit.html" class="nav-link">📁 磁碟盤點教學</a>
+                <a href="Skill-GoogleDrive.html" class="nav-link">☁️ 雲端上傳教學</a>
+                <a href="Skill-BrowserRelay.html" class="nav-link">🌐 網頁操作教學</a>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <!-- 左側：設定面板 -->
+            <div class="panel">
+                <h2>📝 第一步：選擇 Skill 類型</h2>
+                <div class="template-cards">
+                    <div class="template-card selected" data-template="disk-audit">
+                        <div class="icon">📁</div>
+                        <div class="name">磁碟盤點</div>
+                    </div>
+                    <div class="template-card" data-template="gdrive-upload">
+                        <div class="icon">☁️</div>
+                        <div class="name">雲端上傳</div>
+                    </div>
+                    <div class="template-card" data-template="web-scraper">
+                        <div class="icon">🕷️</div>
+                        <div class="name">網頁爬蟲</div>
+                    </div>
+                    <div class="template-card" data-template="scheduler">
+                        <div class="icon">⏰</div>
+                        <div class="name">排程提醒</div>
+                    </div>
+                    <div class="template-card" data-template="file-organizer">
+                        <div class="icon">📂</div>
+                        <div class="name">檔案整理</div>
+                    </div>
+                    <div class="template-card" data-template="backup">
+                        <div class="icon">💾</div>
+                        <div class="name">自動備份</div>
+                    </div>
+                    <div class="template-card" data-template="custom">
+                        <div class="icon">🔧</div>
+                        <div class="name">自訂 Skill</div>
+                    </div>
+                </div>
+
+                <h2>⚙️ 第二步：自訂設定</h2>
+
+                <div class="form-group">
+                    <label>Skill 名稱</label>
+                    <input type="text" id="skillName" placeholder="例如：my-disk-audit">
+                    <small>只能用英文、數字和連字號</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Skill 說明</label>
+                    <input type="text" id="skillDescription" placeholder="例如：自動盤點磁碟並產生報告">
+                </div>
+
+                <!-- 磁碟盤點選項 -->
+                <div id="options-disk-audit" class="template-options">
+                    <div class="form-group">
+                        <label>掃描路徑（每行一個）</label>
+                        <textarea id="scanPaths" placeholder="C:\Users\user\Downloads&#10;C:\Users\user\Desktop&#10;D:\Documents"></textarea>
+                    </div>
+                    <div class="options-grid">
+                        <div class="form-group">
+                            <label>大檔門檻 (MB)</label>
+                            <input type="number" id="largeFileMB" value="500" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>顯示前幾名</label>
+                            <input type="number" id="topN" value="30" min="1" max="100">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>功能選項</label>
+                        <div class="options-grid">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="optLargeFiles" checked>
+                                <label for="optLargeFiles">找大檔案</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="optRecentFiles" checked>
+                                <label for="optRecentFiles">最近修改</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="optExtStats" checked>
+                                <label for="optExtStats">副檔名統計</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="optDuplicates">
+                                <label for="optDuplicates">重複檔偵測</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 雲端上傳選項 -->
+                <div id="options-gdrive-upload" class="template-options hidden">
+                    <div class="form-group">
+                        <label>遠端資料夾名稱</label>
+                        <input type="text" id="remoteFolder" value="OpenClaw-Uploads">
+                    </div>
+                    <div class="form-group">
+                        <label>rclone Remote 名稱</label>
+                        <input type="text" id="remoteName" value="gdrive">
+                        <small>預設是 gdrive，除非你在 rclone config 用了其他名字</small>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="optAutoLink" checked>
+                        <label for="optAutoLink">自動產生分享連結</label>
+                    </div>
+                </div>
+
+                <!-- 網頁爬蟲選項 -->
+                <div id="options-web-scraper" class="template-options hidden">
+                    <div class="form-group">
+                        <label>目標網址（每行一個）</label>
+                        <textarea id="targetUrls" placeholder="https://example.com/news&#10;https://example.com/prices"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>爬蟲模式</label>
+                        <select id="scrapeMode">
+                            <option value="light">Light fetch（輕量，純 HTML）</option>
+                            <option value="dynamic">Dynamic JS（等 JavaScript 載入）</option>
+                            <option value="monitor">Scheduled monitor（定時監控變化）</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>要抓取的資料（CSS 選擇器）</label>
+                        <input type="text" id="cssSelector" placeholder="例如：.news-title, #price, article h2">
+                    </div>
+                </div>
+
+                <!-- 排程提醒選項 -->
+                <div id="options-scheduler" class="template-options hidden">
+                    <div class="form-group">
+                        <label>提醒內容</label>
+                        <textarea id="reminderContent" placeholder="例如：該喝水了！&#10;記得站起來走動一下"></textarea>
+                    </div>
+                    <div class="options-grid">
+                        <div class="form-group">
+                            <label>執行時間</label>
+                            <input type="time" id="scheduleTime" value="09:00">
+                        </div>
+                        <div class="form-group">
+                            <label>重複頻率</label>
+                            <select id="scheduleFreq">
+                                <option value="daily">每天</option>
+                                <option value="weekday">週一到週五</option>
+                                <option value="weekly">每週</option>
+                                <option value="hourly">每小時</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 檔案整理選項 -->
+                <div id="options-file-organizer" class="template-options hidden">
+                    <div class="form-group">
+                        <label>來源資料夾</label>
+                        <input type="text" id="sourceFolder" placeholder="C:\Users\user\Downloads">
+                    </div>
+                    <div class="form-group">
+                        <label>整理規則</label>
+                        <select id="organizeRule">
+                            <option value="extension">依副檔名分類</option>
+                            <option value="date">依日期分類</option>
+                            <option value="size">依大小分類</option>
+                        </select>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="optMoveFiles">
+                        <label for="optMoveFiles">移動檔案（不勾選則只產生報告）</label>
+                    </div>
+                </div>
+
+                <!-- 自動備份選項 -->
+                <div id="options-backup" class="template-options hidden">
+                    <div class="form-group">
+                        <label>備份來源（每行一個）</label>
+                        <textarea id="backupSources" placeholder="C:\Users\user\Documents&#10;C:\Users\user\Pictures"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>備份目的地</label>
+                        <input type="text" id="backupDest" placeholder="D:\Backups 或 gdrive:Backups">
+                    </div>
+                    <div class="form-group">
+                        <label>備份模式</label>
+                        <select id="backupMode">
+                            <option value="copy">完整複製</option>
+                            <option value="sync">同步（刪除目的地多餘檔案）</option>
+                            <option value="incremental">增量備份</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 自訂 Skill 選項 -->
+                <div id="options-custom" class="template-options hidden">
+                    <div class="form-group">
+                        <label>觸發指令</label>
+                        <input type="text" id="customTrigger" placeholder="例如：執行我的任務">
+                        <small>跟龍蝦說這句話就會執行此 Skill</small>
+                    </div>
+                    <div class="form-group">
+                        <label>自訂腳本內容 (PowerShell)</label>
+                        <textarea id="customScript" style="min-height:150px; font-family: Consolas, monospace;" placeholder="# 在這裡寫你的 PowerShell 腳本&#10;Write-Host &quot;Hello from my skill!&quot;"></textarea>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    💡 <strong>提示：</strong>生成後的檔案需要放到 <code>~/.openclaw/workspace/skills/你的skill名稱/</code> 資料夾
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="generateSkill()">⚡ 生成 Skill</button>
+                </div>
+            </div>
+
+            <!-- 右側：預覽與下載 -->
+            <div class="panel">
+                <h2>👀 第三步：預覽與下載</h2>
+
+                <div class="preview-section">
+                    <div class="preview-tabs">
+                        <button class="preview-tab active" data-tab="skill-md">SKILL.md</button>
+                        <button class="preview-tab" data-tab="script">腳本檔案</button>
+                        <button class="preview-tab" data-tab="install">安裝說明</button>
+                    </div>
+                    <div class="preview-content">
+                        <pre id="preview-skill-md"># 請先在左側選擇 Skill 類型並填寫設定</pre>
+                        <pre id="preview-script" class="hidden"># 腳本預覽會顯示在這裡</pre>
+                        <pre id="preview-install" class="hidden"># 安裝說明會顯示在這裡</pre>
+                    </div>
+                </div>
+
+                <div id="download-section" class="hidden">
+                    <div class="success-box">
+                        ✅ Skill 已生成！點擊下方按鈕下載檔案。
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-success" onclick="downloadFile('skill-md')">📄 下載 SKILL.md</button>
+                        <button class="btn btn-success" onclick="downloadFile('script')">📜 下載腳本</button>
+                        <button class="btn btn-primary" onclick="downloadAll()">📦 下載全部 (ZIP)</button>
+                    </div>
+                </div>
+
+                <div class="info-box" style="margin-top: 30px;">
+                    <strong>📂 安裝位置：</strong><br>
+                    <code>C:\Users\你的使用者名稱\.openclaw\workspace\skills\[skill名稱]\</code><br><br>
+                    <strong>📁 資料夾結構：</strong><br>
+                    <code>
+                    skills/<br>
+                    └── [skill名稱]/<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;├── SKILL.md<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;└── scripts/<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── run.ps1
+                    </code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 當前選擇的模板
+        let currentTemplate = 'disk-audit';
+        let generatedFiles = {};
+
+        // 模板卡片點擊
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                currentTemplate = card.dataset.template;
+
+                // 顯示對應的選項
+                document.querySelectorAll('.template-options').forEach(opt => opt.classList.add('hidden'));
+                const optPanel = document.getElementById('options-' + currentTemplate);
+                if (optPanel) optPanel.classList.remove('hidden');
+
+                // 更新預設名稱
+                updateDefaultName();
+            });
+        });
+
+        // 預覽 Tab 切換
+        document.querySelectorAll('.preview-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const tabName = tab.dataset.tab;
+                document.querySelectorAll('.preview-content pre').forEach(pre => pre.classList.add('hidden'));
+                document.getElementById('preview-' + tabName).classList.remove('hidden');
+            });
+        });
+
+        // 更新預設名稱
+        function updateDefaultName() {
+            const nameInput = document.getElementById('skillName');
+            const descInput = document.getElementById('skillDescription');
+
+            const defaults = {
+                'disk-audit': { name: 'disk-audit', desc: '磁碟常態盤點/整理工具' },
+                'gdrive-upload': { name: 'gdrive-upload', desc: '上傳檔案到 Google Drive' },
+                'web-scraper': { name: 'web-scraper', desc: '網頁爬蟲抓取資料' },
+                'scheduler': { name: 'daily-reminder', desc: '每日排程提醒' },
+                'file-organizer': { name: 'file-organizer', desc: '自動整理檔案' },
+                'backup': { name: 'auto-backup', desc: '自動備份重要資料' },
+                'custom': { name: 'my-custom-skill', desc: '我的自訂技能' }
+            };
+
+            if (defaults[currentTemplate]) {
+                nameInput.placeholder = defaults[currentTemplate].name;
+                descInput.placeholder = defaults[currentTemplate].desc;
+            }
+        }
+
+        // 生成 Skill
+        function generateSkill() {
+            const skillName = document.getElementById('skillName').value || document.getElementById('skillName').placeholder;
+            const skillDesc = document.getElementById('skillDescription').value || document.getElementById('skillDescription').placeholder;
+
+            let skillMd = '';
+            let script = '';
+            let installGuide = '';
+            let scriptFileName = 'run.ps1';
+
+            switch (currentTemplate) {
+                case 'disk-audit':
+                    const result = generateDiskAudit(skillName, skillDesc);
+                    skillMd = result.skillMd;
+                    script = result.script;
+                    scriptFileName = 'scan.ps1';
+                    break;
+                case 'gdrive-upload':
+                    const gdriveResult = generateGdriveUpload(skillName, skillDesc);
+                    skillMd = gdriveResult.skillMd;
+                    script = gdriveResult.script;
+                    scriptFileName = 'upload.ps1';
+                    break;
+                case 'web-scraper':
+                    const scraperResult = generateWebScraper(skillName, skillDesc);
+                    skillMd = scraperResult.skillMd;
+                    script = scraperResult.script;
+                    scriptFileName = 'scrape.ps1';
+                    break;
+                case 'scheduler':
+                    const schedResult = generateScheduler(skillName, skillDesc);
+                    skillMd = schedResult.skillMd;
+                    script = schedResult.script;
+                    scriptFileName = 'remind.ps1';
+                    break;
+                case 'file-organizer':
+                    const orgResult = generateFileOrganizer(skillName, skillDesc);
+                    skillMd = orgResult.skillMd;
+                    script = orgResult.script;
+                    scriptFileName = 'organize.ps1';
+                    break;
+                case 'backup':
+                    const backupResult = generateBackup(skillName, skillDesc);
+                    skillMd = backupResult.skillMd;
+                    script = backupResult.script;
+                    scriptFileName = 'backup.ps1';
+                    break;
+                case 'custom':
+                    const customResult = generateCustom(skillName, skillDesc);
+                    skillMd = customResult.skillMd;
+                    script = customResult.script;
+                    break;
+            }
+
+            // 安裝說明
+            installGuide = `# ${skillName} 安裝說明
+
+## 1. 建立資料夾
+在 PowerShell 執行：
+\`\`\`powershell
+mkdir "$env:USERPROFILE\\.openclaw\\workspace\\skills\\${skillName}\\scripts" -Force
+\`\`\`
+
+## 2. 放置檔案
+- 把 \`SKILL.md\` 放到 \`~/.openclaw/workspace/skills/${skillName}/\`
+- 把 \`${scriptFileName}\` 放到 \`~/.openclaw/workspace/skills/${skillName}/scripts/\`
+
+## 3. 使用方式
+跟龍蝦說：「執行 ${skillName}」或「跑${skillDesc}」
+
+## 資料夾結構
+\`\`\`
+.openclaw/
+└── workspace/
+    └── skills/
+        └── ${skillName}/
+            ├── SKILL.md
+            └── scripts/
+                └── ${scriptFileName}
+\`\`\`
+`;
+
+            // 儲存生成的檔案
+            generatedFiles = {
+                'skill-md': { content: skillMd, filename: 'SKILL.md' },
+                'script': { content: script, filename: scriptFileName },
+                'install': { content: installGuide, filename: 'INSTALL.md' }
+            };
+
+            // 更新預覽
+            document.getElementById('preview-skill-md').textContent = skillMd;
+            document.getElementById('preview-script').textContent = script;
+            document.getElementById('preview-install').textContent = installGuide;
+
+            // 顯示下載區
+            document.getElementById('download-section').classList.remove('hidden');
+        }
+
+        // 磁碟盤點生成器
+        function generateDiskAudit(name, desc) {
+            const paths = document.getElementById('scanPaths').value || '$env:USERPROFILE\\Downloads\n$env:USERPROFILE\\Desktop';
+            const largeMB = document.getElementById('largeFileMB').value || 500;
+            const topN = document.getElementById('topN').value || 30;
+            const optLarge = document.getElementById('optLargeFiles').checked;
+            const optRecent = document.getElementById('optRecentFiles').checked;
+            const optExt = document.getElementById('optExtStats').checked;
+            const optDup = document.getElementById('optDuplicates').checked;
+
+            const pathArray = paths.split('\n').filter(p => p.trim()).map(p => `"${p.trim()}"`).join(',\n        ');
+
+            const skillMd = `# ${name}
+
+${desc}
+
+## 功能
+${optLarge ? '- 找出大檔案（Top ' + topN + '）\n' : ''}${optRecent ? '- 最近修改檔案（Top ' + topN + '）\n' : ''}${optExt ? '- 副檔名容量統計\n' : ''}${optDup ? '- 重複檔案偵測（SHA256）\n' : ''}
+## 設定
+- 掃描範圍：${paths.split('\n').filter(p => p.trim()).join(', ')}
+- 大檔門檻：${largeMB}MB
+- 顯示數量：Top ${topN}
+
+## 使用方式
+跟龍蝦說：「跑磁碟盤點」或「執行 ${name}」
+
+## 報告位置
+~/.openclaw/workspace/reports/${name}/YYYY-MM-DD.md
+`;
+
+            const script = `# ${name} - ${desc}
+# 自動生成於 ${new Date().toLocaleDateString('zh-TW')}
+
+param(
+    [string[]]$ScanPaths = @(
+        ${pathArray}
+    ),
+    [int]$LargeFileMB = ${largeMB},
+    [int]$TopN = ${topN}
+)
+
+$reportDate = Get-Date -Format "yyyy-MM-dd"
+$reportDir = "$env:USERPROFILE\\.openclaw\\workspace\\reports\\${name}"
+if (!(Test-Path $reportDir)) { New-Item -ItemType Directory -Path $reportDir -Force }
+$reportPath = "$reportDir\\$reportDate.md"
+
+# 排除的系統資料夾
+$excludeDirs = @("Windows", "Program Files", "Program Files (x86)",
+                 '\$Recycle.Bin', "node_modules", ".git", "AppData")
+
+Write-Host "開始掃描..." -ForegroundColor Cyan
+Write-Host "掃描路徑: $($ScanPaths -join ', ')" -ForegroundColor Gray
+
+# 取得所有檔案
+$allFiles = @()
+foreach ($path in $ScanPaths) {
+    $expandedPath = $ExecutionContext.InvokeCommand.ExpandString($path)
+    if (Test-Path $expandedPath) {
+        Write-Host "掃描中: $expandedPath" -ForegroundColor Yellow
+        $allFiles += Get-ChildItem -Path $expandedPath -Recurse -File -ErrorAction SilentlyContinue |
+            Where-Object {
+                $dominated = $false
+                foreach ($ex in $excludeDirs) {
+                    if ($_.FullName -like "*\\$ex\\*") { $dominated = $true; break }
+                }
+                -not $dominated
+            }
+    } else {
+        Write-Host "路徑不存在: $expandedPath" -ForegroundColor Red
+    }
+}
+
+Write-Host "找到 $($allFiles.Count) 個檔案" -ForegroundColor Green
+
+# 產生報告
+$report = "# 磁碟盤點報告 - $reportDate\`n\`n"
+$report += "掃描路徑: $($ScanPaths -join ', ')\`n"
+$report += "檔案總數: $($allFiles.Count)\`n\`n"
+
+${optLarge ? `# Top 大檔案
+$report += "## Top $TopN 大檔案\`n\`n"
+$report += "| 大小 | 檔案路徑 |\`n"
+$report += "|------|----------|\`n"
+$largeFiles = $allFiles | Sort-Object Length -Descending | Select-Object -First $TopN
+foreach ($f in $largeFiles) {
+    $sizeMB = [math]::Round($f.Length / 1MB, 2)
+    $report += "| $sizeMB MB | $($f.FullName) |\`n"
+}
+$report += "\`n"
+` : ''}
+${optRecent ? `# 最近修改
+$report += "## 最近修改 Top $TopN\`n\`n"
+$report += "| 修改時間 | 檔案路徑 |\`n"
+$report += "|----------|----------|\`n"
+$recentFiles = $allFiles | Sort-Object LastWriteTime -Descending | Select-Object -First $TopN
+foreach ($f in $recentFiles) {
+    $time = $f.LastWriteTime.ToString("yyyy-MM-dd HH:mm")
+    $report += "| $time | $($f.FullName) |\`n"
+}
+$report += "\`n"
+` : ''}
+${optExt ? `# 副檔名統計
+$report += "## 副檔名容量統計\`n\`n"
+$report += "| 副檔名 | 總容量 | 檔案數 |\`n"
+$report += "|--------|--------|--------|\`n"
+$extStats = $allFiles | Group-Object Extension | ForEach-Object {
+    [PSCustomObject]@{
+        Extension = if ($_.Name) { $_.Name } else { "(無副檔名)" }
+        TotalSize = ($_.Group | Measure-Object Length -Sum).Sum
+        Count = $_.Count
+    }
+} | Sort-Object TotalSize -Descending | Select-Object -First $TopN
+foreach ($ext in $extStats) {
+    $sizeMB = [math]::Round($ext.TotalSize / 1MB, 2)
+    $report += "| $($ext.Extension) | $sizeMB MB | $($ext.Count) |\`n"
+}
+$report += "\`n"
+` : ''}
+${optDup ? `# 重複檔案偵測
+$report += "## 可能的重複檔案\`n\`n"
+$sizeGroups = $allFiles | Where-Object { $_.Length -gt 1MB } | Group-Object Length | Where-Object { $_.Count -gt 1 }
+$duplicates = @()
+foreach ($group in $sizeGroups | Select-Object -First 30) {
+    $hashes = @{}
+    foreach ($file in $group.Group) {
+        try {
+            $hash = (Get-FileHash $file.FullName -Algorithm SHA256 -ErrorAction Stop).Hash
+            if ($hashes.ContainsKey($hash)) {
+                $duplicates += [PSCustomObject]@{
+                    Size = $file.Length
+                    File1 = $hashes[$hash]
+                    File2 = $file.FullName
+                }
+            } else {
+                $hashes[$hash] = $file.FullName
+            }
+        } catch { }
+    }
+}
+if ($duplicates.Count -gt 0) {
+    foreach ($dup in $duplicates | Select-Object -First 20) {
+        $sizeMB = [math]::Round($dup.Size / 1MB, 2)
+        $report += "**[$sizeMB MB] 重複:**\`n"
+        $report += "- $($dup.File1)\`n"
+        $report += "- $($dup.File2)\`n\`n"
+    }
+} else {
+    $report += "沒有發現重複檔案。\`n"
+}
+` : ''}
+# 儲存報告
+$report | Out-File -FilePath $reportPath -Encoding UTF8
+Write-Host "\\n報告已產生：$reportPath" -ForegroundColor Green
+Write-Host "完成！" -ForegroundColor Cyan
+`;
+
+            return { skillMd, script };
+        }
+
+        // Google Drive 上傳生成器
+        function generateGdriveUpload(name, desc) {
+            const remoteFolder = document.getElementById('remoteFolder').value || 'OpenClaw-Uploads';
+            const remoteName = document.getElementById('remoteName').value || 'gdrive';
+            const autoLink = document.getElementById('optAutoLink').checked;
+
+            const skillMd = `# ${name}
+
+${desc}
+
+## 功能
+- 上傳檔案到 Google Drive
+- 上傳到指定資料夾：${remoteFolder}
+${autoLink ? '- 自動產生分享連結\n' : ''}
+## 前提條件
+- 已安裝 rclone
+- 已完成 Google Drive 授權（rclone config）
+
+## 使用方式
+跟龍蝦說：「把 xxx 上傳到 Google Drive」
+
+## 手動執行
+\`\`\`powershell
+& "~/.openclaw/workspace/skills/${name}/scripts/upload.ps1" -FilePath "C:\\path\\to\\file.zip"
+\`\`\`
+`;
+
+            const script = `# ${name} - ${desc}
+# 自動生成於 ${new Date().toLocaleDateString('zh-TW')}
+
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$FilePath,
+    [string]$RemoteFolder = "${remoteFolder}",
+    [string]$RemoteName = "${remoteName}"
+)
+
+# 檢查檔案是否存在
+if (!(Test-Path $FilePath)) {
+    Write-Host "錯誤：檔案不存在 - $FilePath" -ForegroundColor Red
+    exit 1
+}
+
+$fileName = Split-Path $FilePath -Leaf
+
+# 檢查 rclone 是否安裝
+if (!(Get-Command rclone -ErrorAction SilentlyContinue)) {
+    Write-Host "錯誤：找不到 rclone，請先安裝" -ForegroundColor Red
+    Write-Host "安裝指令：winget install Rclone.Rclone" -ForegroundColor Yellow
+    exit 1
+}
+
+# 上傳檔案
+Write-Host "正在上傳 $fileName 到 $RemoteName:$RemoteFolder ..." -ForegroundColor Cyan
+rclone copy $FilePath "$RemoteName`:$RemoteFolder" --progress
+
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "上傳成功！" -ForegroundColor Green
+    ${autoLink ? `
+    # 產生分享連結
+    Write-Host "正在產生分享連結..." -ForegroundColor Yellow
+    $link = rclone link "$RemoteName`:$RemoteFolder/$fileName"
+    if ($link) {
+        Write-Host "分享連結：" -ForegroundColor Cyan
+        Write-Host $link -ForegroundColor Green
+
+        # 複製到剪貼簿
+        $link | Set-Clipboard
+        Write-Host "(已複製到剪貼簿)" -ForegroundColor Gray
+    }
+    ` : ''}
+} else {
+    Write-Host "上傳失敗！請檢查 rclone 設定" -ForegroundColor Red
+    exit 1
+}
+`;
+
+            return { skillMd, script };
+        }
+
+        // 網頁爬蟲生成器
+        function generateWebScraper(name, desc) {
+            const urls = document.getElementById('targetUrls').value || 'https://example.com';
+            const mode = document.getElementById('scrapeMode').value;
+            const selector = document.getElementById('cssSelector').value || '.content';
+
+            const modeDesc = {
+                'light': 'Light fetch（輕量抓取）',
+                'dynamic': 'Dynamic JS（等待 JavaScript）',
+                'monitor': 'Scheduled monitor（定時監控）'
+            };
+
+            const skillMd = `# ${name}
+
+${desc}
+
+## 功能
+- 抓取指定網頁的資料
+- 模式：${modeDesc[mode]}
+- CSS 選擇器：${selector}
+
+## 目標網址
+${urls.split('\n').filter(u => u.trim()).map(u => '- ' + u.trim()).join('\n')}
+
+## 使用方式
+跟龍蝦說：「執行網頁爬蟲」或「抓取 xxx 網站」
+`;
+
+            const script = `# ${name} - ${desc}
+# 自動生成於 ${new Date().toLocaleDateString('zh-TW')}
+# 模式：${modeDesc[mode]}
+
+param(
+    [string[]]$Urls = @(
+        ${urls.split('\n').filter(u => u.trim()).map(u => `"${u.trim()}"`).join(',\n        ')}
+    ),
+    [string]$Selector = "${selector}"
+)
+
+$reportDate = Get-Date -Format "yyyy-MM-dd_HHmmss"
+$reportDir = "$env:USERPROFILE\\.openclaw\\workspace\\reports\\${name}"
+if (!(Test-Path $reportDir)) { New-Item -ItemType Directory -Path $reportDir -Force }
+$reportPath = "$reportDir\\$reportDate.md"
+
+$report = "# 網頁爬蟲報告 - $reportDate\`n\`n"
+
+foreach ($url in $Urls) {
+    Write-Host "抓取中: $url" -ForegroundColor Cyan
+    $report += "## $url\`n\`n"
+
+    try {
+        $response = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30
+
+        # 簡易 HTML 解析（PowerShell 內建）
+        $content = $response.Content
+
+        # 移除 script 和 style
+        $content = $content -replace '<script[^>]*>[\\s\\S]*?</script>', ''
+        $content = $content -replace '<style[^>]*>[\\s\\S]*?</style>', ''
+
+        # 移除 HTML 標籤，保留文字
+        $text = $content -replace '<[^>]+>', ' '
+        $text = $text -replace '\\s+', ' '
+        $text = $text.Trim()
+
+        # 取前 2000 字元
+        if ($text.Length -gt 2000) {
+            $text = $text.Substring(0, 2000) + "..."
+        }
+
+        $report += "\`\`\`\`n$text\`n\`\`\`\`n\`n"
+        Write-Host "成功抓取 $($text.Length) 字元" -ForegroundColor Green
+
+    } catch {
+        $report += "錯誤：$($_.Exception.Message)\`n\`n"
+        Write-Host "抓取失敗: $($_.Exception.Message)" -ForegroundColor Red
+    }
+}
+
+$report | Out-File -FilePath $reportPath -Encoding UTF8
+Write-Host "\\n報告已產生：$reportPath" -ForegroundColor Green
+`;
+
+            return { skillMd, script };
+        }
+
+        // 排程提醒生成器
+        function generateScheduler(name, desc) {
+            const content = document.getElementById('reminderContent').value || '這是一則提醒';
+            const time = document.getElementById('scheduleTime').value || '09:00';
+            const freq = document.getElementById('scheduleFreq').value;
+
+            const freqDesc = {
+                'daily': '每天',
+                'weekday': '週一到週五',
+                'weekly': '每週',
+                'hourly': '每小時'
+            };
+
+            const skillMd = `# ${name}
+
+${desc}
+
+## 提醒內容
+${content}
+
+## 排程設定
+- 執行時間：${time}
+- 重複頻率：${freqDesc[freq]}
+
+## 使用方式
+跟龍蝦說：「設定提醒」或「執行 ${name}」
+
+## 手動執行
+\`\`\`powershell
+& "~/.openclaw/workspace/skills/${name}/scripts/remind.ps1"
+\`\`\`
+`;
+
+            const script = `# ${name} - ${desc}
+# 自動生成於 ${new Date().toLocaleDateString('zh-TW')}
+
+param(
+    [string]$Message = @"
+${content}
+"@
+)
+
+$timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "⏰ 提醒時間: $timestamp" -ForegroundColor Yellow
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host ""
+Write-Host $Message -ForegroundColor Green
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Cyan
+
+# 可選：發送 Windows 通知
+# [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
+# 這需要額外的設定，暫時用 Write-Host 顯示
+
+# 記錄到日誌
+$logDir = "$env:USERPROFILE\\.openclaw\\workspace\\logs"
+if (!(Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir -Force }
+$logFile = "$logDir\\reminders.log"
+"$timestamp - $Message" | Out-File -FilePath $logFile -Append -Encoding UTF8
+`;
+
+            return { skillMd, script };
+        }
+
+        // 檔案整理生成器
+        function generateFileOrganizer(name, desc) {
+            const source = document.getElementById('sourceFolder').value || '$env:USERPROFILE\\Downloads';
+            const rule = document.getElementById('organizeRule').value;
+            const moveFiles = document.getElementById('optMoveFiles').checked;
+
+            const ruleDesc = {
+                'extension': '依副檔名分類',
+                'date': '依日期分類',
+                'size': '依大小分類'
+            };
+
+            const skillMd = `# ${name}
+
+${desc}
+
+## 功能
+- 整理規則：${ruleDesc[rule]}
+- 來源資料夾：${source}
+- 模式：${moveFiles ? '移動檔案' : '只產生報告（不移動）'}
+
+## 使用方式
+跟龍蝦說：「整理下載資料夾」或「執行 ${name}」
+`;
+
+            const script = `# ${name} - ${desc}
+# 自動生成於 ${new Date().toLocaleDateString('zh-TW')}
+# 整理規則：${ruleDesc[rule]}
+
+param(
+    [string]$SourceFolder = "${source}",
+    [switch]$MoveFiles = $${moveFiles}
+)
+
+$expandedPath = $ExecutionContext.InvokeCommand.ExpandString($SourceFolder)
+
+if (!(Test-Path $expandedPath)) {
+    Write-Host "錯誤：來源資料夾不存在 - $expandedPath" -ForegroundColor Red
+    exit 1
+}
+
+Write-Host "開始整理: $expandedPath" -ForegroundColor Cyan
+Write-Host "模式: ${moveFiles ? '移動檔案' : '只產生報告'}" -ForegroundColor Yellow
+
+$files = Get-ChildItem -Path $expandedPath -File
+
+$report = "# 檔案整理報告 - $(Get-Date -Format 'yyyy-MM-dd HH:mm')\`n\`n"
+$report += "來源：$expandedPath\`n"
+$report += "檔案數：$($files.Count)\`n\`n"
+
+${rule === 'extension' ? `
+# 依副檔名分類
+$groups = $files | Group-Object Extension
+foreach ($group in $groups | Sort-Object Count -Descending) {
+    $ext = if ($group.Name) { $group.Name } else { "無副檔名" }
+    $report += "## $ext ($($group.Count) 個檔案)\`n"
+    foreach ($file in $group.Group) {
+        $report += "- $($file.Name)\`n"
+        if ($MoveFiles) {
+            $destDir = Join-Path $expandedPath $ext.TrimStart('.')
+            if (!(Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
+            Move-Item $file.FullName $destDir -Force
+        }
+    }
+    $report += "\`n"
+}
+` : ''}
+${rule === 'date' ? `
+# 依日期分類
+$groups = $files | Group-Object { $_.LastWriteTime.ToString("yyyy-MM") }
+foreach ($group in $groups | Sort-Object Name -Descending) {
+    $report += "## $($group.Name) ($($group.Count) 個檔案)\`n"
+    foreach ($file in $group.Group) {
+        $report += "- $($file.Name)\`n"
+        if ($MoveFiles) {
+            $destDir = Join-Path $expandedPath $group.Name
+            if (!(Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
+            Move-Item $file.FullName $destDir -Force
+        }
+    }
+    $report += "\`n"
+}
+` : ''}
+${rule === 'size' ? `
+# 依大小分類
+$categories = @{
+    "01-小檔案(小於1MB)" = { $_.Length -lt 1MB }
+    "02-中檔案(1-100MB)" = { $_.Length -ge 1MB -and $_.Length -lt 100MB }
+    "03-大檔案(100MB-1GB)" = { $_.Length -ge 100MB -and $_.Length -lt 1GB }
+    "04-超大檔案(大於1GB)" = { $_.Length -ge 1GB }
+}
+foreach ($cat in $categories.GetEnumerator() | Sort-Object Key) {
+    $catFiles = $files | Where-Object $cat.Value
+    if ($catFiles.Count -gt 0) {
+        $report += "## $($cat.Key) ($($catFiles.Count) 個檔案)\`n"
+        foreach ($file in $catFiles) {
+            $sizeMB = [math]::Round($file.Length / 1MB, 2)
+            $report += "- [$sizeMB MB] $($file.Name)\`n"
+            if ($MoveFiles) {
+                $destDir = Join-Path $expandedPath $cat.Key
+                if (!(Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
+                Move-Item $file.FullName $destDir -Force
+            }
+        }
+        $report += "\`n"
+    }
+}
+` : ''}
+
+$reportDir = "$env:USERPROFILE\\.openclaw\\workspace\\reports\\${name}"
+if (!(Test-Path $reportDir)) { New-Item -ItemType Directory -Path $reportDir -Force }
+$reportPath = "$reportDir\\$(Get-Date -Format 'yyyy-MM-dd').md"
+$report | Out-File -FilePath $reportPath -Encoding UTF8
+
+Write-Host "\\n報告已產生：$reportPath" -ForegroundColor Green
+if ($MoveFiles) { Write-Host "檔案已移動完成！" -ForegroundColor Cyan }
+`;
+
+            return { skillMd, script };
+        }
+
+        // 自動備份生成器
+        function generateBackup(name, desc) {
+            const sources = document.getElementById('backupSources').value || '$env:USERPROFILE\\Documents';
+            const dest = document.getElementById('backupDest').value || 'D:\\Backups';
+            const mode = document.getElementById('backupMode').value;
+
+            const modeDesc = {
+                'copy': '完整複製',
+                'sync': '同步',
+                'incremental': '增量備份'
+            };
+
+            const skillMd = `# ${name}
+
+${desc}
+
+## 設定
+- 備份來源：
+${sources.split('\n').filter(s => s.trim()).map(s => '  - ' + s.trim()).join('\n')}
+- 備份目的地：${dest}
+- 備份模式：${modeDesc[mode]}
+
+## 使用方式
+跟龍蝦說：「執行備份」或「備份我的檔案」
+`;
+
+            const rcloneCmd = mode === 'sync' ? 'sync' : 'copy';
+
+            const script = `# ${name} - ${desc}
+# 自動生成於 ${new Date().toLocaleDateString('zh-TW')}
+# 備份模式：${modeDesc[mode]}
+
+param(
+    [string[]]$Sources = @(
+        ${sources.split('\n').filter(s => s.trim()).map(s => `"${s.trim()}"`).join(',\n        ')}
+    ),
+    [string]$Destination = "${dest}"
+)
+
+$timestamp = Get-Date -Format "yyyy-MM-dd_HHmmss"
+$logDir = "$env:USERPROFILE\\.openclaw\\workspace\\logs"
+if (!(Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir -Force }
+$logFile = "$logDir\\backup_$timestamp.log"
+
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "開始備份 - $timestamp" -ForegroundColor Yellow
+Write-Host "目的地: $Destination" -ForegroundColor Gray
+Write-Host "========================================" -ForegroundColor Cyan
+
+"備份開始: $timestamp" | Out-File $logFile -Encoding UTF8
+
+foreach ($source in $Sources) {
+    $expandedSource = $ExecutionContext.InvokeCommand.ExpandString($source)
+
+    if (!(Test-Path $expandedSource)) {
+        Write-Host "跳過（不存在）: $expandedSource" -ForegroundColor Yellow
+        "跳過: $expandedSource (不存在)" | Out-File $logFile -Append -Encoding UTF8
+        continue
+    }
+
+    $folderName = Split-Path $expandedSource -Leaf
+    $destPath = if ($Destination -match ":") {
+        # 如果是 rclone remote（如 gdrive:Backups）
+        "$Destination/$folderName"
+    } else {
+        Join-Path $Destination $folderName
+    }
+
+    Write-Host "備份中: $expandedSource -> $destPath" -ForegroundColor Cyan
+
+    if ($Destination -match "^[a-zA-Z]+:") {
+        # 使用 rclone（雲端備份）
+        rclone ${rcloneCmd} "$expandedSource" "$destPath" --progress
+    } else {
+        # 本機備份
+        if (!(Test-Path $destPath)) { New-Item -ItemType Directory -Path $destPath -Force | Out-Null }
+
+        $files = Get-ChildItem -Path $expandedSource -Recurse -File
+        $count = 0
+        foreach ($file in $files) {
+            $relativePath = $file.FullName.Substring($expandedSource.Length)
+            $targetPath = Join-Path $destPath $relativePath
+            $targetDir = Split-Path $targetPath -Parent
+            if (!(Test-Path $targetDir)) { New-Item -ItemType Directory -Path $targetDir -Force | Out-Null }
+            Copy-Item $file.FullName $targetPath -Force
+            $count++
+        }
+        Write-Host "已複製 $count 個檔案" -ForegroundColor Green
+    }
+
+    "完成: $expandedSource -> $destPath" | Out-File $logFile -Append -Encoding UTF8
+}
+
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "備份完成！" -ForegroundColor Green
+Write-Host "日誌檔: $logFile" -ForegroundColor Gray
+"備份完成: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" | Out-File $logFile -Append -Encoding UTF8
+`;
+
+            return { skillMd, script };
+        }
+
+        // 自訂 Skill 生成器
+        function generateCustom(name, desc) {
+            const trigger = document.getElementById('customTrigger').value || '執行我的任務';
+            const script = document.getElementById('customScript').value || 'Write-Host "Hello from my custom skill!"';
+
+            const skillMd = `# ${name}
+
+${desc}
+
+## 觸發指令
+跟龍蝦說：「${trigger}」
+
+## 功能說明
+自訂技能，執行以下腳本。
+
+## 使用方式
+\`\`\`
+${trigger}
+\`\`\`
+`;
+
+            const fullScript = `# ${name} - ${desc}
+# 自動生成於 ${new Date().toLocaleDateString('zh-TW')}
+# 觸發指令：${trigger}
+
+${script}
+`;
+
+            return { skillMd, script: fullScript };
+        }
+
+        // 下載單一檔案
+        function downloadFile(type) {
+            if (!generatedFiles[type]) {
+                alert('請先生成 Skill！');
+                return;
+            }
+
+            const file = generatedFiles[type];
+            const blob = new Blob([file.content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = file.filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // 下載全部（模擬 ZIP，實際上分別下載）
+        function downloadAll() {
+            // 由於純前端難以建立真正的 ZIP，改為逐一下載
+            downloadFile('skill-md');
+            setTimeout(() => downloadFile('script'), 500);
+            setTimeout(() => downloadFile('install'), 1000);
+        }
+
+        // 初始化
+        updateDefaultName();
+    </script>
+</body>
+</html>
