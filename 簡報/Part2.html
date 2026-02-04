@@ -63,17 +63,40 @@
                 <h1>Part 2: 安裝基礎環境</h1>
                 <h2 style="border: none; font-size: 28px; color: #666;">安裝 nvm 和 Node.js</h2>
                 <div style="margin-top: 40px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                    <span class="highlight">一鍵安裝包（推薦）</span>
                     <span class="highlight">nvm-windows</span>
-                    <span class="highlight">Node.js 24</span>
+                    <span class="highlight">Node.js 22</span>
                     <span class="highlight">PowerShell</span>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 2: 什麼是 nvm -->
+        <!-- Slide 2: 安裝方式選擇 -->
         <div class="slide">
             <div class="content-card">
-                <h2>🤔 什麼是 nvm？</h2>
+                <h2>🎯 選擇安裝方式</h2>
+                <p>有兩種方式可以安裝基礎環境：</p>
+                <div class="step-box" style="background: linear-gradient(135deg, rgba(0, 200, 81, 0.1), rgba(0, 126, 51, 0.1)); border-color: #00C851;">
+                    <h3 style="color: #00C851;">⭐ 方式一：一鍵安裝包（推薦新手）</h3>
+                    <p>從 Google Drive 下載已打包好的 Node.js 22 + Python 3.12</p>
+                    <p>📦 <a href="https://drive.google.com/drive/folders/1k5uyzt6-s5HLmKZjzQ6ePJ0LlJKqtsjg?usp=sharing" target="_blank" style="color: #00C851; font-weight: bold;">點此下載一鍵安裝包</a></p>
+                    <p style="font-size: 16px; color: #666;">下載後直接執行安裝程式，無需額外設定！</p>
+                </div>
+                <div class="step-box">
+                    <h3>方式二：手動安裝（進階使用者）</h3>
+                    <p>透過 nvm 安裝 Node.js，可自由管理多個版本</p>
+                    <p style="font-size: 16px; color: #666;">適合已有開發經驗的使用者</p>
+                </div>
+                <div class="box info">
+                    <strong>💡 建議：</strong>如果你是新手，建議使用一鍵安裝包，省時省力！
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: 什麼是 nvm -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>🤔 什麼是 nvm？（手動安裝用）</h2>
                 <p><strong>nvm</strong> = Node Version Manager（Node 版本管理器）</p>
                 <p>它可以幫你管理電腦上的 Node.js 版本。</p>
                 <div class="box info">
@@ -181,17 +204,17 @@
         <!-- Slide 7: 安裝 Node.js -->
         <div class="slide">
             <div class="content-card">
-                <h2>📦 第五步：安裝 Node.js 24 版</h2>
+                <h2>📦 第五步：安裝 Node.js 22 版</h2>
                 <p>在 PowerShell 視窗輸入這行，然後按 Enter：</p>
-                <pre>nvm install 24</pre>
+                <pre>nvm install 22</pre>
                 <p>等它下載完成，會顯示 <code>Installation complete</code>。</p>
                 <div class="box info">
                     <strong>這會需要一點時間，</strong>大約 1-3 分鐘，耐心等待！
                 </div>
-                <h3>接著切換到 Node.js 24 版</h3>
+                <h3>接著切換到 Node.js 22 版</h3>
                 <p>輸入這行，按 Enter：</p>
-                <pre>nvm use 24</pre>
-                <p>會顯示 <code>Now using node v24.x.x</code>。</p>
+                <pre>nvm use 22</pre>
+                <p>會顯示 <code>Now using node v22.x.x</code>。</p>
             </div>
         </div>
 
@@ -203,7 +226,7 @@
                 <pre>node -v
 npm -v</pre>
                 <p>你應該看到類似這樣：</p>
-                <pre>v24.13.0
+                <pre>v22.13.0
 11.6.4</pre>
                 <div class="box success">
                     <strong>🎉 看到版本號就代表成功了！</strong><br>
@@ -220,7 +243,7 @@ npm -v</pre>
                 <p style="font-size: 24px;">你已經成功安裝了：</p>
                 <div style="display: flex; justify-content: center; gap: 30px; margin: 30px 0; flex-wrap: wrap;">
                     <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ nvm</span>
-                    <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ Node.js 24</span>
+                    <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ Node.js 22</span>
                     <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ npm</span>
                 </div>
                 <p style="font-size: 20px;">接下來前往下一章安裝 Clawdbot/Moltbot！</p>

@@ -70,7 +70,7 @@
                 <ol>
                     <li>關掉 PowerShell</li>
                     <li>重新開一個新的 PowerShell（系統管理員）</li>
-                    <li>輸入：<code>nvm use 24</code></li>
+                    <li>輸入：<code>nvm use 22</code></li>
                     <li>輸入：<code>setx PATH "$env:APPDATA\npm;$env:Path"</code></li>
                     <li>關掉 PowerShell，再重新開一個</li>
                     <li>再試一次原本的指令</li>
@@ -88,7 +88,7 @@
                     <li>在 PowerShell 輸入：<code>codex login</code></li>
                     <li>瀏覽器會打開，登入你的 ChatGPT/OpenAI 帳號</li>
                     <li>登入完成後，回到 PowerShell</li>
-                    <li>輸入：<code>clawdbot gateway restart</code></li>
+                    <li>輸入：<code>openclaw gateway restart</code></li>
                 </ol>
             </div>
         </div>
@@ -97,11 +97,11 @@
             <div class="content-card">
                 <h2>❌ 問題 3-4：版本問題</h2>
                 <h3>Node.js 版本太舊</h3>
-                <pre>required: { node: '>=24' }</pre>
+                <pre>required: { node: '>=22' }</pre>
                 <p><strong>解決：</strong></p>
-                <pre>nvm install 24
-nvm use 24</pre>
-                <h3>ngrok 版本太舊</h3>
+                <pre>nvm install 22
+nvm use 22</pre>
+                <h3>ngrok 版本太舊 (ERR_NGROK_121)</h3>
                 <pre>Your ngrok-agent version is too old</pre>
                 <p><strong>解決：</strong></p>
                 <pre>ngrok update</pre>
@@ -110,29 +110,84 @@ nvm use 24</pre>
 
         <div class="slide">
             <div class="content-card">
-                <h2>❌ 問題 5：LINE 機器人沒回應</h2>
-                <h3>可能原因 1：ngrok 已經關了</h3>
-                <p>解決：重新開 ngrok，然後更新 LINE Webhook URL</p>
-                <pre>ngrok http 18789</pre>
-                <h3>可能原因 2：Clawdbot/Moltbot 沒在跑</h3>
-                <pre>clawdbot gateway start</pre>
-                <h3>可能原因 3：還沒配對</h3>
-                <p>傳訊息給機器人取得配對碼，然後執行：</p>
-                <pre>clawdbot pairing approve line 配對碼</pre>
+                <h2>❌ 問題 5：PowerShell 執行原則錯誤</h2>
+                <p><strong>看到的錯誤訊息：</strong></p>
+                <pre>PSSecurityException: 無法載入檔案...
+因為這個系統上已停用指令碼執行</pre>
+                <p><strong>解決方法：</strong></p>
+                <ol>
+                    <li>以系統管理員身分開啟 PowerShell</li>
+                    <li>執行：<code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code></li>
+                    <li>輸入 <code>Y</code> 確認</li>
+                    <li>重新執行原本的指令</li>
+                </ol>
             </div>
         </div>
 
         <div class="slide">
             <div class="content-card">
-                <h2>📋 Clawdbot/Moltbot 常用指令</h2>
+                <h2>❌ 問題 6：ngrok authtoken 格式錯誤</h2>
+                <p><strong>看到的錯誤訊息：</strong></p>
+                <pre>ERR_NGROK_105: The authtoken you specified is improperly formatted</pre>
+                <p><strong>解決方法：</strong></p>
+                <ol>
+                    <li>登入 <code>https://dashboard.ngrok.com/</code></li>
+                    <li>點左邊的 <strong>Your Authtoken</strong></li>
+                    <li>點 <strong>Reset</strong> 重設 token</li>
+                    <li>複製新的 token，重新執行：<br>
+                        <code>ngrok config add-authtoken 你的新token</code></li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>❌ 問題 7：502 Bad Gateway</h2>
+                <p><strong>看到的錯誤訊息：</strong></p>
+                <pre>502 Bad Gateway
+ngrok: upstream connection error</pre>
+                <p><strong>解決方法：</strong></p>
+                <ol>
+                    <li>確認 OpenClaw 正在執行：<code>openclaw gateway status</code></li>
+                    <li>如果沒在跑，啟動它：<code>openclaw gateway start</code></li>
+                    <li>確認 ngrok 連接的 port 正確：<code>ngrok http 18789</code></li>
+                    <li>重新啟動 OpenClaw：<code>openclaw gateway restart</code></li>
+                </ol>
+                <div class="box warning">
+                    <strong>⚠️ 注意：</strong>ngrok 和 OpenClaw 都要同時執行才會正常！
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>❌ 問題 8：LINE 機器人沒回應</h2>
+                <h3>可能原因 1：ngrok 已經關了</h3>
+                <p>解決：重新開 ngrok，然後更新 LINE Webhook URL</p>
+                <pre>ngrok http 18789</pre>
+                <h3>可能原因 2：OpenClaw 沒在跑</h3>
+                <pre>openclaw gateway start</pre>
+                <h3>可能原因 3：還沒配對</h3>
+                <p>傳訊息給機器人取得配對碼，然後執行：</p>
+                <pre>openclaw pairing approve line 配對碼</pre>
+                <div class="box info">
+                    <strong>💡 需要更多協助？</strong><br>
+                    可以詢問 <a href="https://gemini.google.com/gem/1tU1Fg7oNheh5UmRTbDPnWsSVDs_Z2bSA?usp=sharing" target="_blank" style="color: #2196f3;">Gemini 小幫手</a> 來解決問題！
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>📋 OpenClaw 常用指令</h2>
                 <table>
                     <tr><th>你想做的事</th><th>輸入這個指令</th></tr>
-                    <tr><td>🚀 啟動龍蝦</td><td><code>clawdbot gateway start</code></td></tr>
-                    <tr><td>🛑 關閉龍蝦</td><td><code>clawdbot gateway stop</code></td></tr>
-                    <tr><td>🔄 重新啟動龍蝦</td><td><code>clawdbot gateway restart</code></td></tr>
-                    <tr><td>📊 看龍蝦狀態</td><td><code>clawdbot gateway status</code></td></tr>
-                    <tr><td>🔍 檢查有沒有問題</td><td><code>clawdbot doctor</code></td></tr>
-                    <tr><td>✅ 批准 LINE 配對</td><td><code>clawdbot pairing approve line 配對碼</code></td></tr>
+                    <tr><td>🚀 啟動龍蝦</td><td><code>openclaw gateway start</code></td></tr>
+                    <tr><td>🛑 關閉龍蝦</td><td><code>openclaw gateway stop</code></td></tr>
+                    <tr><td>🔄 重新啟動龍蝦</td><td><code>openclaw gateway restart</code></td></tr>
+                    <tr><td>📊 看龍蝦狀態</td><td><code>openclaw gateway status</code></td></tr>
+                    <tr><td>🔍 檢查有沒有問題</td><td><code>openclaw doctor</code></td></tr>
+                    <tr><td>✅ 批准 LINE 配對</td><td><code>openclaw pairing approve line 配對碼</code></td></tr>
                     <tr><td>🔑 重新登入 OpenAI</td><td><code>codex login</code></td></tr>
                 </table>
             </div>
@@ -152,8 +207,8 @@ nvm use 24</pre>
                 <table>
                     <tr><th>你想做的事</th><th>輸入這個指令</th></tr>
                     <tr><td>看 Node 版本</td><td><code>node -v</code></td></tr>
-                    <tr><td>安裝 Node 24</td><td><code>nvm install 24</code></td></tr>
-                    <tr><td>切換到 Node 24</td><td><code>nvm use 24</code></td></tr>
+                    <tr><td>安裝 Node 22</td><td><code>nvm install 22</code></td></tr>
+                    <tr><td>切換到 Node 22</td><td><code>nvm use 22</code></td></tr>
                 </table>
             </div>
         </div>
@@ -163,18 +218,18 @@ nvm use 24</pre>
                 <h2>🔄 關閉與重新啟動</h2>
                 <div class="box info">
                     <strong>📋 快速指令摘要（每次開機都要做）：</strong><br>
-                    <code>clawdbot gateway start</code> → 第一個視窗<br>
+                    <code>openclaw gateway start</code> → 第一個視窗<br>
                     <code>ngrok http 18789</code> → 第二個視窗<br>
                     然後更新 LINE Webhook URL！
                 </div>
                 <h3>要關閉的時候</h3>
                 <ol>
                     <li>在 ngrok 的視窗按 <code>Ctrl + C</code></li>
-                    <li>在另一個視窗輸入：<code>clawdbot gateway stop</code></li>
+                    <li>在另一個視窗輸入：<code>openclaw gateway stop</code></li>
                 </ol>
                 <h3>下次要啟動的時候</h3>
                 <ol>
-                    <li>開 PowerShell，輸入：<code>clawdbot gateway start</code></li>
+                    <li>開 PowerShell，輸入：<code>openclaw gateway start</code></li>
                     <li>開另一個 PowerShell，輸入：<code>ngrok http 18789</code></li>
                     <li><strong>重要！</strong>用指令開啟 LINE Developers：<br>
                         <code>start https://developers.line.biz/</code><br>

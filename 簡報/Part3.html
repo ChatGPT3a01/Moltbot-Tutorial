@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Part 3 - 安裝 Clawdbot/Moltbot</title>
+    <title>Part 3 - 安裝 OpenClaw（龍蝦機器人）</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow: hidden; color: #333; }
@@ -44,7 +44,7 @@
 </head>
 <body>
     <div class="nav-bar">
-        <div class="nav-title">🤖 Part 3 - 安裝 Clawdbot/Moltbot</div>
+        <div class="nav-title">🤖 Part 3 - 安裝 OpenClaw</div>
         <div class="nav-buttons">
             <a href="index.html" class="nav-btn">🏠 首頁</a>
             <a href="Part2.html" class="nav-btn">⬅️ 上一章</a>
@@ -61,11 +61,11 @@
         <div class="slide active">
             <div class="content-card" style="text-align: center;">
                 <span style="font-size: 80px;">🤖</span>
-                <h1>Part 3: 安裝 Clawdbot/Moltbot</h1>
-                <h2 style="border: none; font-size: 28px; color: #666;">安裝龍蝦機器人本體</h2>
+                <h1>Part 3: 安裝 OpenClaw</h1>
+                <h2 style="border: none; font-size: 28px; color: #666;">安裝龍蝦機器人本體（原 OpenClaw）</h2>
                 <div style="margin-top: 40px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
-                    <span class="highlight">install.ps1</span>
-                    <span class="highlight">OpenAI OAuth</span>
+                    <span class="highlight">一鍵安裝</span>
+                    <span class="highlight">npm install</span>
                     <span class="highlight">Gateway</span>
                 </div>
             </div>
@@ -88,18 +88,27 @@ cd D:\Moltbot</pre>
             </div>
         </div>
 
-        <!-- Slide 3: 執行安裝指令 -->
+        <!-- Slide 3: 選擇安裝方式 -->
         <div class="slide">
             <div class="content-card">
-                <h2>🚀 第二步：執行安裝指令</h2>
-                <p>輸入這行神奇的安裝指令：</p>
-                <pre>iwr -useb https://molt.bot/install.ps1 | iex</pre>
-                <p>等它跑，會出現一個有龍蝦圖案的畫面！</p>
-                <div class="box success">
-                    <strong>🦞 看到龍蝦圖案就代表安裝程式啟動成功！</strong>
+                <h2>🎯 第二步：選擇安裝方式</h2>
+                <div class="step-box" style="background: linear-gradient(135deg, rgba(0, 200, 81, 0.1), rgba(0, 126, 51, 0.1)); border-color: #00C851;">
+                    <h3 style="color: #00C851;">⭐ 方式 A：npm 安裝（推薦，最穩定）</h3>
+                    <pre style="background: #1e1e1e; color: #d4d4d4;">npm install -g openclaw@latest</pre>
+                    <p style="font-size: 16px;">如果你已經安裝好 Node.js 22，這是最穩定的方式</p>
                 </div>
-                <div class="box warning">
-                    <strong>注意：</strong> 這個指令會從網路下載安裝程式，請確保網路連線正常。
+                <div class="step-box">
+                    <h3>方式 B：一鍵安裝腳本</h3>
+                    <pre style="background: #1e1e1e; color: #d4d4d4;"># 先設定執行權限
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# 下載並執行安裝腳本
+iwr -useb https://openclaw.ai/install.ps1 -OutFile install.ps1
+powershell -ExecutionPolicy Bypass -File .\install.ps1</pre>
+                </div>
+                <div class="box info">
+                    <strong>💡 遇到「禁止執行指令碼」錯誤？</strong><br>
+                    先執行：<code>Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force</code>
                 </div>
             </div>
         </div>
@@ -191,14 +200,36 @@ cd D:\Moltbot</pre>
             </div>
         </div>
 
-        <!-- Slide 9: 安裝完成 -->
+        <!-- Slide 9: 執行初始化 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>🔧 第三步：執行初始化</h2>
+                <p>安裝完成後，執行初始化設定：</p>
+                <pre>openclaw onboard --install-daemon</pre>
+                <p>這個指令會：</p>
+                <ul>
+                    <li>引導你設定 LLM API 金鑰（Gemini / OpenAI / Claude）</li>
+                    <li>安裝 Gateway 服務</li>
+                    <li>建立設定檔</li>
+                </ul>
+                <div class="box info">
+                    <strong>💡 推薦模型：</strong>
+                    <ul>
+                        <li><code>gemini-2.5-flash</code> - 推薦，穩定且快速</li>
+                        <li><code>gpt-5.2</code> - OpenAI 最新穩定版</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: 安裝完成 -->
         <div class="slide">
             <div class="content-card">
                 <h2>✅ 安裝完成！</h2>
                 <p>看到這些訊息就代表成功：</p>
                 <pre>Gateway service installed</pre>
                 <div class="box success">
-                    <strong>🎉 恭喜！Clawdbot/Moltbot 已經安裝完成！</strong>
+                    <strong>🎉 恭喜！OpenClaw 已經安裝完成！</strong>
                 </div>
                 <div class="box info">
                     <strong>接下來要做什麼？</strong><br>
@@ -212,7 +243,7 @@ cd D:\Moltbot</pre>
             <div class="content-card" style="text-align: center;">
                 <span style="font-size: 80px;">🎉</span>
                 <h2 style="border: none;">Part 3 完成！</h2>
-                <p style="font-size: 24px;">Clawdbot/Moltbot 龍蝦本體已經安裝好了！</p>
+                <p style="font-size: 24px;">OpenClaw 龍蝦本體已經安裝好了！</p>
                 <p style="font-size: 20px; margin-top: 20px;">接下來前往下一章建立 LINE 機器人帳號！</p>
                 <a href="Part4.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);">
                     ➡️ Part 4：建立 LINE 機器人帳號
