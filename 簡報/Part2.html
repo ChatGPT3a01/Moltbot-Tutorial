@@ -38,7 +38,6 @@
         .indicators { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 4000; padding: 10px 25px; background: rgba(0,0,0,0.3); border-radius: 30px; }
         .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; }
         .dot.active { background: #fff; transform: scale(1.3); }
-        @media (max-width: 768px) { .content-card { padding: 25px; } h1 { font-size: 32px; } h2 { font-size: 26px; } p, li { font-size: 16px; } pre { font-size: 14px; } }
     </style>
 </head>
 <body>
@@ -49,9 +48,6 @@
             <a href="Part1.html" class="nav-btn">⬅️ 上一章</a>
             <a href="Part3.html" class="nav-btn">下一章 ➡️</a>
             <button class="nav-btn" onclick="toggleFullscreen()">🖥️ 全螢幕</button>
-            <a href="https://www.facebook.com/?locale=zh_TW" target="_blank" class="nav-btn">📘 FB</a>
-            <a href="https://www.youtube.com/@Liang-yt02" target="_blank" class="nav-btn">🎥 YT</a>
-            <a href="https://www.facebook.com/groups/2754139931432955?locale=zh_TW" target="_blank" class="nav-btn">👥 3A</a>
         </div>
     </div>
 
@@ -61,194 +57,97 @@
             <div class="content-card" style="text-align: center;">
                 <span style="font-size: 80px;">⚙️</span>
                 <h1>Part 2: 安裝基礎環境</h1>
-                <h2 style="border: none; font-size: 28px; color: #666;">安裝 nvm 和 Node.js</h2>
+                <h2 style="border: none; font-size: 28px; color: #666;">一鍵安裝，超簡單！</h2>
                 <div style="margin-top: 40px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
-                    <span class="highlight">一鍵安裝包（推薦）</span>
-                    <span class="highlight">nvm-windows</span>
-                    <span class="highlight">Node.js 22</span>
-                    <span class="highlight">PowerShell</span>
+                    <span class="highlight">一鍵安裝腳本</span>
+                    <span class="highlight">自動安裝 Node.js</span>
+                    <span class="highlight">免手動設定</span>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 2: 安裝方式選擇 -->
+        <!-- Slide 2: 開啟 PowerShell -->
         <div class="slide">
             <div class="content-card">
-                <h2>🎯 選擇安裝方式</h2>
-                <p>有兩種方式可以安裝基礎環境：</p>
-                <div class="step-box" style="background: linear-gradient(135deg, rgba(0, 200, 81, 0.1), rgba(0, 126, 51, 0.1)); border-color: #00C851;">
-                    <h3 style="color: #00C851;">⭐ 方式一：一鍵安裝包（推薦新手）</h3>
-                    <p>從 Google Drive 下載已打包好的 Node.js 22 + Python 3.12</p>
-                    <p>📦 <a href="https://drive.google.com/drive/folders/1k5uyzt6-s5HLmKZjzQ6ePJ0LlJKqtsjg?usp=sharing" target="_blank" style="color: #00C851; font-weight: bold;">點此下載一鍵安裝包</a></p>
-                    <p style="font-size: 16px; color: #666;">下載後直接執行安裝程式，無需額外設定！</p>
-                </div>
+                <h2>🖥️ 第一步：開啟 PowerShell</h2>
                 <div class="step-box">
-                    <h3>方式二：手動安裝（進階使用者）</h3>
-                    <p>透過 nvm 安裝 Node.js，可自由管理多個版本</p>
-                    <p style="font-size: 16px; color: #666;">適合已有開發經驗的使用者</p>
-                </div>
-                <div class="box info">
-                    <strong>💡 建議：</strong>如果你是新手，建議使用一鍵安裝包，省時省力！
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 3: 什麼是 nvm -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>🤔 什麼是 nvm？（手動安裝用）</h2>
-                <p><strong>nvm</strong> = Node Version Manager（Node 版本管理器）</p>
-                <p>它可以幫你管理電腦上的 Node.js 版本。</p>
-                <div class="box info">
-                    <strong>為什麼需要它？</strong><br>
-                    不同的程式可能需要不同版本的 Node.js。<br>
-                    有了 nvm，你可以輕鬆切換不同版本！
-                </div>
-                <div class="box success">
-                    <strong>簡單說：</strong> nvm 就像一個「版本切換器」，讓你想用哪個版本就用哪個版本！
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 3: 下載 nvm -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>📥 第一步：下載 nvm</h2>
-                <div class="step-box">
-                    <p><span class="step-number">1</span>打開瀏覽器</p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">2</span>進入這個網址：</p>
-                    <pre>https://github.com/coreybutler/nvm-windows/releases</pre>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">3</span>往下滑，找到 <strong>Assets</strong></p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">4</span>點 <code>nvm-setup.exe</code> 下載</p>
-                </div>
-                <div class="box warning">
-                    <strong>注意：</strong> 要下載的是 <code>nvm-setup.exe</code>，不是其他檔案喔！
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 4: 安裝 nvm -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>🔧 第二步：安裝 nvm</h2>
-                <div class="step-box">
-                    <p><span class="step-number">1</span>打開剛剛下載的 <code>nvm-setup.exe</code></p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">2</span>一直按 <strong>Next</strong>（下一步）</p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">3</span>按 <strong>Install</strong>（安裝）</p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">4</span>等它跑完，按 <strong>Finish</strong>（完成）</p>
-                </div>
-                <div class="box success">
-                    <strong>✅ 安裝很簡單，基本上就是一直按「下一步」！</strong>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 5: 確認 nvm 安裝 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>✅ 第三步：確認 nvm 安裝成功</h2>
-                <div class="step-box">
-                    <p><span class="step-number">1</span>按下鍵盤的 <code>Windows 鍵 + R</code></p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">2</span>輸入 <code>powershell</code>，按 Enter</p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">3</span>在 PowerShell 視窗輸入：</p>
-                    <pre>nvm version</pre>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">4</span>如果看到版本號（例如 <code>1.2.2</code>），就代表成功了！</p>
-                </div>
-                <div class="box info">
-                    <strong>💡 小提示：</strong> 如果顯示「找不到指令」，試試看關掉 PowerShell 重新開一個。
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 6: 開啟管理員 PowerShell -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>🔑 第四步：開啟管理員 PowerShell</h2>
-                <p>接下來要安裝 Node.js，需要用<strong>系統管理員</strong>身分。</p>
-                <div class="step-box">
-                    <p><span class="step-number">1</span>點 <strong>開始</strong>（左下角的 Windows 圖示）</p>
+                    <p><span class="step-number">1</span>按下鍵盤的 <code>Windows 鍵</code></p>
                 </div>
                 <div class="step-box">
                     <p><span class="step-number">2</span>搜尋 <code>PowerShell</code></p>
                 </div>
                 <div class="step-box">
-                    <p><span class="step-number">3</span>在 <strong>Windows PowerShell</strong> 上面 <strong>按右鍵</strong></p>
+                    <p><span class="step-number">3</span>在 <strong>Windows PowerShell</strong> 上 <strong>按右鍵</strong></p>
                 </div>
                 <div class="step-box">
                     <p><span class="step-number">4</span>選 <strong>以系統管理員身分執行</strong></p>
                 </div>
-                <div class="step-box">
-                    <p><span class="step-number">5</span>如果跳出詢問視窗，按 <strong>是</strong></p>
+                <div class="box warning">
+                    <strong>⚠️ 重要：</strong>一定要用「系統管理員」身分，不然會安裝失敗！
                 </div>
             </div>
         </div>
 
-        <!-- Slide 7: 安裝 Node.js -->
+        <!-- Slide 3: 執行一鍵安裝 -->
         <div class="slide">
             <div class="content-card">
-                <h2>📦 第五步：安裝 Node.js 22 版</h2>
-                <p>在 PowerShell 視窗輸入這行，然後按 Enter：</p>
-                <pre>nvm install 22</pre>
-                <p>等它下載完成，會顯示 <code>Installation complete</code>。</p>
-                <div class="box info">
-                    <strong>這會需要一點時間，</strong>大約 1-3 分鐘，耐心等待！
-                </div>
-                <h3>接著切換到 Node.js 22 版</h3>
-                <p>輸入這行，按 Enter：</p>
-                <pre>nvm use 22</pre>
-                <p>會顯示 <code>Now using node v22.x.x</code>。</p>
-            </div>
-        </div>
-
-        <!-- Slide 8: 確認 Node.js 安裝 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>✅ 第六步：確認 Node.js 安裝成功</h2>
-                <p>輸入這兩行（一行一行輸入，每輸入一行按一次 Enter）：</p>
-                <pre>node -v
-npm -v</pre>
-                <p>你應該看到類似這樣：</p>
-                <pre>v22.13.0
-11.6.4</pre>
+                <h2>🚀 第二步：執行一鍵安裝</h2>
+                <p>複製這行指令，貼到 PowerShell，按 Enter：</p>
+                <pre>iwr -useb https://openclaw.ai/install.ps1 | iex</pre>
                 <div class="box success">
-                    <strong>🎉 看到版本號就代表成功了！</strong><br>
-                    Node.js 和 npm 都安裝好了！
+                    <strong>這個腳本會自動幫你安裝：</strong>
+                    <ul style="margin-top: 10px; margin-bottom: 0;">
+                        <li>Node.js 22</li>
+                        <li>OpenClaw</li>
+                        <li>所有必要的設定</li>
+                    </ul>
+                </div>
+                <div class="box info">
+                    <strong>💡 安裝過程約 2-5 分鐘，請耐心等待！</strong>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 9: 完成 -->
+        <!-- Slide 4: 如果腳本被阻擋 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>❓ 如果腳本被阻擋？</h2>
+                <p>如果看到「執行原則」錯誤，先執行這行：</p>
+                <pre>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</pre>
+                <p>輸入 <code>Y</code> 確認，然後再執行安裝指令：</p>
+                <pre>iwr -useb https://openclaw.ai/install.ps1 | iex</pre>
+                <div class="box info">
+                    <strong>💡 這只需要做一次，以後就不用了！</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: 確認安裝成功 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>✅ 第三步：確認安裝成功</h2>
+                <p>安裝完成後，輸入這行確認：</p>
+                <pre>openclaw --version</pre>
+                <p>如果看到版本號，就代表成功了！</p>
+                <div class="box success">
+                    <strong>🎉 恭喜！環境安裝完成！</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: 完成 -->
         <div class="slide">
             <div class="content-card" style="text-align: center;">
                 <span style="font-size: 80px;">🎉</span>
                 <h2 style="border: none;">Part 2 完成！</h2>
-                <p style="font-size: 24px;">你已經成功安裝了：</p>
+                <p style="font-size: 24px;">環境已經準備好了！</p>
                 <div style="display: flex; justify-content: center; gap: 30px; margin: 30px 0; flex-wrap: wrap;">
-                    <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ nvm</span>
                     <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ Node.js 22</span>
-                    <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ npm</span>
+                    <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ OpenClaw</span>
                 </div>
-                <p style="font-size: 20px;">接下來前往下一章安裝 Clawdbot/Moltbot！</p>
+                <p style="font-size: 20px;">接下來進行初始化設定！</p>
                 <a href="Part3.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);">
-                    ➡️ Part 3：安裝 Clawdbot/Moltbot
+                    ➡️ Part 3：設定 OpenClaw
                 </a>
             </div>
         </div>

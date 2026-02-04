@@ -3,30 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Part 3 - 安裝 OpenClaw（龍蝦機器人）</title>
+    <title>Part 3 - 設定 OpenClaw</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow: hidden; color: #333; }
-        .nav-bar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; z-index: 10000; }
+        .nav-bar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; z-index: 10000; }
         .nav-title { font-size: 22px; font-weight: 700; color: #fff; }
         .nav-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
-        .nav-btn { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
-        .nav-btn:hover { background: rgba(255, 255, 255, 0.4); transform: translateY(-2px); }
-        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.25); color: white; width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); font-size: 24px; cursor: pointer; z-index: 9000; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
-        .nav-arrow:hover { background: rgba(255,255,255,0.5); transform: translateY(-50%) scale(1.1); }
-        .prev-arrow { left: 30px; }
-        .next-arrow { right: 30px; }
-        .nav-arrow:disabled { opacity: 0.3; cursor: not-allowed; }
-        .slide-container { width: 100%; height: 100vh; padding-top: 60px; position: relative; }
-        .slide { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); display: none; align-items: center; justify-content: center; padding: 40px; opacity: 0; transition: opacity 0.4s ease; }
-        .slide.active { display: flex; opacity: 1; }
+        .nav-btn { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.4); }
+        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.25); color: white; width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); font-size: 24px; cursor: pointer; z-index: 9000; display: flex; align-items: center; justify-content: center; }
+        .prev-arrow { left: 30px; } .next-arrow { right: 30px; }
+        .nav-arrow:disabled { opacity: 0.3; }
+        .slide { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); display: none; align-items: center; justify-content: center; padding: 40px; }
+        .slide.active { display: flex; }
         .content-card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); padding: 50px; max-width: 1200px; width: 95%; max-height: 88vh; overflow-y: auto; }
         h1 { color: #667eea; font-size: 48px; margin-bottom: 24px; text-align: center; }
         h2 { color: #764ba2; font-size: 36px; margin-bottom: 30px; border-bottom: 3px solid #667eea; padding-bottom: 12px; }
         h3 { color: #667eea; font-size: 24px; margin: 25px 0 15px 0; }
         p, li { font-size: 20px; line-height: 1.8; color: #444; margin-bottom: 12px; }
         code { background: #f0f2f5; padding: 3px 8px; border-radius: 6px; font-family: 'Consolas', monospace; color: #d63384; font-weight: 600; }
-        pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 12px; overflow-x: auto; margin: 20px 0; font-size: 18px; line-height: 1.6; font-family: 'Consolas', monospace; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 12px; margin: 20px 0; font-size: 18px; }
         .box { padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 6px solid; font-size: 18px; }
         .info { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
         .success { background: #d4edda; border-color: #28a745; color: #155724; }
@@ -44,15 +41,12 @@
 </head>
 <body>
     <div class="nav-bar">
-        <div class="nav-title">🤖 Part 3 - 安裝 OpenClaw</div>
+        <div class="nav-title">🤖 Part 3 - 設定 OpenClaw</div>
         <div class="nav-buttons">
             <a href="index.html" class="nav-btn">🏠 首頁</a>
             <a href="Part2.html" class="nav-btn">⬅️ 上一章</a>
             <a href="Part4.html" class="nav-btn">下一章 ➡️</a>
             <button class="nav-btn" onclick="toggleFullscreen()">🖥️ 全螢幕</button>
-            <a href="https://www.facebook.com/?locale=zh_TW" target="_blank" class="nav-btn">📘 FB</a>
-            <a href="https://www.youtube.com/@Liang-yt02" target="_blank" class="nav-btn">🎥 YT</a>
-            <a href="https://www.facebook.com/groups/2754139931432955?locale=zh_TW" target="_blank" class="nav-btn">👥 3A</a>
         </div>
     </div>
 
@@ -61,191 +55,137 @@
         <div class="slide active">
             <div class="content-card" style="text-align: center;">
                 <span style="font-size: 80px;">🤖</span>
-                <h1>Part 3: 安裝 OpenClaw</h1>
-                <h2 style="border: none; font-size: 28px; color: #666;">安裝龍蝦機器人本體（原 OpenClaw）</h2>
+                <h1>Part 3: 設定 OpenClaw</h1>
+                <h2 style="border: none; font-size: 28px; color: #666;">執行初始化設定精靈</h2>
                 <div style="margin-top: 40px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
-                    <span class="highlight">一鍵安裝</span>
-                    <span class="highlight">npm install</span>
-                    <span class="highlight">Gateway</span>
+                    <span class="highlight">onboard 精靈</span>
+                    <span class="highlight">選擇 AI 模型</span>
+                    <span class="highlight">Gateway 服務</span>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 2: 建立工作資料夾 -->
+        <!-- Slide 2: 執行初始化 -->
         <div class="slide">
             <div class="content-card">
-                <h2>📁 第一步：建立工作資料夾</h2>
-                <p>在 PowerShell（系統管理員）輸入：</p>
-                <pre>mkdir D:\Moltbot
-cd D:\Moltbot</pre>
+                <h2>🚀 第一步：執行初始化設定</h2>
+                <p>在 PowerShell 輸入：</p>
+                <pre>openclaw onboard --install-daemon</pre>
                 <div class="box info">
-                    <strong>說明：</strong>
-                    <ul>
-                        <li><code>mkdir</code> = 建立資料夾</li>
-                        <li><code>cd</code> = 移動到該資料夾</li>
+                    <strong>這個指令會：</strong>
+                    <ul style="margin-top: 10px; margin-bottom: 0;">
+                        <li>啟動設定精靈</li>
+                        <li>安裝 Gateway 背景服務</li>
+                        <li>設定 AI 模型</li>
                     </ul>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 3: 選擇安裝方式 -->
+        <!-- Slide 3: 回答問題 1 -->
         <div class="slide">
             <div class="content-card">
-                <h2>🎯 第二步：選擇安裝方式</h2>
-                <div class="step-box" style="background: linear-gradient(135deg, rgba(0, 200, 81, 0.1), rgba(0, 126, 51, 0.1)); border-color: #00C851;">
-                    <h3 style="color: #00C851;">⭐ 方式 A：npm 安裝（推薦，最穩定）</h3>
-                    <pre style="background: #1e1e1e; color: #d4d4d4;">npm install -g openclaw@latest</pre>
-                    <p style="font-size: 16px;">如果你已經安裝好 Node.js 22，這是最穩定的方式</p>
-                </div>
-                <div class="step-box">
-                    <h3>方式 B：一鍵安裝腳本</h3>
-                    <pre style="background: #1e1e1e; color: #d4d4d4;"># 先設定執行權限
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-
-# 下載並執行安裝腳本
-iwr -useb https://openclaw.ai/install.ps1 -OutFile install.ps1
-powershell -ExecutionPolicy Bypass -File .\install.ps1</pre>
-                </div>
-                <div class="box info">
-                    <strong>💡 遇到「禁止執行指令碼」錯誤？</strong><br>
-                    先執行：<code>Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force</code>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 4: 問題 1 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>❓ 回答安裝問題（1/8）</h2>
+                <h2>📝 回答設定問題</h2>
                 <div class="question-box">
                     <div class="question-title">問題 1：I understand this is powerful and inherently risky. Continue?</div>
-                    <p>（我了解這很強大但有風險，要繼續嗎？）</p>
-                    <p class="answer">👉 用方向鍵 ↑↓ 選 <strong>Yes</strong>，按 Enter</p>
+                    <p>用方向鍵選 <span class="answer">Yes</span>，按 Enter</p>
                 </div>
-                <div class="box info">
-                    這只是一個提醒，選 Yes 繼續就好！
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 5: 問題 2-3 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>❓ 回答安裝問題（2-3/8）</h2>
                 <div class="question-box">
                     <div class="question-title">問題 2：Onboarding mode</div>
-                    <p>（選擇安裝模式）</p>
-                    <p class="answer">👉 選 <strong>QuickStart</strong>，按 Enter</p>
+                    <p>選 <span class="answer">QuickStart</span>，按 Enter</p>
                 </div>
+                <div class="box info">
+                    <strong>💡 用方向鍵 ↑↓ 選擇，Enter 確認</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: 回答問題 2 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📝 選擇 AI 模型</h2>
                 <div class="question-box">
                     <div class="question-title">問題 3：Model/auth provider</div>
-                    <p>（選擇模型提供者）</p>
-                    <p class="answer">👉 選 <strong>OpenAI (Codex OAuth + API key)</strong>，按 Enter</p>
+                    <p>選 <span class="answer">OpenAI (Codex OAuth + API key)</span>，按 Enter</p>
                 </div>
-            </div>
-        </div>
-
-        <!-- Slide 6: 問題 4 - OAuth 登入 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>❓ 回答安裝問題（4/8）- 重要！</h2>
                 <div class="question-box">
                     <div class="question-title">問題 4：OpenAI auth method</div>
-                    <p>（選擇 OpenAI 認證方式）</p>
-                    <p class="answer">👉 選 <strong>OpenAI Codex OAuth (ChatGPT OAuth)</strong>，按 Enter</p>
+                    <p>選 <span class="answer">OpenAI Codex OAuth (ChatGPT OAuth)</span>，按 Enter</p>
                 </div>
                 <div class="box warning">
-                    <strong>⚠️ 這時候瀏覽器會自動打開！</strong>
-                    <ol>
-                        <li>登入你的 ChatGPT 帳號</li>
-                        <li>登入完成後，網頁會跳轉</li>
-                        <li>回到 PowerShell，它會自動繼續</li>
-                    </ol>
+                    <strong>⚠️ 瀏覽器會自動打開</strong>，請登入你的 ChatGPT 帳號！
                 </div>
             </div>
         </div>
 
-        <!-- Slide 7: 問題 5-6 -->
+        <!-- Slide 5: 登入 ChatGPT -->
         <div class="slide">
             <div class="content-card">
-                <h2>❓ 回答安裝問題（5-6/8）</h2>
+                <h2>🔐 登入 ChatGPT</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>瀏覽器會自動打開 ChatGPT 登入頁面</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>登入你的 ChatGPT 帳號</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>授權完成後，回到 PowerShell</p>
+                </div>
+                <div class="box success">
+                    <strong>✅ PowerShell 會自動繼續下一步！</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: 繼續設定 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📝 繼續回答問題</h2>
                 <div class="question-box">
                     <div class="question-title">問題 5：Default model</div>
-                    <p>（選擇預設模型）</p>
-                    <p class="answer">👉 選 <strong>Keep current (openai-codex/gpt-5.2)</strong>，按 Enter</p>
+                    <p>選 <span class="answer">Keep current</span>，按 Enter</p>
                 </div>
                 <div class="question-box">
                     <div class="question-title">問題 6：Select channel (QuickStart)</div>
-                    <p>（選擇通訊頻道）</p>
-                    <p class="answer">👉 用方向鍵找到 <strong>LINE (Messaging API)</strong>，按 Enter</p>
+                    <p>找到 <span class="answer">LINE (Messaging API)</span>，按 Enter</p>
                 </div>
-            </div>
-        </div>
-
-        <!-- Slide 8: 問題 7-8 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>❓ 回答安裝問題（7-8/8）</h2>
                 <div class="question-box">
                     <div class="question-title">問題 7：Install LINE plugin?</div>
-                    <p>（要安裝 LINE 插件嗎？）</p>
-                    <p class="answer">👉 選 <strong>Skip for now</strong>，按 Enter</p>
-                    <p style="color: #666; font-size: 16px;">（之後會手動設定）</p>
+                    <p>選 <span class="answer">Skip for now</span>，按 Enter</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: 最後設定 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📝 最後幾個問題</h2>
+                <div class="question-box">
+                    <div class="question-title">問題 8：Configure skills now?</div>
+                    <p>選 <span class="answer">No</span>，按 Enter</p>
                 </div>
                 <div class="question-box">
-                    <div class="question-title">問題 8：Configure skills now? / Enable hooks?</div>
-                    <p>（要設定技能/啟用 hooks 嗎？）</p>
-                    <p class="answer">👉 都選 <strong>No</strong> 或 <strong>Skip for now</strong>，按 Enter</p>
+                    <div class="question-title">問題 9：Enable hooks?</div>
+                    <p>按空白鍵選 <span class="answer">Skip for now</span>，按 Enter</p>
                 </div>
-            </div>
-        </div>
-
-        <!-- Slide 9: 執行初始化 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>🔧 第三步：執行初始化</h2>
-                <p>安裝完成後，執行初始化設定：</p>
-                <pre>openclaw onboard --install-daemon</pre>
-                <p>這個指令會：</p>
-                <ul>
-                    <li>引導你設定 LLM API 金鑰（Gemini / OpenAI / Claude）</li>
-                    <li>安裝 Gateway 服務</li>
-                    <li>建立設定檔</li>
-                </ul>
-                <div class="box info">
-                    <strong>💡 推薦模型：</strong>
-                    <ul>
-                        <li><code>gemini-2.5-flash</code> - 推薦，穩定且快速</li>
-                        <li><code>gpt-5.2</code> - OpenAI 最新穩定版</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 10: 安裝完成 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>✅ 安裝完成！</h2>
-                <p>看到這些訊息就代表成功：</p>
-                <pre>Gateway service installed</pre>
                 <div class="box success">
-                    <strong>🎉 恭喜！OpenClaw 已經安裝完成！</strong>
-                </div>
-                <div class="box info">
-                    <strong>接下來要做什麼？</strong><br>
-                    我們需要建立 LINE 機器人帳號，才能讓龍蝦透過 LINE 跟你聊天。
+                    <strong>🎉 看到 "Gateway service installed" 就成功了！</strong>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 10: 前往下一章 -->
+        <!-- Slide 8: 完成 -->
         <div class="slide">
             <div class="content-card" style="text-align: center;">
                 <span style="font-size: 80px;">🎉</span>
                 <h2 style="border: none;">Part 3 完成！</h2>
-                <p style="font-size: 24px;">OpenClaw 龍蝦本體已經安裝好了！</p>
-                <p style="font-size: 20px; margin-top: 20px;">接下來前往下一章建立 LINE 機器人帳號！</p>
-                <a href="Part4.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);">
+                <p style="font-size: 24px;">OpenClaw 已經設定好了！</p>
+                <div style="display: flex; justify-content: center; gap: 30px; margin: 30px 0; flex-wrap: wrap;">
+                    <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ Gateway 服務已安裝</span>
+                    <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ AI 模型已設定</span>
+                </div>
+                <p style="font-size: 20px;">接下來建立 LINE 機器人帳號！</p>
+                <a href="Part4.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px;">
                     ➡️ Part 4：建立 LINE 機器人帳號
                 </a>
             </div>
