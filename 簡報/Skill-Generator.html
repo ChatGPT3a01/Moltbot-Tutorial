@@ -524,6 +524,11 @@
         let currentTemplate = 'disk-audit';
         let generatedFiles = {};
 
+        // 用於 Markdown 程式碼區塊的輔助函數
+        const FENCE = '`' + '`' + '`';
+        const BT = '`';  // 單個反引號
+        const NL = '\\`n';  // PowerShell 換行符
+
         // 模板卡片點擊
         document.querySelectorAll('.template-card').forEach(card => {
             card.addEventListener('click', () => {
@@ -629,32 +634,27 @@
             }
 
             // 安裝說明
-            installGuide = `# ${skillName} 安裝說明
-
-## 1. 建立資料夾
-在 PowerShell 執行：
-\`\`\`powershell
-mkdir "$env:USERPROFILE\\.openclaw\\workspace\\skills\\${skillName}\\scripts" -Force
-\`\`\`
-
-## 2. 放置檔案
-- 把 \`SKILL.md\` 放到 \`~/.openclaw/workspace/skills/${skillName}/\`
-- 把 \`${scriptFileName}\` 放到 \`~/.openclaw/workspace/skills/${skillName}/scripts/\`
-
-## 3. 使用方式
-跟龍蝦說：「執行 ${skillName}」或「跑${skillDesc}」
-
-## 資料夾結構
-\`\`\`
-.openclaw/
-└── workspace/
-    └── skills/
-        └── ${skillName}/
-            ├── SKILL.md
-            └── scripts/
-                └── ${scriptFileName}
-\`\`\`
-`;
+            installGuide = '# ' + skillName + ' 安裝說明\n\n' +
+'## 1. 建立資料夾\n' +
+'在 PowerShell 執行：\n' +
+FENCE + 'powershell\n' +
+'mkdir "$env:USERPROFILE\\.openclaw\\workspace\\skills\\' + skillName + '\\scripts" -Force\n' +
+FENCE + '\n\n' +
+'## 2. 放置檔案\n' +
+'- 把 ' + BT + 'SKILL.md' + BT + ' 放到 ' + BT + '~/.openclaw/workspace/skills/' + skillName + '/' + BT + '\n' +
+'- 把 ' + BT + scriptFileName + BT + ' 放到 ' + BT + '~/.openclaw/workspace/skills/' + skillName + '/scripts/' + BT + '\n\n' +
+'## 3. 使用方式\n' +
+'跟龍蝦說：「執行 ' + skillName + '」或「跑' + skillDesc + '」\n\n' +
+'## 資料夾結構\n' +
+FENCE + '\n' +
+'.openclaw/\n' +
+'└── workspace/\n' +
+'    └── skills/\n' +
+'        └── ' + skillName + '/\n' +
+'            ├── SKILL.md\n' +
+'            └── scripts/\n' +
+'                └── ' + scriptFileName + '\n' +
+FENCE + '\n';
 
             // 儲存生成的檔案
             generatedFiles = {
@@ -682,153 +682,153 @@ mkdir "$env:USERPROFILE\\.openclaw\\workspace\\skills\\${skillName}\\scripts" -F
             const optExt = document.getElementById('optExtStats').checked;
             const optDup = document.getElementById('optDuplicates').checked;
 
-            const pathArray = paths.split('\n').filter(p => p.trim()).map(p => `"${p.trim()}"`).join(',\n        ');
+            const pathArray = paths.split('\n').filter(function(p) { return p.trim(); }).map(function(p) { return '"' + p.trim() + '"'; }).join(',\n        ');
+            const pathList = paths.split('\n').filter(function(p) { return p.trim(); }).join(', ');
+            const PSN = '`n';  // PowerShell newline
 
-            const skillMd = `# ${name}
+            // Build skillMd
+            var skillMd = '# ' + name + '\n\n' + desc + '\n\n## 功能\n';
+            if (optLarge) skillMd += '- 找出大檔案（Top ' + topN + '）\n';
+            if (optRecent) skillMd += '- 最近修改檔案（Top ' + topN + '）\n';
+            if (optExt) skillMd += '- 副檔名容量統計\n';
+            if (optDup) skillMd += '- 重複檔案偵測（SHA256）\n';
+            skillMd += '\n## 設定\n';
+            skillMd += '- 掃描範圍：' + pathList + '\n';
+            skillMd += '- 大檔門檻：' + largeMB + 'MB\n';
+            skillMd += '- 顯示數量：Top ' + topN + '\n\n';
+            skillMd += '## 使用方式\n';
+            skillMd += '跟龍蝦說：「跑磁碟盤點」或「執行 ' + name + '」\n\n';
+            skillMd += '## 報告位置\n';
+            skillMd += '~/.openclaw/workspace/reports/' + name + '/YYYY-MM-DD.md\n';
 
-${desc}
+            // Build script
+            var script = '# ' + name + ' - ' + desc + '\n';
+            script += '# 自動生成於 ' + new Date().toLocaleDateString('zh-TW') + '\n\n';
+            script += 'param(\n';
+            script += '    [string[]]$ScanPaths = @(\n';
+            script += '        ' + pathArray + '\n';
+            script += '    ),\n';
+            script += '    [int]$LargeFileMB = ' + largeMB + ',\n';
+            script += '    [int]$TopN = ' + topN + '\n';
+            script += ')\n\n';
+            script += '$reportDate = Get-Date -Format "yyyy-MM-dd"\n';
+            script += '$reportDir = "$env:USERPROFILE\\.openclaw\\workspace\\reports\\' + name + '"\n';
+            script += 'if (!(Test-Path $reportDir)) { New-Item -ItemType Directory -Path $reportDir -Force }\n';
+            script += '$reportPath = "$reportDir\\$reportDate.md"\n\n';
+            script += '# 排除的系統資料夾\n';
+            script += '$excludeDirs = @("Windows", "Program Files", "Program Files (x86)",\n';
+            script += "                 '\\$Recycle.Bin', \"node_modules\", \".git\", \"AppData\")\n\n";
+            script += 'Write-Host "開始掃描..." -ForegroundColor Cyan\n';
+            script += 'Write-Host "掃描路徑: $($ScanPaths -join \', \')" -ForegroundColor Gray\n\n';
+            script += '# 取得所有檔案\n';
+            script += '$allFiles = @()\n';
+            script += 'foreach ($path in $ScanPaths) {\n';
+            script += '    $expandedPath = $ExecutionContext.InvokeCommand.ExpandString($path)\n';
+            script += '    if (Test-Path $expandedPath) {\n';
+            script += '        Write-Host "掃描中: $expandedPath" -ForegroundColor Yellow\n';
+            script += '        $allFiles += Get-ChildItem -Path $expandedPath -Recurse -File -ErrorAction SilentlyContinue |\n';
+            script += '            Where-Object {\n';
+            script += '                $dominated = $false\n';
+            script += '                foreach ($ex in $excludeDirs) {\n';
+            script += '                    if ($_.FullName -like "*\\$ex\\*") { $dominated = $true; break }\n';
+            script += '                }\n';
+            script += '                -not $dominated\n';
+            script += '            }\n';
+            script += '    } else {\n';
+            script += '        Write-Host "路徑不存在: $expandedPath" -ForegroundColor Red\n';
+            script += '    }\n';
+            script += '}\n\n';
+            script += 'Write-Host "找到 $($allFiles.Count) 個檔案" -ForegroundColor Green\n\n';
+            script += '# 產生報告\n';
+            script += '$report = "# 磁碟盤點報告 - $reportDate' + PSN + PSN + '"\n';
+            script += '$report += "掃描路徑: $($ScanPaths -join \', \')' + PSN + '"\n';
+            script += '$report += "檔案總數: $($allFiles.Count)' + PSN + PSN + '"\n\n';
 
-## 功能
-${optLarge ? '- 找出大檔案（Top ' + topN + '）\n' : ''}${optRecent ? '- 最近修改檔案（Top ' + topN + '）\n' : ''}${optExt ? '- 副檔名容量統計\n' : ''}${optDup ? '- 重複檔案偵測（SHA256）\n' : ''}
-## 設定
-- 掃描範圍：${paths.split('\n').filter(p => p.trim()).join(', ')}
-- 大檔門檻：${largeMB}MB
-- 顯示數量：Top ${topN}
-
-## 使用方式
-跟龍蝦說：「跑磁碟盤點」或「執行 ${name}」
-
-## 報告位置
-~/.openclaw/workspace/reports/${name}/YYYY-MM-DD.md
-`;
-
-            const script = `# ${name} - ${desc}
-# 自動生成於 ${new Date().toLocaleDateString('zh-TW')}
-
-param(
-    [string[]]$ScanPaths = @(
-        ${pathArray}
-    ),
-    [int]$LargeFileMB = ${largeMB},
-    [int]$TopN = ${topN}
-)
-
-$reportDate = Get-Date -Format "yyyy-MM-dd"
-$reportDir = "$env:USERPROFILE\\.openclaw\\workspace\\reports\\${name}"
-if (!(Test-Path $reportDir)) { New-Item -ItemType Directory -Path $reportDir -Force }
-$reportPath = "$reportDir\\$reportDate.md"
-
-# 排除的系統資料夾
-$excludeDirs = @("Windows", "Program Files", "Program Files (x86)",
-                 '\$Recycle.Bin', "node_modules", ".git", "AppData")
-
-Write-Host "開始掃描..." -ForegroundColor Cyan
-Write-Host "掃描路徑: $($ScanPaths -join ', ')" -ForegroundColor Gray
-
-# 取得所有檔案
-$allFiles = @()
-foreach ($path in $ScanPaths) {
-    $expandedPath = $ExecutionContext.InvokeCommand.ExpandString($path)
-    if (Test-Path $expandedPath) {
-        Write-Host "掃描中: $expandedPath" -ForegroundColor Yellow
-        $allFiles += Get-ChildItem -Path $expandedPath -Recurse -File -ErrorAction SilentlyContinue |
-            Where-Object {
-                $dominated = $false
-                foreach ($ex in $excludeDirs) {
-                    if ($_.FullName -like "*\\$ex\\*") { $dominated = $true; break }
-                }
-                -not $dominated
+            if (optLarge) {
+                script += '# Top 大檔案\n';
+                script += '$report += "## Top $TopN 大檔案' + PSN + PSN + '"\n';
+                script += '$report += "| 大小 | 檔案路徑 |' + PSN + '"\n';
+                script += '$report += "|------|----------|' + PSN + '"\n';
+                script += '$largeFiles = $allFiles | Sort-Object Length -Descending | Select-Object -First $TopN\n';
+                script += 'foreach ($f in $largeFiles) {\n';
+                script += '    $sizeMB = [math]::Round($f.Length / 1MB, 2)\n';
+                script += '    $report += "| $sizeMB MB | $($f.FullName) |' + PSN + '"\n';
+                script += '}\n';
+                script += '$report += "' + PSN + '"\n\n';
             }
-    } else {
-        Write-Host "路徑不存在: $expandedPath" -ForegroundColor Red
-    }
-}
 
-Write-Host "找到 $($allFiles.Count) 個檔案" -ForegroundColor Green
-
-# 產生報告
-$report = "# 磁碟盤點報告 - $reportDate\`n\`n"
-$report += "掃描路徑: $($ScanPaths -join ', ')\`n"
-$report += "檔案總數: $($allFiles.Count)\`n\`n"
-
-${optLarge ? `# Top 大檔案
-$report += "## Top $TopN 大檔案\`n\`n"
-$report += "| 大小 | 檔案路徑 |\`n"
-$report += "|------|----------|\`n"
-$largeFiles = $allFiles | Sort-Object Length -Descending | Select-Object -First $TopN
-foreach ($f in $largeFiles) {
-    $sizeMB = [math]::Round($f.Length / 1MB, 2)
-    $report += "| $sizeMB MB | $($f.FullName) |\`n"
-}
-$report += "\`n"
-` : ''}
-${optRecent ? `# 最近修改
-$report += "## 最近修改 Top $TopN\`n\`n"
-$report += "| 修改時間 | 檔案路徑 |\`n"
-$report += "|----------|----------|\`n"
-$recentFiles = $allFiles | Sort-Object LastWriteTime -Descending | Select-Object -First $TopN
-foreach ($f in $recentFiles) {
-    $time = $f.LastWriteTime.ToString("yyyy-MM-dd HH:mm")
-    $report += "| $time | $($f.FullName) |\`n"
-}
-$report += "\`n"
-` : ''}
-${optExt ? `# 副檔名統計
-$report += "## 副檔名容量統計\`n\`n"
-$report += "| 副檔名 | 總容量 | 檔案數 |\`n"
-$report += "|--------|--------|--------|\`n"
-$extStats = $allFiles | Group-Object Extension | ForEach-Object {
-    [PSCustomObject]@{
-        Extension = if ($_.Name) { $_.Name } else { "(無副檔名)" }
-        TotalSize = ($_.Group | Measure-Object Length -Sum).Sum
-        Count = $_.Count
-    }
-} | Sort-Object TotalSize -Descending | Select-Object -First $TopN
-foreach ($ext in $extStats) {
-    $sizeMB = [math]::Round($ext.TotalSize / 1MB, 2)
-    $report += "| $($ext.Extension) | $sizeMB MB | $($ext.Count) |\`n"
-}
-$report += "\`n"
-` : ''}
-${optDup ? `# 重複檔案偵測
-$report += "## 可能的重複檔案\`n\`n"
-$sizeGroups = $allFiles | Where-Object { $_.Length -gt 1MB } | Group-Object Length | Where-Object { $_.Count -gt 1 }
-$duplicates = @()
-foreach ($group in $sizeGroups | Select-Object -First 30) {
-    $hashes = @{}
-    foreach ($file in $group.Group) {
-        try {
-            $hash = (Get-FileHash $file.FullName -Algorithm SHA256 -ErrorAction Stop).Hash
-            if ($hashes.ContainsKey($hash)) {
-                $duplicates += [PSCustomObject]@{
-                    Size = $file.Length
-                    File1 = $hashes[$hash]
-                    File2 = $file.FullName
-                }
-            } else {
-                $hashes[$hash] = $file.FullName
+            if (optRecent) {
+                script += '# 最近修改\n';
+                script += '$report += "## 最近修改 Top $TopN' + PSN + PSN + '"\n';
+                script += '$report += "| 修改時間 | 檔案路徑 |' + PSN + '"\n';
+                script += '$report += "|----------|----------|' + PSN + '"\n';
+                script += '$recentFiles = $allFiles | Sort-Object LastWriteTime -Descending | Select-Object -First $TopN\n';
+                script += 'foreach ($f in $recentFiles) {\n';
+                script += '    $time = $f.LastWriteTime.ToString("yyyy-MM-dd HH:mm")\n';
+                script += '    $report += "| $time | $($f.FullName) |' + PSN + '"\n';
+                script += '}\n';
+                script += '$report += "' + PSN + '"\n\n';
             }
-        } catch { }
-    }
-}
-if ($duplicates.Count -gt 0) {
-    foreach ($dup in $duplicates | Select-Object -First 20) {
-        $sizeMB = [math]::Round($dup.Size / 1MB, 2)
-        $report += "**[$sizeMB MB] 重複:**\`n"
-        $report += "- $($dup.File1)\`n"
-        $report += "- $($dup.File2)\`n\`n"
-    }
-} else {
-    $report += "沒有發現重複檔案。\`n"
-}
-` : ''}
-# 儲存報告
-$report | Out-File -FilePath $reportPath -Encoding UTF8
-Write-Host "\\n報告已產生：$reportPath" -ForegroundColor Green
-Write-Host "完成！" -ForegroundColor Cyan
-`;
 
-            return { skillMd, script };
+            if (optExt) {
+                script += '# 副檔名統計\n';
+                script += '$report += "## 副檔名容量統計' + PSN + PSN + '"\n';
+                script += '$report += "| 副檔名 | 總容量 | 檔案數 |' + PSN + '"\n';
+                script += '$report += "|--------|--------|--------|' + PSN + '"\n';
+                script += '$extStats = $allFiles | Group-Object Extension | ForEach-Object {\n';
+                script += '    [PSCustomObject]@{\n';
+                script += '        Extension = if ($_.Name) { $_.Name } else { "(無副檔名)" }\n';
+                script += '        TotalSize = ($_.Group | Measure-Object Length -Sum).Sum\n';
+                script += '        Count = $_.Count\n';
+                script += '    }\n';
+                script += '} | Sort-Object TotalSize -Descending | Select-Object -First $TopN\n';
+                script += 'foreach ($ext in $extStats) {\n';
+                script += '    $sizeMB = [math]::Round($ext.TotalSize / 1MB, 2)\n';
+                script += '    $report += "| $($ext.Extension) | $sizeMB MB | $($ext.Count) |' + PSN + '"\n';
+                script += '}\n';
+                script += '$report += "' + PSN + '"\n\n';
+            }
+
+            if (optDup) {
+                script += '# 重複檔案偵測\n';
+                script += '$report += "## 可能的重複檔案' + PSN + PSN + '"\n';
+                script += '$sizeGroups = $allFiles | Where-Object { $_.Length -gt 1MB } | Group-Object Length | Where-Object { $_.Count -gt 1 }\n';
+                script += '$duplicates = @()\n';
+                script += 'foreach ($group in $sizeGroups | Select-Object -First 30) {\n';
+                script += '    $hashes = @{}\n';
+                script += '    foreach ($file in $group.Group) {\n';
+                script += '        try {\n';
+                script += '            $hash = (Get-FileHash $file.FullName -Algorithm SHA256 -ErrorAction Stop).Hash\n';
+                script += '            if ($hashes.ContainsKey($hash)) {\n';
+                script += '                $duplicates += [PSCustomObject]@{\n';
+                script += '                    Size = $file.Length\n';
+                script += '                    File1 = $hashes[$hash]\n';
+                script += '                    File2 = $file.FullName\n';
+                script += '                }\n';
+                script += '            } else {\n';
+                script += '                $hashes[$hash] = $file.FullName\n';
+                script += '            }\n';
+                script += '        } catch { }\n';
+                script += '    }\n';
+                script += '}\n';
+                script += 'if ($duplicates.Count -gt 0) {\n';
+                script += '    foreach ($dup in $duplicates | Select-Object -First 20) {\n';
+                script += '        $sizeMB = [math]::Round($dup.Size / 1MB, 2)\n';
+                script += '        $report += "**[$sizeMB MB] 重複:**' + PSN + '"\n';
+                script += '        $report += "- $($dup.File1)' + PSN + '"\n';
+                script += '        $report += "- $($dup.File2)' + PSN + PSN + '"\n';
+                script += '    }\n';
+                script += '} else {\n';
+                script += '    $report += "沒有發現重複檔案。' + PSN + '"\n';
+                script += '}\n\n';
+            }
+
+            script += '# 儲存報告\n';
+            script += '$report | Out-File -FilePath $reportPath -Encoding UTF8\n';
+            script += 'Write-Host "\\n報告已產生：$reportPath" -ForegroundColor Green\n';
+            script += 'Write-Host "完成！" -ForegroundColor Cyan\n';
+
+            return { skillMd: skillMd, script: script };
         }
 
         // Google Drive 上傳生成器
@@ -837,78 +837,65 @@ Write-Host "完成！" -ForegroundColor Cyan
             const remoteName = document.getElementById('remoteName').value || 'gdrive';
             const autoLink = document.getElementById('optAutoLink').checked;
 
-            const skillMd = `# ${name}
+            const skillMd = '# ' + name + '\n\n' +
+desc + '\n\n' +
+'## 功能\n' +
+'- 上傳檔案到 Google Drive\n' +
+'- 上傳到指定資料夾：' + remoteFolder + '\n' +
+(autoLink ? '- 自動產生分享連結\n' : '') +
+'\n## 前提條件\n' +
+'- 已安裝 rclone\n' +
+'- 已完成 Google Drive 授權（rclone config）\n\n' +
+'## 使用方式\n' +
+'跟龍蝦說：「把 xxx 上傳到 Google Drive」\n\n' +
+'## 手動執行\n' +
+FENCE + 'powershell\n' +
+'& "~/.openclaw/workspace/skills/' + name + '/scripts/upload.ps1" -FilePath "C:\\\\path\\\\to\\\\file.zip"\n' +
+FENCE + '\n';
 
-${desc}
+            var script = '# ' + name + ' - ' + desc + '\n';
+            script += '# 自動生成於 ' + new Date().toLocaleDateString('zh-TW') + '\n\n';
+            script += 'param(\n';
+            script += '    [Parameter(Mandatory=$true)]\n';
+            script += '    [string]$FilePath,\n';
+            script += '    [string]$RemoteFolder = "' + remoteFolder + '",\n';
+            script += '    [string]$RemoteName = "' + remoteName + '"\n';
+            script += ')\n\n';
+            script += '# 檢查檔案是否存在\n';
+            script += 'if (!(Test-Path $FilePath)) {\n';
+            script += '    Write-Host "錯誤：檔案不存在 - $FilePath" -ForegroundColor Red\n';
+            script += '    exit 1\n';
+            script += '}\n\n';
+            script += '$fileName = Split-Path $FilePath -Leaf\n\n';
+            script += '# 檢查 rclone 是否安裝\n';
+            script += 'if (!(Get-Command rclone -ErrorAction SilentlyContinue)) {\n';
+            script += '    Write-Host "錯誤：找不到 rclone，請先安裝" -ForegroundColor Red\n';
+            script += '    Write-Host "安裝指令：winget install Rclone.Rclone" -ForegroundColor Yellow\n';
+            script += '    exit 1\n';
+            script += '}\n\n';
+            script += '# 上傳檔案\n';
+            script += 'Write-Host "正在上傳 $fileName 到 $RemoteName:$RemoteFolder ..." -ForegroundColor Cyan\n';
+            script += 'rclone copy $FilePath "$RemoteName`:$RemoteFolder" --progress\n\n';
+            script += 'if ($LASTEXITCODE -eq 0) {\n';
+            script += '    Write-Host "上傳成功！" -ForegroundColor Green\n';
+            if (autoLink) {
+                script += '    # 產生分享連結\n';
+                script += '    Write-Host "正在產生分享連結..." -ForegroundColor Yellow\n';
+                script += '    $link = rclone link "$RemoteName`:$RemoteFolder/$fileName"\n';
+                script += '    if ($link) {\n';
+                script += '        Write-Host "分享連結：" -ForegroundColor Cyan\n';
+                script += '        Write-Host $link -ForegroundColor Green\n\n';
+                script += '        # 複製到剪貼簿\n';
+                script += '        $link | Set-Clipboard\n';
+                script += '        Write-Host "(已複製到剪貼簿)" -ForegroundColor Gray\n';
+                script += '    }\n';
+            }
+            script += '} else {\n';
+            script += '    Write-Host "上傳失敗！請檢查 rclone 設定" -ForegroundColor Red\n';
+            script += '    exit 1\n';
+            script += '}\n';
 
-## 功能
-- 上傳檔案到 Google Drive
-- 上傳到指定資料夾：${remoteFolder}
-${autoLink ? '- 自動產生分享連結\n' : ''}
-## 前提條件
-- 已安裝 rclone
-- 已完成 Google Drive 授權（rclone config）
-
-## 使用方式
-跟龍蝦說：「把 xxx 上傳到 Google Drive」
-
-## 手動執行
-\`\`\`powershell
-& "~/.openclaw/workspace/skills/${name}/scripts/upload.ps1" -FilePath "C:\\path\\to\\file.zip"
-\`\`\`
-`;
-
-            const script = `# ${name} - ${desc}
-# 自動生成於 ${new Date().toLocaleDateString('zh-TW')}
-
-param(
-    [Parameter(Mandatory=$true)]
-    [string]$FilePath,
-    [string]$RemoteFolder = "${remoteFolder}",
-    [string]$RemoteName = "${remoteName}"
-)
-
-# 檢查檔案是否存在
-if (!(Test-Path $FilePath)) {
-    Write-Host "錯誤：檔案不存在 - $FilePath" -ForegroundColor Red
-    exit 1
-}
-
-$fileName = Split-Path $FilePath -Leaf
-
-# 檢查 rclone 是否安裝
-if (!(Get-Command rclone -ErrorAction SilentlyContinue)) {
-    Write-Host "錯誤：找不到 rclone，請先安裝" -ForegroundColor Red
-    Write-Host "安裝指令：winget install Rclone.Rclone" -ForegroundColor Yellow
-    exit 1
-}
-
-# 上傳檔案
-Write-Host "正在上傳 $fileName 到 $RemoteName:$RemoteFolder ..." -ForegroundColor Cyan
-rclone copy $FilePath "$RemoteName`:$RemoteFolder" --progress
-
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "上傳成功！" -ForegroundColor Green
-    ${autoLink ? `
-    # 產生分享連結
-    Write-Host "正在產生分享連結..." -ForegroundColor Yellow
-    $link = rclone link "$RemoteName`:$RemoteFolder/$fileName"
-    if ($link) {
-        Write-Host "分享連結：" -ForegroundColor Cyan
-        Write-Host $link -ForegroundColor Green
-
-        # 複製到剪貼簿
-        $link | Set-Clipboard
-        Write-Host "(已複製到剪貼簿)" -ForegroundColor Gray
-    }
-    ` : ''}
-} else {
-    Write-Host "上傳失敗！請檢查 rclone 設定" -ForegroundColor Red
-    exit 1
-}
-`;
-
-            return { skillMd, script };
+            return { skillMd: skillMd, script: script };
         }
 
         // 網頁爬蟲生成器
@@ -916,6 +903,7 @@ if ($LASTEXITCODE -eq 0) {
             const urls = document.getElementById('targetUrls').value || 'https://example.com';
             const mode = document.getElementById('scrapeMode').value;
             const selector = document.getElementById('cssSelector').value || '.content';
+            const PSN = '`n';  // PowerShell newline
 
             const modeDesc = {
                 'light': 'Light fetch（輕量抓取）',
@@ -923,78 +911,63 @@ if ($LASTEXITCODE -eq 0) {
                 'monitor': 'Scheduled monitor（定時監控）'
             };
 
-            const skillMd = `# ${name}
+            const urlList = urls.split('\n').filter(function(u) { return u.trim(); }).map(function(u) { return '- ' + u.trim(); }).join('\n');
+            const urlArray = urls.split('\n').filter(function(u) { return u.trim(); }).map(function(u) { return '"' + u.trim() + '"'; }).join(',\n        ');
 
-${desc}
+            var skillMd = '# ' + name + '\n\n' +
+desc + '\n\n' +
+'## 功能\n' +
+'- 抓取指定網頁的資料\n' +
+'- 模式：' + modeDesc[mode] + '\n' +
+'- CSS 選擇器：' + selector + '\n\n' +
+'## 目標網址\n' +
+urlList + '\n\n' +
+'## 使用方式\n' +
+'跟龍蝦說：「執行網頁爬蟲」或「抓取 xxx 網站」\n';
 
-## 功能
-- 抓取指定網頁的資料
-- 模式：${modeDesc[mode]}
-- CSS 選擇器：${selector}
+            var script = '# ' + name + ' - ' + desc + '\n';
+            script += '# 自動生成於 ' + new Date().toLocaleDateString('zh-TW') + '\n';
+            script += '# 模式：' + modeDesc[mode] + '\n\n';
+            script += 'param(\n';
+            script += '    [string[]]$Urls = @(\n';
+            script += '        ' + urlArray + '\n';
+            script += '    ),\n';
+            script += '    [string]$Selector = "' + selector + '"\n';
+            script += ')\n\n';
+            script += '$reportDate = Get-Date -Format "yyyy-MM-dd_HHmmss"\n';
+            script += '$reportDir = "$env:USERPROFILE\\.openclaw\\workspace\\reports\\' + name + '"\n';
+            script += 'if (!(Test-Path $reportDir)) { New-Item -ItemType Directory -Path $reportDir -Force }\n';
+            script += '$reportPath = "$reportDir\\$reportDate.md"\n\n';
+            script += '$report = "# 網頁爬蟲報告 - $reportDate' + PSN + PSN + '"\n\n';
+            script += 'foreach ($url in $Urls) {\n';
+            script += '    Write-Host "抓取中: $url" -ForegroundColor Cyan\n';
+            script += '    $report += "## $url' + PSN + PSN + '"\n\n';
+            script += '    try {\n';
+            script += '        $response = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30\n\n';
+            script += '        # 簡易 HTML 解析（PowerShell 內建）\n';
+            script += '        $content = $response.Content\n\n';
+            script += '        # 移除 script 和 style\n';
+            script += "        $content = $content -replace '<script[^>]*>[\\s\\S]*?</script>', ''\n";
+            script += "        $content = $content -replace '<style[^>]*>[\\s\\S]*?</style>', ''\n\n";
+            script += '        # 移除 HTML 標籤，保留文字\n';
+            script += "        $text = $content -replace '<[^>]+>', ' '\n";
+            script += "        $text = $text -replace '\\s+', ' '\n";
+            script += '        $text = $text.Trim()\n\n';
+            script += '        # 取前 2000 字元\n';
+            script += '        if ($text.Length -gt 2000) {\n';
+            script += '            $text = $text.Substring(0, 2000) + "..."\n';
+            script += '        }\n\n';
+            script += '        $report += "' + FENCE + PSN + '$text' + PSN + FENCE + PSN + PSN + '"\n';
+            script += '        Write-Host "成功抓取 $($text.Length) 字元" -ForegroundColor Green\n\n';
+            script += '    } catch {\n';
+            script += '        $report += "錯誤：$($_.Exception.Message)' + PSN + PSN + '"\n';
+            script += '        Write-Host "抓取失敗: $($_.Exception.Message)" -ForegroundColor Red\n';
+            script += '    }\n';
+            script += '}\n\n';
+            script += '$report | Out-File -FilePath $reportPath -Encoding UTF8\n';
+            script += 'Write-Host "\\n報告已產生：$reportPath" -ForegroundColor Green\n';
 
-## 目標網址
-${urls.split('\n').filter(u => u.trim()).map(u => '- ' + u.trim()).join('\n')}
-
-## 使用方式
-跟龍蝦說：「執行網頁爬蟲」或「抓取 xxx 網站」
-`;
-
-            const script = `# ${name} - ${desc}
-# 自動生成於 ${new Date().toLocaleDateString('zh-TW')}
-# 模式：${modeDesc[mode]}
-
-param(
-    [string[]]$Urls = @(
-        ${urls.split('\n').filter(u => u.trim()).map(u => `"${u.trim()}"`).join(',\n        ')}
-    ),
-    [string]$Selector = "${selector}"
-)
-
-$reportDate = Get-Date -Format "yyyy-MM-dd_HHmmss"
-$reportDir = "$env:USERPROFILE\\.openclaw\\workspace\\reports\\${name}"
-if (!(Test-Path $reportDir)) { New-Item -ItemType Directory -Path $reportDir -Force }
-$reportPath = "$reportDir\\$reportDate.md"
-
-$report = "# 網頁爬蟲報告 - $reportDate\`n\`n"
-
-foreach ($url in $Urls) {
-    Write-Host "抓取中: $url" -ForegroundColor Cyan
-    $report += "## $url\`n\`n"
-
-    try {
-        $response = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30
-
-        # 簡易 HTML 解析（PowerShell 內建）
-        $content = $response.Content
-
-        # 移除 script 和 style
-        $content = $content -replace '<script[^>]*>[\\s\\S]*?</script>', ''
-        $content = $content -replace '<style[^>]*>[\\s\\S]*?</style>', ''
-
-        # 移除 HTML 標籤，保留文字
-        $text = $content -replace '<[^>]+>', ' '
-        $text = $text -replace '\\s+', ' '
-        $text = $text.Trim()
-
-        # 取前 2000 字元
-        if ($text.Length -gt 2000) {
-            $text = $text.Substring(0, 2000) + "..."
-        }
-
-        $report += "\`\`\`\`n$text\`n\`\`\`\`n\`n"
-        Write-Host "成功抓取 $($text.Length) 字元" -ForegroundColor Green
-
-    } catch {
-        $report += "錯誤：$($_.Exception.Message)\`n\`n"
-        Write-Host "抓取失敗: $($_.Exception.Message)" -ForegroundColor Red
-    }
-}
-
-$report | Out-File -FilePath $reportPath -Encoding UTF8
-Write-Host "\\n報告已產生：$reportPath" -ForegroundColor Green
-`;
-
-            return { skillMd, script };
+            return { skillMd: skillMd, script: script };
         }
 
         // 排程提醒生成器
@@ -1010,55 +983,43 @@ Write-Host "\\n報告已產生：$reportPath" -ForegroundColor Green
                 'hourly': '每小時'
             };
 
-            const skillMd = `# ${name}
+            const skillMd = '# ' + name + '\n\n' +
+desc + '\n\n' +
+'## 提醒內容\n' +
+content + '\n\n' +
+'## 排程設定\n' +
+'- 執行時間：' + time + '\n' +
+'- 重複頻率：' + freqDesc[freq] + '\n\n' +
+'## 使用方式\n' +
+'跟龍蝦說：「設定提醒」或「執行 ' + name + '」\n\n' +
+'## 手動執行\n' +
+FENCE + 'powershell\n' +
+'& "~/.openclaw/workspace/skills/' + name + '/scripts/remind.ps1"\n' +
+FENCE + '\n';
 
-${desc}
-
-## 提醒內容
-${content}
-
-## 排程設定
-- 執行時間：${time}
-- 重複頻率：${freqDesc[freq]}
-
-## 使用方式
-跟龍蝦說：「設定提醒」或「執行 ${name}」
-
-## 手動執行
-\`\`\`powershell
-& "~/.openclaw/workspace/skills/${name}/scripts/remind.ps1"
-\`\`\`
-`;
-
-            const script = `# ${name} - ${desc}
-# 自動生成於 ${new Date().toLocaleDateString('zh-TW')}
-
-param(
-    [string]$Message = @"
-${content}
-"@
-)
-
-$timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "⏰ 提醒時間: $timestamp" -ForegroundColor Yellow
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host ""
-Write-Host $Message -ForegroundColor Green
-Write-Host ""
-Write-Host "========================================" -ForegroundColor Cyan
-
-# 可選：發送 Windows 通知
-# [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
-# 這需要額外的設定，暫時用 Write-Host 顯示
-
-# 記錄到日誌
-$logDir = "$env:USERPROFILE\\.openclaw\\workspace\\logs"
-if (!(Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir -Force }
-$logFile = "$logDir\\reminders.log"
-"$timestamp - $Message" | Out-File -FilePath $logFile -Append -Encoding UTF8
-`;
+            const script = '# ' + name + ' - ' + desc + '\n' +
+'# 自動生成於 ' + new Date().toLocaleDateString('zh-TW') + '\n\n' +
+'param(\n' +
+'    [string]$Message = @"\n' +
+content + '\n' +
+'"@\n' +
+')\n\n' +
+'$timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"\n\n' +
+'Write-Host "========================================" -ForegroundColor Cyan\n' +
+'Write-Host "⏰ 提醒時間: $timestamp" -ForegroundColor Yellow\n' +
+'Write-Host "========================================" -ForegroundColor Cyan\n' +
+'Write-Host ""\n' +
+'Write-Host $Message -ForegroundColor Green\n' +
+'Write-Host ""\n' +
+'Write-Host "========================================" -ForegroundColor Cyan\n\n' +
+'# 可選：發送 Windows 通知\n' +
+'# [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null\n' +
+'# 這需要額外的設定，暫時用 Write-Host 顯示\n\n' +
+'# 記錄到日誌\n' +
+'$logDir = "$env:USERPROFILE\\.openclaw\\workspace\\logs"\n' +
+'if (!(Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir -Force }\n' +
+'$logFile = "$logDir\\reminders.log"\n' +
+'"$timestamp - $Message" | Out-File -FilePath $logFile -Append -Encoding UTF8\n';
 
             return { skillMd, script };
         }
@@ -1068,6 +1029,7 @@ $logFile = "$logDir\\reminders.log"
             const source = document.getElementById('sourceFolder').value || '$env:USERPROFILE\\Downloads';
             const rule = document.getElementById('organizeRule').value;
             const moveFiles = document.getElementById('optMoveFiles').checked;
+            const PSN = '`n';  // PowerShell newline
 
             const ruleDesc = {
                 'extension': '依副檔名分類',
@@ -1075,113 +1037,102 @@ $logFile = "$logDir\\reminders.log"
                 'size': '依大小分類'
             };
 
-            const skillMd = `# ${name}
+            var skillMd = '# ' + name + '\n\n' + desc + '\n\n';
+            skillMd += '## 功能\n';
+            skillMd += '- 整理規則：' + ruleDesc[rule] + '\n';
+            skillMd += '- 來源資料夾：' + source + '\n';
+            skillMd += '- 模式：' + (moveFiles ? '移動檔案' : '只產生報告（不移動）') + '\n\n';
+            skillMd += '## 使用方式\n';
+            skillMd += '跟龍蝦說：「整理下載資料夾」或「執行 ' + name + '」\n';
 
-${desc}
+            var script = '# ' + name + ' - ' + desc + '\n';
+            script += '# 自動生成於 ' + new Date().toLocaleDateString('zh-TW') + '\n';
+            script += '# 整理規則：' + ruleDesc[rule] + '\n\n';
+            script += 'param(\n';
+            script += '    [string]$SourceFolder = "' + source + '",\n';
+            script += '    [switch]$MoveFiles = $' + moveFiles + '\n';
+            script += ')\n\n';
+            script += '$expandedPath = $ExecutionContext.InvokeCommand.ExpandString($SourceFolder)\n\n';
+            script += 'if (!(Test-Path $expandedPath)) {\n';
+            script += '    Write-Host "錯誤：來源資料夾不存在 - $expandedPath" -ForegroundColor Red\n';
+            script += '    exit 1\n';
+            script += '}\n\n';
+            script += 'Write-Host "開始整理: $expandedPath" -ForegroundColor Cyan\n';
+            script += 'Write-Host "模式: ' + (moveFiles ? '移動檔案' : '只產生報告') + '" -ForegroundColor Yellow\n\n';
+            script += '$files = Get-ChildItem -Path $expandedPath -File\n\n';
+            script += '$report = "# 檔案整理報告 - $(Get-Date -Format \'yyyy-MM-dd HH:mm\')' + PSN + PSN + '"\n';
+            script += '$report += "來源：$expandedPath' + PSN + '"\n';
+            script += '$report += "檔案數：$($files.Count)' + PSN + PSN + '"\n\n';
 
-## 功能
-- 整理規則：${ruleDesc[rule]}
-- 來源資料夾：${source}
-- 模式：${moveFiles ? '移動檔案' : '只產生報告（不移動）'}
-
-## 使用方式
-跟龍蝦說：「整理下載資料夾」或「執行 ${name}」
-`;
-
-            const script = `# ${name} - ${desc}
-# 自動生成於 ${new Date().toLocaleDateString('zh-TW')}
-# 整理規則：${ruleDesc[rule]}
-
-param(
-    [string]$SourceFolder = "${source}",
-    [switch]$MoveFiles = $${moveFiles}
-)
-
-$expandedPath = $ExecutionContext.InvokeCommand.ExpandString($SourceFolder)
-
-if (!(Test-Path $expandedPath)) {
-    Write-Host "錯誤：來源資料夾不存在 - $expandedPath" -ForegroundColor Red
-    exit 1
-}
-
-Write-Host "開始整理: $expandedPath" -ForegroundColor Cyan
-Write-Host "模式: ${moveFiles ? '移動檔案' : '只產生報告'}" -ForegroundColor Yellow
-
-$files = Get-ChildItem -Path $expandedPath -File
-
-$report = "# 檔案整理報告 - $(Get-Date -Format 'yyyy-MM-dd HH:mm')\`n\`n"
-$report += "來源：$expandedPath\`n"
-$report += "檔案數：$($files.Count)\`n\`n"
-
-${rule === 'extension' ? `
-# 依副檔名分類
-$groups = $files | Group-Object Extension
-foreach ($group in $groups | Sort-Object Count -Descending) {
-    $ext = if ($group.Name) { $group.Name } else { "無副檔名" }
-    $report += "## $ext ($($group.Count) 個檔案)\`n"
-    foreach ($file in $group.Group) {
-        $report += "- $($file.Name)\`n"
-        if ($MoveFiles) {
-            $destDir = Join-Path $expandedPath $ext.TrimStart('.')
-            if (!(Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
-            Move-Item $file.FullName $destDir -Force
-        }
-    }
-    $report += "\`n"
-}
-` : ''}
-${rule === 'date' ? `
-# 依日期分類
-$groups = $files | Group-Object { $_.LastWriteTime.ToString("yyyy-MM") }
-foreach ($group in $groups | Sort-Object Name -Descending) {
-    $report += "## $($group.Name) ($($group.Count) 個檔案)\`n"
-    foreach ($file in $group.Group) {
-        $report += "- $($file.Name)\`n"
-        if ($MoveFiles) {
-            $destDir = Join-Path $expandedPath $group.Name
-            if (!(Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
-            Move-Item $file.FullName $destDir -Force
-        }
-    }
-    $report += "\`n"
-}
-` : ''}
-${rule === 'size' ? `
-# 依大小分類
-$categories = @{
-    "01-小檔案(小於1MB)" = { $_.Length -lt 1MB }
-    "02-中檔案(1-100MB)" = { $_.Length -ge 1MB -and $_.Length -lt 100MB }
-    "03-大檔案(100MB-1GB)" = { $_.Length -ge 100MB -and $_.Length -lt 1GB }
-    "04-超大檔案(大於1GB)" = { $_.Length -ge 1GB }
-}
-foreach ($cat in $categories.GetEnumerator() | Sort-Object Key) {
-    $catFiles = $files | Where-Object $cat.Value
-    if ($catFiles.Count -gt 0) {
-        $report += "## $($cat.Key) ($($catFiles.Count) 個檔案)\`n"
-        foreach ($file in $catFiles) {
-            $sizeMB = [math]::Round($file.Length / 1MB, 2)
-            $report += "- [$sizeMB MB] $($file.Name)\`n"
-            if ($MoveFiles) {
-                $destDir = Join-Path $expandedPath $cat.Key
-                if (!(Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
-                Move-Item $file.FullName $destDir -Force
+            if (rule === 'extension') {
+                script += '# 依副檔名分類\n';
+                script += '$groups = $files | Group-Object Extension\n';
+                script += 'foreach ($group in $groups | Sort-Object Count -Descending) {\n';
+                script += '    $ext = if ($group.Name) { $group.Name } else { "無副檔名" }\n';
+                script += '    $report += "## $ext ($($group.Count) 個檔案)' + PSN + '"\n';
+                script += '    foreach ($file in $group.Group) {\n';
+                script += '        $report += "- $($file.Name)' + PSN + '"\n';
+                script += '        if ($MoveFiles) {\n';
+                script += "            $destDir = Join-Path $expandedPath $ext.TrimStart('.')\n";
+                script += '            if (!(Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }\n';
+                script += '            Move-Item $file.FullName $destDir -Force\n';
+                script += '        }\n';
+                script += '    }\n';
+                script += '    $report += "' + PSN + '"\n';
+                script += '}\n\n';
             }
-        }
-        $report += "\`n"
-    }
-}
-` : ''}
 
-$reportDir = "$env:USERPROFILE\\.openclaw\\workspace\\reports\\${name}"
-if (!(Test-Path $reportDir)) { New-Item -ItemType Directory -Path $reportDir -Force }
-$reportPath = "$reportDir\\$(Get-Date -Format 'yyyy-MM-dd').md"
-$report | Out-File -FilePath $reportPath -Encoding UTF8
+            if (rule === 'date') {
+                script += '# 依日期分類\n';
+                script += '$groups = $files | Group-Object { $_.LastWriteTime.ToString("yyyy-MM") }\n';
+                script += 'foreach ($group in $groups | Sort-Object Name -Descending) {\n';
+                script += '    $report += "## $($group.Name) ($($group.Count) 個檔案)' + PSN + '"\n';
+                script += '    foreach ($file in $group.Group) {\n';
+                script += '        $report += "- $($file.Name)' + PSN + '"\n';
+                script += '        if ($MoveFiles) {\n';
+                script += '            $destDir = Join-Path $expandedPath $group.Name\n';
+                script += '            if (!(Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }\n';
+                script += '            Move-Item $file.FullName $destDir -Force\n';
+                script += '        }\n';
+                script += '    }\n';
+                script += '    $report += "' + PSN + '"\n';
+                script += '}\n\n';
+            }
 
-Write-Host "\\n報告已產生：$reportPath" -ForegroundColor Green
-if ($MoveFiles) { Write-Host "檔案已移動完成！" -ForegroundColor Cyan }
-`;
+            if (rule === 'size') {
+                script += '# 依大小分類\n';
+                script += '$categories = @{\n';
+                script += '    "01-小檔案(小於1MB)" = { $_.Length -lt 1MB }\n';
+                script += '    "02-中檔案(1-100MB)" = { $_.Length -ge 1MB -and $_.Length -lt 100MB }\n';
+                script += '    "03-大檔案(100MB-1GB)" = { $_.Length -ge 100MB -and $_.Length -lt 1GB }\n';
+                script += '    "04-超大檔案(大於1GB)" = { $_.Length -ge 1GB }\n';
+                script += '}\n';
+                script += 'foreach ($cat in $categories.GetEnumerator() | Sort-Object Key) {\n';
+                script += '    $catFiles = $files | Where-Object $cat.Value\n';
+                script += '    if ($catFiles.Count -gt 0) {\n';
+                script += '        $report += "## $($cat.Key) ($($catFiles.Count) 個檔案)' + PSN + '"\n';
+                script += '        foreach ($file in $catFiles) {\n';
+                script += '            $sizeMB = [math]::Round($file.Length / 1MB, 2)\n';
+                script += '            $report += "- [$sizeMB MB] $($file.Name)' + PSN + '"\n';
+                script += '            if ($MoveFiles) {\n';
+                script += '                $destDir = Join-Path $expandedPath $cat.Key\n';
+                script += '                if (!(Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }\n';
+                script += '                Move-Item $file.FullName $destDir -Force\n';
+                script += '            }\n';
+                script += '        }\n';
+                script += '        $report += "' + PSN + '"\n';
+                script += '    }\n';
+                script += '}\n\n';
+            }
 
-            return { skillMd, script };
+            script += '$reportDir = "$env:USERPROFILE\\.openclaw\\workspace\\reports\\' + name + '"\n';
+            script += 'if (!(Test-Path $reportDir)) { New-Item -ItemType Directory -Path $reportDir -Force }\n';
+            script += "$reportPath = \"$reportDir\\$(Get-Date -Format 'yyyy-MM-dd').md\"\n";
+            script += '$report | Out-File -FilePath $reportPath -Encoding UTF8\n\n';
+            script += 'Write-Host "\\n報告已產生：$reportPath" -ForegroundColor Green\n';
+            script += 'if ($MoveFiles) { Write-Host "檔案已移動完成！" -ForegroundColor Cyan }\n';
+
+            return { skillMd: skillMd, script: script };
         }
 
         // 自動備份生成器
@@ -1196,123 +1147,101 @@ if ($MoveFiles) { Write-Host "檔案已移動完成！" -ForegroundColor Cyan }
                 'incremental': '增量備份'
             };
 
-            const skillMd = `# ${name}
+            const sourceList = sources.split('\n').filter(function(s) { return s.trim(); }).map(function(s) { return '  - ' + s.trim(); }).join('\n');
+            const sourceArray = sources.split('\n').filter(function(s) { return s.trim(); }).map(function(s) { return '"' + s.trim() + '"'; }).join(',\n        ');
 
-${desc}
+            var skillMd = '# ' + name + '\n\n' + desc + '\n\n';
+            skillMd += '## 設定\n';
+            skillMd += '- 備份來源：\n';
+            skillMd += sourceList + '\n';
+            skillMd += '- 備份目的地：' + dest + '\n';
+            skillMd += '- 備份模式：' + modeDesc[mode] + '\n\n';
+            skillMd += '## 使用方式\n';
+            skillMd += '跟龍蝦說：「執行備份」或「備份我的檔案」\n';
 
-## 設定
-- 備份來源：
-${sources.split('\n').filter(s => s.trim()).map(s => '  - ' + s.trim()).join('\n')}
-- 備份目的地：${dest}
-- 備份模式：${modeDesc[mode]}
+            var rcloneCmd = mode === 'sync' ? 'sync' : 'copy';
 
-## 使用方式
-跟龍蝦說：「執行備份」或「備份我的檔案」
-`;
+            var script = '# ' + name + ' - ' + desc + '\n';
+            script += '# 自動生成於 ' + new Date().toLocaleDateString('zh-TW') + '\n';
+            script += '# 備份模式：' + modeDesc[mode] + '\n\n';
+            script += 'param(\n';
+            script += '    [string[]]$Sources = @(\n';
+            script += '        ' + sourceArray + '\n';
+            script += '    ),\n';
+            script += '    [string]$Destination = "' + dest + '"\n';
+            script += ')\n\n';
+            script += '$timestamp = Get-Date -Format "yyyy-MM-dd_HHmmss"\n';
+            script += '$logDir = "$env:USERPROFILE\\.openclaw\\workspace\\logs"\n';
+            script += 'if (!(Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir -Force }\n';
+            script += '$logFile = "$logDir\\backup_$timestamp.log"\n\n';
+            script += 'Write-Host "========================================" -ForegroundColor Cyan\n';
+            script += 'Write-Host "開始備份 - $timestamp" -ForegroundColor Yellow\n';
+            script += 'Write-Host "目的地: $Destination" -ForegroundColor Gray\n';
+            script += 'Write-Host "========================================" -ForegroundColor Cyan\n\n';
+            script += '"備份開始: $timestamp" | Out-File $logFile -Encoding UTF8\n\n';
+            script += 'foreach ($source in $Sources) {\n';
+            script += '    $expandedSource = $ExecutionContext.InvokeCommand.ExpandString($source)\n\n';
+            script += '    if (!(Test-Path $expandedSource)) {\n';
+            script += '        Write-Host "跳過（不存在）: $expandedSource" -ForegroundColor Yellow\n';
+            script += '        "跳過: $expandedSource (不存在)" | Out-File $logFile -Append -Encoding UTF8\n';
+            script += '        continue\n';
+            script += '    }\n\n';
+            script += '    $folderName = Split-Path $expandedSource -Leaf\n';
+            script += '    $destPath = if ($Destination -match ":") {\n';
+            script += '        # 如果是 rclone remote（如 gdrive:Backups）\n';
+            script += '        "$Destination/$folderName"\n';
+            script += '    } else {\n';
+            script += '        Join-Path $Destination $folderName\n';
+            script += '    }\n\n';
+            script += '    Write-Host "備份中: $expandedSource -> $destPath" -ForegroundColor Cyan\n\n';
+            script += '    if ($Destination -match "^[a-zA-Z]+:") {\n';
+            script += '        # 使用 rclone（雲端備份）\n';
+            script += '        rclone ' + rcloneCmd + ' "$expandedSource" "$destPath" --progress\n';
+            script += '    } else {\n';
+            script += '        # 本機備份\n';
+            script += '        if (!(Test-Path $destPath)) { New-Item -ItemType Directory -Path $destPath -Force | Out-Null }\n\n';
+            script += '        $files = Get-ChildItem -Path $expandedSource -Recurse -File\n';
+            script += '        $count = 0\n';
+            script += '        foreach ($file in $files) {\n';
+            script += '            $relativePath = $file.FullName.Substring($expandedSource.Length)\n';
+            script += '            $targetPath = Join-Path $destPath $relativePath\n';
+            script += '            $targetDir = Split-Path $targetPath -Parent\n';
+            script += '            if (!(Test-Path $targetDir)) { New-Item -ItemType Directory -Path $targetDir -Force | Out-Null }\n';
+            script += '            Copy-Item $file.FullName $targetPath -Force\n';
+            script += '            $count++\n';
+            script += '        }\n';
+            script += '        Write-Host "已複製 $count 個檔案" -ForegroundColor Green\n';
+            script += '    }\n\n';
+            script += '    "完成: $expandedSource -> $destPath" | Out-File $logFile -Append -Encoding UTF8\n';
+            script += '}\n\n';
+            script += 'Write-Host "========================================" -ForegroundColor Cyan\n';
+            script += 'Write-Host "備份完成！" -ForegroundColor Green\n';
+            script += 'Write-Host "日誌檔: $logFile" -ForegroundColor Gray\n';
+            script += '"備份完成: $(Get-Date -Format \'yyyy-MM-dd HH:mm:ss\')" | Out-File $logFile -Append -Encoding UTF8\n';
 
-            const rcloneCmd = mode === 'sync' ? 'sync' : 'copy';
-
-            const script = `# ${name} - ${desc}
-# 自動生成於 ${new Date().toLocaleDateString('zh-TW')}
-# 備份模式：${modeDesc[mode]}
-
-param(
-    [string[]]$Sources = @(
-        ${sources.split('\n').filter(s => s.trim()).map(s => `"${s.trim()}"`).join(',\n        ')}
-    ),
-    [string]$Destination = "${dest}"
-)
-
-$timestamp = Get-Date -Format "yyyy-MM-dd_HHmmss"
-$logDir = "$env:USERPROFILE\\.openclaw\\workspace\\logs"
-if (!(Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir -Force }
-$logFile = "$logDir\\backup_$timestamp.log"
-
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "開始備份 - $timestamp" -ForegroundColor Yellow
-Write-Host "目的地: $Destination" -ForegroundColor Gray
-Write-Host "========================================" -ForegroundColor Cyan
-
-"備份開始: $timestamp" | Out-File $logFile -Encoding UTF8
-
-foreach ($source in $Sources) {
-    $expandedSource = $ExecutionContext.InvokeCommand.ExpandString($source)
-
-    if (!(Test-Path $expandedSource)) {
-        Write-Host "跳過（不存在）: $expandedSource" -ForegroundColor Yellow
-        "跳過: $expandedSource (不存在)" | Out-File $logFile -Append -Encoding UTF8
-        continue
-    }
-
-    $folderName = Split-Path $expandedSource -Leaf
-    $destPath = if ($Destination -match ":") {
-        # 如果是 rclone remote（如 gdrive:Backups）
-        "$Destination/$folderName"
-    } else {
-        Join-Path $Destination $folderName
-    }
-
-    Write-Host "備份中: $expandedSource -> $destPath" -ForegroundColor Cyan
-
-    if ($Destination -match "^[a-zA-Z]+:") {
-        # 使用 rclone（雲端備份）
-        rclone ${rcloneCmd} "$expandedSource" "$destPath" --progress
-    } else {
-        # 本機備份
-        if (!(Test-Path $destPath)) { New-Item -ItemType Directory -Path $destPath -Force | Out-Null }
-
-        $files = Get-ChildItem -Path $expandedSource -Recurse -File
-        $count = 0
-        foreach ($file in $files) {
-            $relativePath = $file.FullName.Substring($expandedSource.Length)
-            $targetPath = Join-Path $destPath $relativePath
-            $targetDir = Split-Path $targetPath -Parent
-            if (!(Test-Path $targetDir)) { New-Item -ItemType Directory -Path $targetDir -Force | Out-Null }
-            Copy-Item $file.FullName $targetPath -Force
-            $count++
-        }
-        Write-Host "已複製 $count 個檔案" -ForegroundColor Green
-    }
-
-    "完成: $expandedSource -> $destPath" | Out-File $logFile -Append -Encoding UTF8
-}
-
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "備份完成！" -ForegroundColor Green
-Write-Host "日誌檔: $logFile" -ForegroundColor Gray
-"備份完成: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" | Out-File $logFile -Append -Encoding UTF8
-`;
-
-            return { skillMd, script };
+            return { skillMd: skillMd, script: script };
         }
 
         // 自訂 Skill 生成器
         function generateCustom(name, desc) {
             const trigger = document.getElementById('customTrigger').value || '執行我的任務';
-            const script = document.getElementById('customScript').value || 'Write-Host "Hello from my custom skill!"';
+            const userScript = document.getElementById('customScript').value || 'Write-Host "Hello from my custom skill!"';
 
-            const skillMd = `# ${name}
+            const skillMd = '# ' + name + '\n\n' +
+desc + '\n\n' +
+'## 觸發指令\n' +
+'跟龍蝦說：「' + trigger + '」\n\n' +
+'## 功能說明\n' +
+'自訂技能，執行以下腳本。\n\n' +
+'## 使用方式\n' +
+FENCE + '\n' +
+trigger + '\n' +
+FENCE + '\n';
 
-${desc}
-
-## 觸發指令
-跟龍蝦說：「${trigger}」
-
-## 功能說明
-自訂技能，執行以下腳本。
-
-## 使用方式
-\`\`\`
-${trigger}
-\`\`\`
-`;
-
-            const fullScript = `# ${name} - ${desc}
-# 自動生成於 ${new Date().toLocaleDateString('zh-TW')}
-# 觸發指令：${trigger}
-
-${script}
-`;
+            const fullScript = '# ' + name + ' - ' + desc + '\n' +
+'# 自動生成於 ' + new Date().toLocaleDateString('zh-TW') + '\n' +
+'# 觸發指令：' + trigger + '\n\n' +
+userScript + '\n';
 
             return { skillMd, script: fullScript };
         }
