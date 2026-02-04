@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Part 9 - 生活與學習應用</title>
+    <title>Part 9 - 設定 LINE Webhook</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow: hidden; color: #333; }
@@ -17,374 +17,144 @@
         .nav-arrow:disabled { opacity: 0.3; }
         .slide { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); display: none; align-items: center; justify-content: center; padding: 40px; }
         .slide.active { display: flex; }
-        .content-card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); padding: 35px; max-width: 1200px; width: 95%; max-height: 88vh; overflow-y: auto; }
+        .content-card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); padding: 50px; max-width: 1200px; width: 95%; max-height: 88vh; overflow-y: auto; }
         h1 { color: #667eea; font-size: 48px; margin-bottom: 24px; text-align: center; }
-        h2 { color: #764ba2; font-size: 28px; margin-bottom: 15px; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
-        h3 { color: #667eea; font-size: 18px; margin: 12px 0 8px 0; }
-        p { font-size: 16px; line-height: 1.6; color: #444; margin-bottom: 8px; }
-        pre { background: #1e1e1e; color: #d4d4d4; padding: 12px; border-radius: 10px; margin: 8px 0; font-size: 14px; white-space: pre-wrap; }
-        .box { padding: 12px; border-radius: 10px; margin: 12px 0; border-left: 5px solid; font-size: 15px; }
+        h2 { color: #764ba2; font-size: 36px; margin-bottom: 30px; border-bottom: 3px solid #667eea; padding-bottom: 12px; }
+        p, li { font-size: 20px; line-height: 1.8; color: #444; margin-bottom: 12px; }
+        code { background: #f0f2f5; padding: 3px 8px; border-radius: 6px; font-family: 'Consolas', monospace; color: #d63384; font-weight: 600; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 12px; margin: 20px 0; font-size: 16px; overflow-x: auto; }
+        .box { padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 6px solid; font-size: 18px; }
         .info { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
         .success { background: #d4edda; border-color: #28a745; color: #155724; }
+        .warning { background: #fff3cd; border-color: #ffc107; color: #856404; }
         .highlight { background: linear-gradient(120deg, #667eea 0%, #764ba2 100%); padding: 4px 12px; border-radius: 6px; font-weight: bold; color: white; }
-        .indicators { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 4000; padding: 8px 20px; background: rgba(0,0,0,0.3); border-radius: 30px; }
-        .dot { width: 10px; height: 10px; background: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; }
+        .step-box { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); padding: 25px; border-radius: 15px; margin: 20px 0; border: 2px solid rgba(102, 126, 234, 0.3); }
+        .step-number { display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: white; width: 40px; height: 40px; border-radius: 50%; text-align: center; line-height: 40px; font-weight: bold; margin-right: 15px; }
+        .indicators { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 4000; padding: 10px 25px; background: rgba(0,0,0,0.3); border-radius: 30px; }
+        .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; }
         .dot.active { background: #fff; transform: scale(1.3); }
     </style>
 </head>
 <body>
     <div class="nav-bar">
-        <div class="nav-title">📚 生活與學習應用（15 個情境）</div>
+        <div class="nav-title">🔗 Part 9 - 設定 LINE Webhook</div>
         <div class="nav-buttons">
             <a href="index.html" class="nav-btn">🏠 首頁</a>
-            <a href="Part1.html" class="nav-btn">⬅️ 上一章</a>
+            <a href="Part8.html" class="nav-btn">⬅️ 上一章</a>
             <a href="Part10.html" class="nav-btn">下一章 ➡️</a>
             <button class="nav-btn" onclick="toggleFullscreen()">🖥️ 全螢幕</button>
+            <a href="https://www.facebook.com/?locale=zh_TW" target="_blank" class="nav-btn">📘 FB</a>
+            <a href="https://www.youtube.com/@Liang-yt02" target="_blank" class="nav-btn">🎥 YT</a>
+            <a href="https://www.facebook.com/groups/2754139931432955?locale=zh_TW" target="_blank" class="nav-btn">👥 3A</a>
         </div>
     </div>
 
     <div class="slide-container">
-        <!-- 封面 -->
         <div class="slide active">
             <div class="content-card" style="text-align: center;">
-                <span style="font-size: 80px;">📚</span>
-                <h1>生活與學習應用</h1>
-                <h2 style="border: none; font-size: 24px; color: #666;">龍蝦可以幫你做什麼？15 個實用情境！</h2>
-                <div style="margin-top: 25px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
-                    <span class="highlight">查資料</span>
-                    <span class="highlight">寫文章</span>
-                    <span class="highlight">翻譯</span>
-                    <span class="highlight">解數學</span>
-                    <span class="highlight">想點子</span>
-                    <span class="highlight">規劃行程</span>
-                    <span class="highlight">練英文</span>
-                    <span class="highlight">寫程式</span>
+                <span style="font-size: 80px;">🔗</span>
+                <h1>Part 9: 設定 LINE Webhook</h1>
+                <h2 style="border: none; font-size: 28px; color: #666;">讓 LINE 和龍蝦連起來</h2>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>📝 第一步：修改 Clawdbot/Moltbot 設定檔</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>按 <code>Windows 鍵 + R</code>，輸入 <code>notepad</code>，打開記事本</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>點 檔案 → 開啟，在檔案名稱輸入：</p>
+                    <pre>C:\Users\你的使用者名稱\.clawdbot\clawdbot.json</pre>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>找到 <code>"channels": {</code> 這一段</p>
                 </div>
             </div>
         </div>
 
-        <!-- 情境 1 -->
         <div class="slide">
             <div class="content-card">
-                <h2>🔍 情境 1：幫你查資料整理重點</h2>
-                <h3>你說：</h3>
-                <pre>幫我查一下今天的科技新聞，整理成 5 個重點</pre>
-                <h3>龍蝦會回覆：</h3>
-                <pre>好的，以下是今天的 5 則科技新聞重點：
-
-1. 蘋果發表新款 iPhone 17，搭載 A20 晶片
-2. Google 推出新版 Gemini 3.0，支援更長對話
-3. 台積電宣布 1 奈米製程研發進度
-4. Meta 發表新款 VR 頭盔，重量減輕 30%
-5. 微軟 Copilot 新增程式碼自動修復功能</pre>
-                <div class="box success">不用自己一個一個網站看，龍蝦幫你整理好！</div>
+                <h2>📝 加入 LINE 設定</h2>
+                <p>在 <code>"channels":</code> 裡面加入：</p>
+                <pre>{
+  "channels": {
+    "line": {
+      "enabled": true,
+      "channelId": "你的Channel ID",
+      "channelSecret": "你的Channel Secret",
+      "channelAccessToken": "你的Channel Access Token"
+    }
+  }
+}</pre>
+                <div class="box warning">
+                    把剛剛記事本記下來的三個值填進去，然後存檔！
+                </div>
             </div>
         </div>
 
-        <!-- 情境 2 -->
         <div class="slide">
             <div class="content-card">
-                <h2>✍️ 情境 2：幫你寫文章</h2>
-                <h3>你說：</h3>
-                <pre>幫我寫一篇 200 字的自我介紹，我是一個國小老師，喜歡用科技教學</pre>
-                <h3>龍蝦會回覆：</h3>
-                <pre>大家好，我是一位熱愛教育的國小老師。
-
-在課堂上，我喜歡運用各種科技工具，讓學習變得更有趣。
-無論是互動式白板、教育 App，還是線上遊戲化學習平台，
-我都樂於嘗試，希望能激發學生的學習熱情。
-
-我相信科技可以讓教育更生動、更有效率。
-看到學生眼中閃爍的光芒，就是我最大的成就感。</pre>
-                <div class="box success">幾秒鐘就寫好一篇文章，還可以請它修改！</div>
+                <h2>🔄 第二步：重啟 Clawdbot/Moltbot</h2>
+                <p>在 PowerShell 輸入：</p>
+                <pre>clawdbot gateway restart</pre>
+                <div class="box success">
+                    這會讓龍蝦讀取新的設定！
+                </div>
             </div>
         </div>
 
-        <!-- 情境 3 -->
         <div class="slide">
             <div class="content-card">
-                <h2>🌐 情境 3：多國語言翻譯</h2>
-                <h3>你說：</h3>
-                <pre>把這段翻成英文：今天天氣很好，我們去公園玩吧！</pre>
-                <h3>龍蝦會回覆：</h3>
-                <pre>The weather is great today. Let's go to the park!</pre>
-                <h3>你還可以說：</h3>
-                <pre>再幫我翻成日文、韓文、法文</pre>
-                <h3>龍蝦會回覆：</h3>
-                <pre>日文：今日はいい天気ですね。公園に遊びに行きましょう！
-韓文：오늘 날씨가 좋네요. 공원에 놀러 가요!
-法文：Il fait beau aujourd'hui. Allons au parc !</pre>
-                <div class="box success">支援超過 100 種語言翻譯！</div>
+                <h2>🌐 第三步：啟動 ngrok</h2>
+                <div class="box warning">
+                    <strong>開一個新的 PowerShell 視窗</strong>（不要關掉舊的）
+                </div>
+                <p>輸入：</p>
+                <pre>ngrok http 18789</pre>
+                <p>你會看到一個表格，找到 <strong>Forwarding</strong> 那一行，例如：</p>
+                <pre>Forwarding    https://abcd1234.ngrok-free.app -> http://localhost:18789</pre>
+                <p>把 <code>https://abcd1234.ngrok-free.app</code> 這個網址複製下來！</p>
+                <div class="box warning">
+                    <strong>⚠️ 不要關掉這個視窗，ngrok 要一直開著！</strong>
+                </div>
             </div>
         </div>
 
-        <!-- 情境 4 -->
         <div class="slide">
             <div class="content-card">
-                <h2>🔢 情境 4：解數學題目並教你</h2>
-                <h3>你說：</h3>
-                <pre>一個長方形的長是 12 公分，寬是 8 公分，請問面積和周長是多少？</pre>
-                <h3>龍蝦會回覆：</h3>
-                <pre>讓我來幫你算！
-
-📐 面積公式：長 × 寬
-   = 12 × 8 = 96 平方公分
-
-📏 周長公式：(長 + 寬) × 2
-   = (12 + 8) × 2 = 40 公分
-
-答案：面積 96 平方公分，周長 40 公分</pre>
-                <div class="box success">不只給答案，還會教你怎麼算！</div>
+                <h2>🔧 第四步：設定 LINE Webhook URL</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>回到 LINE Developers 網站</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>進入你的 Channel，點 <strong>Messaging API</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>找到 <strong>Webhook URL</strong>，點 <strong>Edit</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">4</span>在輸入框貼上 ngrok 的網址，後面加上 <code>/line/webhook</code></p>
+                    <pre>https://abcd1234.ngrok-free.app/line/webhook</pre>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">5</span>點 <strong>Update</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">6</span>把 <strong>Use webhook</strong> 的開關打開（變成綠色 ON）</p>
+                </div>
             </div>
         </div>
 
-        <!-- 情境 5 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>💡 情境 5：幫你想創意點子</h2>
-                <h3>你說：</h3>
-                <pre>我要辦班級慶生會，給我 5 個有趣的活動點子</pre>
-                <h3>龍蝦會回覆：</h3>
-                <pre>好的！以下是 5 個有趣的班級慶生會活動：
-
-1. 🎂 DIY 蛋糕裝飾 - 準備小蛋糕讓大家發揮創意
-2. 🎮 分組競賽遊戲 - 猜謎、比手畫腳、記憶大考驗
-3. 🎁 交換禮物 - 設定金額上限，抽籤交換
-4. 📸 拍照打卡區 - 準備有趣道具拍照留念
-5. 🎤 才藝表演 - 唱歌、跳舞、說笑話都可以</pre>
-                <div class="box success">腦袋空空的時候，龍蝦幫你想！</div>
-            </div>
-        </div>
-
-        <!-- 情境 6 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>🗺️ 情境 6：規劃旅遊行程</h2>
-                <h3>你說：</h3>
-                <pre>我週末要去台中玩一天，幫我規劃行程，要有吃的和玩的</pre>
-                <h3>龍蝦會回覆：</h3>
-                <pre>🌅 早上
-09:00 出發前往台中
-10:30 「審計新村」逛文創市集
-12:00 「宮原眼科」吃冰淇淋 + 周邊小吃
-
-🌞 下午
-14:00 「國家歌劇院」參觀拍照
-15:30 「勤美誠品綠園道」散步逛街
-17:00 「逢甲夜市」提早吃晚餐
-
-🌙 晚上
-19:00 「高美濕地」看夕陽
-20:30 回程</pre>
-            </div>
-        </div>
-
-        <!-- 情境 7 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>📝 情境 7：檢查錯字和文法</h2>
-                <h3>你說：</h3>
-                <pre>幫我檢查這段文字有沒有錯字：
-今天的天氣很晴朗，我和朋友一起去乒乓，玩得很開心。</pre>
-                <h3>龍蝦會回覆：</h3>
-                <pre>我發現一個錯誤：
-
-❌ 錯誤：「去乒乓」
-✅ 正確：「去打乒乓」或「去公園」
-
-修正後的句子：
-「今天的天氣很晴朗，我和朋友一起去打乒乓球，玩得很開心。」</pre>
-                <div class="box success">幫你抓錯字，寫作業更安心！</div>
-            </div>
-        </div>
-
-        <!-- 情境 8 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>🤔 情境 8：用簡單的話解釋難懂的東西</h2>
-                <h3>你說：</h3>
-                <pre>什麼是人工智慧？用小學生聽得懂的方式解釋</pre>
-                <h3>龍蝦會回覆：</h3>
-                <pre>人工智慧就像是「會學習的電腦程式」！
-
-想像一下：
-🐕 你教小狗「坐下」，牠聽懂後就會坐下
-🤖 人工智慧也是這樣，你給它很多例子，它就學會了
-
-舉個例子：
-📷 你給電腦看 1000 張貓的照片
-🧠 電腦就學會「什麼是貓」
-😺 之後你給它看新的照片，它就能說「這是貓！」
-
-簡單說：讓電腦變聰明，可以幫人類做事情！</pre>
-            </div>
-        </div>
-
-        <!-- 情境 9 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>🗣️ 情境 9：陪你練習英文對話</h2>
-                <h3>你說：</h3>
-                <pre>我想練習英文，假裝你是餐廳服務生，我是客人</pre>
-                <h3>龍蝦會回覆：</h3>
-                <pre>Good evening! Welcome to our restaurant. 🍽️
-
-My name is Lobster, and I'll be your server tonight.
-Here's the menu. Would you like something to drink first?
-
-（晚安！歡迎來到我們的餐廳。這是菜單，請問您想先喝點什麼嗎？）
-
-💡 你可以說：
-- "Can I have some water, please?"
-- "What do you recommend?"</pre>
-                <div class="box success">隨時隨地練習英文對話！</div>
-            </div>
-        </div>
-
-        <!-- 情境 10 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>💻 情境 10：幫你寫程式</h2>
-                <h3>你說：</h3>
-                <pre>寫一個 Python 程式，可以計算 1 加到 100 的總和</pre>
-                <h3>龍蝦會回覆：</h3>
-                <pre># 方法一：用迴圈
-total = 0
-for i in range(1, 101):
-    total = total + i
-print("答案是：", total)
-
-# 方法二：用數學公式（更快）
-n = 100
-total = n * (n + 1) // 2
-print("答案是：", total)
-
-# 答案：5050</pre>
-                <div class="box success">學寫程式的好幫手！</div>
-            </div>
-        </div>
-
-        <!-- 情境 11 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>📖 情境 11：幫你寫讀書心得</h2>
-                <h3>你說：</h3>
-                <pre>幫我寫一篇《乞丐乾爹》的讀書心得，300字左右</pre>
-                <h3>龍蝦會回覆：</h3>
-                <pre>《乞丐乾爹》讀書心得
-
-這本書讓我學到「不要以貌取人」的道理。故事中的乞丐看起來
-又髒又窮，但他其實有一顆善良的心，願意幫助需要幫助的人。
-
-書中最讓我感動的是，乞丐雖然自己很窮，卻把好不容易得到的
-食物分給更需要的小孩。這讓我想到，真正的富有不是口袋裡有
-多少錢，而是心裡有多少愛。
-
-讀完這本書，我告訴自己：以後不要只看外表來判斷一個人，
-要用心去了解他的內在。每個人都有值得學習的地方。</pre>
-            </div>
-        </div>
-
-        <!-- 情境 12 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>🍳 情境 12：教你做菜食譜</h2>
-                <h3>你說：</h3>
-                <pre>我想學做番茄炒蛋，給我簡單的步驟</pre>
-                <h3>龍蝦會回覆：</h3>
-                <pre>🍳 番茄炒蛋（超簡單版）
-
-材料：番茄 2 顆、雞蛋 3 顆、蔥少許、鹽、糖
-
-步驟：
-1. 番茄切塊、蔥切段、雞蛋打散加少許鹽
-2. 熱鍋加油，倒入蛋液，稍微凝固就推散盛起
-3. 同一鍋加點油，放番茄炒軟（約2分鐘）
-4. 加入半匙糖、少許鹽調味
-5. 把炒好的蛋倒回去，翻炒均勻
-6. 撒上蔥花，完成！
-
-💡 小技巧：蛋不要炒太熟，最後再加會更嫩</pre>
-            </div>
-        </div>
-
-        <!-- 情境 13 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>🎵 情境 13：推薦音樂電影</h2>
-                <h3>你說：</h3>
-                <pre>推薦 5 部適合全家一起看的電影</pre>
-                <h3>龍蝦會回覆：</h3>
-                <pre>🎬 適合全家觀看的 5 部電影：
-
-1. 《乖乖龍的家》- 溫馨感人的親情故事
-2. 《乖乖龍的家》- 適合親子討論夢想
-3. 《乖乖龍的家》- 勇氣與友情的冒險
-4. 《腦筋急轉彎》- 認識情緒的好教材
-5. 《乖乖龍的家》- 環保議題輕鬆學
-
-💡 這些電影都沒有暴力或不適合兒童的內容，
-   看完還可以跟孩子討論劇情！</pre>
-            </div>
-        </div>
-
-        <!-- 情境 14 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>📅 情境 14：制定讀書計畫</h2>
-                <h3>你說：</h3>
-                <pre>我下週要考數學，幫我制定 7 天的複習計畫</pre>
-                <h3>龍蝦會回覆：</h3>
-                <pre>📅 數學考試 7 天複習計畫
-
-Day 1（週一）：整理筆記 + 公式表
-Day 2（週二）：第一章 - 做課本習題
-Day 3（週三）：第二章 - 做課本習題
-Day 4（週四）：第三章 - 做課本習題
-Day 5（週五）：寫考古題第一份
-Day 6（週六）：寫考古題第二份 + 檢討錯題
-Day 7（週日）：複習錯題本 + 早點睡
-
-💡 每天讀 1-2 小時就好，不要熬夜！
-💡 不會的題目標記起來，考前再看一次</pre>
-            </div>
-        </div>
-
-        <!-- 情境 15 -->
-        <div class="slide">
-            <div class="content-card">
-                <h2>💪 情境 15：健康生活建議</h2>
-                <h3>你說：</h3>
-                <pre>我最近常常腰痠背痛，可能是久坐的關係，有什麼建議？</pre>
-                <h3>龍蝦會回覆：</h3>
-                <pre>💺 久坐族的舒緩建議：
-
-【每小時做】
-- 站起來走動 5 分鐘
-- 伸展脖子和肩膀
-
-【簡單伸展操】
-1. 轉頭運動：左右各 10 次
-2. 聳肩放鬆：聳肩 5 秒後放下，重複 10 次
-3. 貓牛式：趴下後拱背、凹背交替
-
-【改善姿勢】
-- 螢幕與眼睛同高
-- 椅子高度讓腳能平放地面
-- 每 30 分鐘調整坐姿
-
-⚠️ 如果持續疼痛，建議看醫生檢查</pre>
-            </div>
-        </div>
-
-        <!-- 結尾 -->
         <div class="slide">
             <div class="content-card" style="text-align: center;">
-                <span style="font-size: 80px;">💼</span>
-                <h2 style="border: none;">想看更多進階應用？</h2>
-                <p style="font-size: 20px;">接下來看看企業與商業的應用範例！</p>
-                <a href="Part10.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px;">
-                    ➡️ 企業與商業應用
+                <span style="font-size: 80px;">🎉</span>
+                <h2 style="border: none;">Part 9 完成！</h2>
+                <p style="font-size: 24px;">LINE 和龍蝦已經連起來了！</p>
+                <p style="font-size: 20px;">接下來前往下一章配對你的 LINE 帳號！</p>
+                <a href="Part10.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);">
+                    ➡️ Part 10：配對與測試
                 </a>
             </div>
         </div>

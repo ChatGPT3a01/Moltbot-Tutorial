@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Part 6 - 設定 LINE Webhook</title>
+    <title>Part 6 - 設定 OpenClaw</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow: hidden; color: #333; }
@@ -20,9 +20,10 @@
         .content-card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); padding: 50px; max-width: 1200px; width: 95%; max-height: 88vh; overflow-y: auto; }
         h1 { color: #667eea; font-size: 48px; margin-bottom: 24px; text-align: center; }
         h2 { color: #764ba2; font-size: 36px; margin-bottom: 30px; border-bottom: 3px solid #667eea; padding-bottom: 12px; }
+        h3 { color: #667eea; font-size: 24px; margin: 25px 0 15px 0; }
         p, li { font-size: 20px; line-height: 1.8; color: #444; margin-bottom: 12px; }
         code { background: #f0f2f5; padding: 3px 8px; border-radius: 6px; font-family: 'Consolas', monospace; color: #d63384; font-weight: 600; }
-        pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 12px; margin: 20px 0; font-size: 16px; overflow-x: auto; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 12px; margin: 20px 0; font-size: 18px; }
         .box { padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 6px solid; font-size: 18px; }
         .info { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
         .success { background: #d4edda; border-color: #28a745; color: #155724; }
@@ -30,6 +31,9 @@
         .highlight { background: linear-gradient(120deg, #667eea 0%, #764ba2 100%); padding: 4px 12px; border-radius: 6px; font-weight: bold; color: white; }
         .step-box { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); padding: 25px; border-radius: 15px; margin: 20px 0; border: 2px solid rgba(102, 126, 234, 0.3); }
         .step-number { display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: white; width: 40px; height: 40px; border-radius: 50%; text-align: center; line-height: 40px; font-weight: bold; margin-right: 15px; }
+        .question-box { background: #f8f9fa; border: 2px solid #667eea; border-radius: 15px; padding: 20px; margin: 15px 0; }
+        .question-title { color: #667eea; font-weight: bold; margin-bottom: 10px; }
+        .answer { color: #28a745; font-weight: bold; }
         .indicators { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 4000; padding: 10px 25px; background: rgba(0,0,0,0.3); border-radius: 30px; }
         .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; }
         .dot.active { background: #fff; transform: scale(1.3); }
@@ -37,124 +41,152 @@
 </head>
 <body>
     <div class="nav-bar">
-        <div class="nav-title">🔗 Part 6 - 設定 LINE Webhook</div>
+        <div class="nav-title">🤖 Part 6 - 設定 OpenClaw</div>
         <div class="nav-buttons">
             <a href="index.html" class="nav-btn">🏠 首頁</a>
             <a href="Part5.html" class="nav-btn">⬅️ 上一章</a>
             <a href="Part7.html" class="nav-btn">下一章 ➡️</a>
             <button class="nav-btn" onclick="toggleFullscreen()">🖥️ 全螢幕</button>
-            <a href="https://www.facebook.com/?locale=zh_TW" target="_blank" class="nav-btn">📘 FB</a>
-            <a href="https://www.youtube.com/@Liang-yt02" target="_blank" class="nav-btn">🎥 YT</a>
-            <a href="https://www.facebook.com/groups/2754139931432955?locale=zh_TW" target="_blank" class="nav-btn">👥 3A</a>
         </div>
     </div>
 
     <div class="slide-container">
+        <!-- Slide 1: 封面 -->
         <div class="slide active">
             <div class="content-card" style="text-align: center;">
-                <span style="font-size: 80px;">🔗</span>
-                <h1>Part 6: 設定 LINE Webhook</h1>
-                <h2 style="border: none; font-size: 28px; color: #666;">讓 LINE 和龍蝦連起來</h2>
-            </div>
-        </div>
-
-        <div class="slide">
-            <div class="content-card">
-                <h2>📝 第一步：修改 Clawdbot/Moltbot 設定檔</h2>
-                <div class="step-box">
-                    <p><span class="step-number">1</span>按 <code>Windows 鍵 + R</code>，輸入 <code>notepad</code>，打開記事本</p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">2</span>點 檔案 → 開啟，在檔案名稱輸入：</p>
-                    <pre>C:\Users\你的使用者名稱\.clawdbot\clawdbot.json</pre>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">3</span>找到 <code>"channels": {</code> 這一段</p>
+                <span style="font-size: 80px;">🤖</span>
+                <h1>Part 6: 設定 OpenClaw</h1>
+                <h2 style="border: none; font-size: 28px; color: #666;">執行初始化設定精靈</h2>
+                <div style="margin-top: 40px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                    <span class="highlight">onboard 精靈</span>
+                    <span class="highlight">選擇 AI 模型</span>
+                    <span class="highlight">Gateway 服務</span>
                 </div>
             </div>
         </div>
 
+        <!-- Slide 2: 執行初始化 -->
         <div class="slide">
             <div class="content-card">
-                <h2>📝 加入 LINE 設定</h2>
-                <p>在 <code>"channels":</code> 裡面加入：</p>
-                <pre>{
-  "channels": {
-    "line": {
-      "enabled": true,
-      "channelId": "你的Channel ID",
-      "channelSecret": "你的Channel Secret",
-      "channelAccessToken": "你的Channel Access Token"
-    }
-  }
-}</pre>
-                <div class="box warning">
-                    把剛剛記事本記下來的三個值填進去，然後存檔！
-                </div>
-            </div>
-        </div>
-
-        <div class="slide">
-            <div class="content-card">
-                <h2>🔄 第二步：重啟 Clawdbot/Moltbot</h2>
+                <h2>🚀 第一步：執行初始化設定</h2>
                 <p>在 PowerShell 輸入：</p>
-                <pre>clawdbot gateway restart</pre>
+                <pre>openclaw onboard --install-daemon</pre>
+                <div class="box info">
+                    <strong>這個指令會：</strong>
+                    <ul style="margin-top: 10px; margin-bottom: 0;">
+                        <li>啟動設定精靈</li>
+                        <li>安裝 Gateway 背景服務</li>
+                        <li>設定 AI 模型</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: 回答問題 1 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📝 回答設定問題</h2>
+                <div class="question-box">
+                    <div class="question-title">問題 1：I understand this is powerful and inherently risky. Continue?</div>
+                    <p>用方向鍵選 <span class="answer">Yes</span>，按 Enter</p>
+                </div>
+                <div class="question-box">
+                    <div class="question-title">問題 2：Onboarding mode</div>
+                    <p>選 <span class="answer">QuickStart</span>，按 Enter</p>
+                </div>
+                <div class="box info">
+                    <strong>💡 用方向鍵 ↑↓ 選擇，Enter 確認</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: 回答問題 2 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📝 選擇 AI 模型</h2>
+                <div class="question-box">
+                    <div class="question-title">問題 3：Model/auth provider</div>
+                    <p>選 <span class="answer">OpenAI (Codex OAuth + API key)</span>，按 Enter</p>
+                </div>
+                <div class="question-box">
+                    <div class="question-title">問題 4：OpenAI auth method</div>
+                    <p>選 <span class="answer">OpenAI Codex OAuth (ChatGPT OAuth)</span>，按 Enter</p>
+                </div>
+                <div class="box warning">
+                    <strong>⚠️ 瀏覽器會自動打開</strong>，請登入你的 ChatGPT 帳號！
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: 登入 ChatGPT -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>🔐 登入 ChatGPT</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>瀏覽器會自動打開 ChatGPT 登入頁面</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>登入你的 ChatGPT 帳號</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>授權完成後，回到 PowerShell</p>
+                </div>
                 <div class="box success">
-                    這會讓龍蝦讀取新的設定！
+                    <strong>✅ PowerShell 會自動繼續下一步！</strong>
                 </div>
             </div>
         </div>
 
+        <!-- Slide 6: 繼續設定 -->
         <div class="slide">
             <div class="content-card">
-                <h2>🌐 第三步：啟動 ngrok</h2>
-                <div class="box warning">
-                    <strong>開一個新的 PowerShell 視窗</strong>（不要關掉舊的）
+                <h2>📝 繼續回答問題</h2>
+                <div class="question-box">
+                    <div class="question-title">問題 5：Default model</div>
+                    <p>選 <span class="answer">Keep current</span>，按 Enter</p>
                 </div>
-                <p>輸入：</p>
-                <pre>ngrok http 18789</pre>
-                <p>你會看到一個表格，找到 <strong>Forwarding</strong> 那一行，例如：</p>
-                <pre>Forwarding    https://abcd1234.ngrok-free.app -> http://localhost:18789</pre>
-                <p>把 <code>https://abcd1234.ngrok-free.app</code> 這個網址複製下來！</p>
-                <div class="box warning">
-                    <strong>⚠️ 不要關掉這個視窗，ngrok 要一直開著！</strong>
+                <div class="question-box">
+                    <div class="question-title">問題 6：Select channel (QuickStart)</div>
+                    <p>找到 <span class="answer">LINE (Messaging API)</span>，按 Enter</p>
+                </div>
+                <div class="question-box">
+                    <div class="question-title">問題 7：Install LINE plugin?</div>
+                    <p>選 <span class="answer">Skip for now</span>，按 Enter</p>
                 </div>
             </div>
         </div>
 
+        <!-- Slide 7: 最後設定 -->
         <div class="slide">
             <div class="content-card">
-                <h2>🔧 第四步：設定 LINE Webhook URL</h2>
-                <div class="step-box">
-                    <p><span class="step-number">1</span>回到 LINE Developers 網站</p>
+                <h2>📝 最後幾個問題</h2>
+                <div class="question-box">
+                    <div class="question-title">問題 8：Configure skills now?</div>
+                    <p>選 <span class="answer">No</span>，按 Enter</p>
                 </div>
-                <div class="step-box">
-                    <p><span class="step-number">2</span>進入你的 Channel，點 <strong>Messaging API</strong></p>
+                <div class="question-box">
+                    <div class="question-title">問題 9：Enable hooks?</div>
+                    <p>按空白鍵選 <span class="answer">Skip for now</span>，按 Enter</p>
                 </div>
-                <div class="step-box">
-                    <p><span class="step-number">3</span>找到 <strong>Webhook URL</strong>，點 <strong>Edit</strong></p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">4</span>在輸入框貼上 ngrok 的網址，後面加上 <code>/line/webhook</code></p>
-                    <pre>https://abcd1234.ngrok-free.app/line/webhook</pre>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">5</span>點 <strong>Update</strong></p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">6</span>把 <strong>Use webhook</strong> 的開關打開（變成綠色 ON）</p>
+                <div class="box success">
+                    <strong>🎉 看到 "Gateway service installed" 就成功了！</strong>
                 </div>
             </div>
         </div>
 
+        <!-- Slide 8: 完成 -->
         <div class="slide">
             <div class="content-card" style="text-align: center;">
                 <span style="font-size: 80px;">🎉</span>
                 <h2 style="border: none;">Part 6 完成！</h2>
-                <p style="font-size: 24px;">LINE 和龍蝦已經連起來了！</p>
-                <p style="font-size: 20px;">接下來前往下一章配對你的 LINE 帳號！</p>
-                <a href="Part7.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);">
-                    ➡️ Part 7：配對與測試
+                <p style="font-size: 24px;">OpenClaw 已經設定好了！</p>
+                <div style="display: flex; justify-content: center; gap: 30px; margin: 30px 0; flex-wrap: wrap;">
+                    <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ Gateway 服務已安裝</span>
+                    <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ AI 模型已設定</span>
+                </div>
+                <p style="font-size: 20px;">接下來建立 LINE 機器人帳號！</p>
+                <a href="Part7.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px;">
+                    ➡️ Part 7：建立 LINE 機器人帳號
                 </a>
             </div>
         </div>
@@ -165,13 +197,16 @@
     <div class="indicators" id="indicatorContainer"></div>
 
     <script>
-        let currentSlide = 0; const slides = document.querySelectorAll('.slide'); const totalSlides = slides.length;
-        function init() { createIndicators(); showSlide(0); document.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') changeSlide(-1); if (e.key === 'ArrowRight') changeSlide(1); }); }
-        function createIndicators() { const c = document.getElementById('indicatorContainer'); slides.forEach((_, i) => { const d = document.createElement('div'); d.className = 'dot'; d.onclick = () => goToSlide(i); c.appendChild(d); }); }
-        function showSlide(i) { if (i < 0) i = 0; if (i >= totalSlides) i = totalSlides - 1; slides.forEach(s => s.classList.remove('active')); slides[i].classList.add('active'); currentSlide = i; document.querySelectorAll('.dot').forEach((d, j) => d.classList.toggle('active', j === i)); document.getElementById('prevBtn').disabled = i === 0; document.getElementById('nextBtn').disabled = i === totalSlides - 1; }
-        function changeSlide(d) { showSlide(currentSlide + d); }
-        function goToSlide(i) { showSlide(i); }
-        function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        function init() { createIndicators(); showSlide(0); document.addEventListener('keydown', handleKeydown); }
+        function handleKeydown(e) { if (e.key === 'ArrowLeft') changeSlide(-1); if (e.key === 'ArrowRight') changeSlide(1); }
+        function createIndicators() { const container = document.getElementById('indicatorContainer'); slides.forEach((_, index) => { const dot = document.createElement('div'); dot.className = 'dot'; dot.onclick = () => goToSlide(index); container.appendChild(dot); }); }
+        function showSlide(index) { if (index < 0) index = 0; if (index >= totalSlides) index = totalSlides - 1; slides.forEach(slide => slide.classList.remove('active')); slides[index].classList.add('active'); currentSlide = index; document.querySelectorAll('.dot').forEach((dot, idx) => { dot.classList.toggle('active', idx === index); }); document.getElementById('prevBtn').disabled = currentSlide === 0; document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1; }
+        function changeSlide(direction) { showSlide(currentSlide + direction); }
+        function goToSlide(index) { showSlide(index); }
+        function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else if (document.exitFullscreen) document.exitFullscreen(); }
         init();
     </script>
 </body>

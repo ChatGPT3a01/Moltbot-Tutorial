@@ -3,36 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Part 8 - 常見問題與指令表</title>
+    <title>Part 8 - 安裝 ngrok</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow: hidden; color: #333; }
         .nav-bar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; z-index: 10000; }
         .nav-title { font-size: 22px; font-weight: 700; color: #fff; }
         .nav-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
-        .nav-btn { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; }
+        .nav-btn { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
         .nav-btn:hover { background: rgba(255, 255, 255, 0.4); }
         .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.25); color: white; width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); font-size: 24px; cursor: pointer; z-index: 9000; display: flex; align-items: center; justify-content: center; }
         .prev-arrow { left: 30px; } .next-arrow { right: 30px; }
         .nav-arrow:disabled { opacity: 0.3; }
+        .slide-container { width: 100%; height: 100vh; padding-top: 60px; }
         .slide { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); display: none; align-items: center; justify-content: center; padding: 40px; }
         .slide.active { display: flex; }
         .content-card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); padding: 50px; max-width: 1200px; width: 95%; max-height: 88vh; overflow-y: auto; }
         h1 { color: #667eea; font-size: 48px; margin-bottom: 24px; text-align: center; }
-        h2 { color: #764ba2; font-size: 32px; margin-bottom: 25px; border-bottom: 3px solid #667eea; padding-bottom: 12px; }
-        h3 { color: #667eea; font-size: 22px; margin: 20px 0 10px 0; }
-        p, li { font-size: 18px; line-height: 1.8; color: #444; margin-bottom: 10px; }
+        h2 { color: #764ba2; font-size: 36px; margin-bottom: 30px; border-bottom: 3px solid #667eea; padding-bottom: 12px; }
+        p, li { font-size: 20px; line-height: 1.8; color: #444; margin-bottom: 12px; }
         code { background: #f0f2f5; padding: 3px 8px; border-radius: 6px; font-family: 'Consolas', monospace; color: #d63384; font-weight: 600; }
-        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 12px; margin: 15px 0; font-size: 16px; }
-        .box { padding: 15px; border-radius: 12px; margin: 15px 0; border-left: 6px solid; font-size: 16px; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 12px; margin: 20px 0; font-size: 18px; }
+        .box { padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 6px solid; font-size: 18px; }
         .info { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
         .success { background: #d4edda; border-color: #28a745; color: #155724; }
         .warning { background: #fff3cd; border-color: #ffc107; color: #856404; }
         .highlight { background: linear-gradient(120deg, #667eea 0%, #764ba2 100%); padding: 4px 12px; border-radius: 6px; font-weight: bold; color: white; }
-        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 16px; }
-        th, td { border: 2px solid #ddd; padding: 12px; text-align: left; }
-        th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        tr:nth-child(even) { background: #f8f9fa; }
+        .step-box { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); padding: 25px; border-radius: 15px; margin: 20px 0; border: 2px solid rgba(102, 126, 234, 0.3); }
+        .step-number { display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: white; width: 40px; height: 40px; border-radius: 50%; text-align: center; line-height: 40px; font-weight: bold; margin-right: 15px; }
         .indicators { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 4000; padding: 10px 25px; background: rgba(0,0,0,0.3); border-radius: 30px; }
         .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; }
         .dot.active { background: #fff; transform: scale(1.3); }
@@ -40,11 +38,11 @@
 </head>
 <body>
     <div class="nav-bar">
-        <div class="nav-title">🔧 Part 8 - 常見問題與指令表</div>
+        <div class="nav-title">🌐 Part 8 - 安裝 ngrok</div>
         <div class="nav-buttons">
             <a href="index.html" class="nav-btn">🏠 首頁</a>
             <a href="Part7.html" class="nav-btn">⬅️ 上一章</a>
-            <a href="Part11.html" class="nav-btn">下一章 ➡️</a>
+            <a href="Part9.html" class="nav-btn">下一章 ➡️</a>
             <button class="nav-btn" onclick="toggleFullscreen()">🖥️ 全螢幕</button>
             <a href="https://www.facebook.com/?locale=zh_TW" target="_blank" class="nav-btn">📘 FB</a>
             <a href="https://www.youtube.com/@Liang-yt02" target="_blank" class="nav-btn">🎥 YT</a>
@@ -55,202 +53,119 @@
     <div class="slide-container">
         <div class="slide active">
             <div class="content-card" style="text-align: center;">
-                <span style="font-size: 80px;">🔧</span>
-                <h1>Part 8: 常見問題與指令表</h1>
-                <h2 style="border: none; font-size: 28px; color: #666;">遇到問題？這裡有解答！</h2>
+                <span style="font-size: 80px;">🌐</span>
+                <h1>Part 8: 安裝 ngrok</h1>
+                <h2 style="border: none; font-size: 28px; color: #666;">讓 LINE 能連到你的電腦</h2>
             </div>
         </div>
 
         <div class="slide">
             <div class="content-card">
-                <h2>❌ 問題 1：spawn npm ENOENT</h2>
-                <p><strong>看到的錯誤訊息：</strong></p>
-                <pre>Error: spawn npm ENOENT</pre>
-                <p><strong>解決方法：</strong></p>
-                <ol>
-                    <li>關掉 PowerShell</li>
-                    <li>重新開一個新的 PowerShell（系統管理員）</li>
-                    <li>輸入：<code>nvm use 22</code></li>
-                    <li>輸入：<code>setx PATH "$env:APPDATA\npm;$env:Path"</code></li>
-                    <li>關掉 PowerShell，再重新開一個</li>
-                    <li>再試一次原本的指令</li>
-                </ol>
+                <h2>🤔 什麼是 ngrok？</h2>
+                <p><strong>ngrok</strong> 是一個「隧道工具」。</p>
+                <div class="box info">
+                    <strong>簡單說：</strong><br>
+                    你的電腦在家裡，LINE 伺服器在外面。<br>
+                    ngrok 就像一條隧道，讓 LINE 可以「穿越」進來跟你的電腦說話！
+                </div>
+                <div class="box success">
+                    沒有 ngrok，LINE 就找不到你的電腦在哪裡。
+                </div>
             </div>
         </div>
 
         <div class="slide">
             <div class="content-card">
-                <h2>❌ 問題 2：OAuth token 過期</h2>
-                <p><strong>看到的錯誤訊息：</strong></p>
-                <pre>OAuth token refresh failed for openai-codex</pre>
-                <p><strong>解決方法：</strong></p>
-                <ol>
-                    <li>在 PowerShell 輸入：<code>codex login</code></li>
-                    <li>瀏覽器會打開，登入你的 ChatGPT/OpenAI 帳號</li>
-                    <li>登入完成後，回到 PowerShell</li>
-                    <li>輸入：<code>openclaw gateway restart</code></li>
-                </ol>
+                <h2>📥 第一步：安裝 ngrok</h2>
+                <p>在 PowerShell 輸入：</p>
+                <pre>winget install ngrok.ngrok</pre>
+                <p>等它跑完，會顯示「已成功安裝」。</p>
+                <div class="box info">
+                    <strong>winget</strong> 是 Windows 內建的軟體安裝工具，很方便！
+                </div>
             </div>
         </div>
 
         <div class="slide">
             <div class="content-card">
-                <h2>❌ 問題 3-4：版本問題</h2>
-                <h3>Node.js 版本太舊</h3>
-                <pre>required: { node: '>=22' }</pre>
-                <p><strong>解決：</strong></p>
-                <pre>nvm install 22
-nvm use 22</pre>
-                <h3>ngrok 版本太舊 (ERR_NGROK_121)</h3>
-                <pre>Your ngrok-agent version is too old</pre>
-                <p><strong>解決：</strong></p>
-                <pre>ngrok update</pre>
-            </div>
-        </div>
-
-        <div class="slide">
-            <div class="content-card">
-                <h2>❌ 問題 5：PowerShell 執行原則錯誤</h2>
-                <p><strong>看到的錯誤訊息：</strong></p>
-                <pre>PSSecurityException: 無法載入檔案...
-因為這個系統上已停用指令碼執行</pre>
-                <p><strong>解決方法：</strong></p>
-                <ol>
-                    <li>以系統管理員身分開啟 PowerShell</li>
-                    <li>執行：<code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code></li>
-                    <li>輸入 <code>Y</code> 確認</li>
-                    <li>重新執行原本的指令</li>
-                </ol>
-            </div>
-        </div>
-
-        <div class="slide">
-            <div class="content-card">
-                <h2>❌ 問題 6：ngrok authtoken 格式錯誤</h2>
-                <p><strong>看到的錯誤訊息：</strong></p>
-                <pre>ERR_NGROK_105: The authtoken you specified is improperly formatted</pre>
-                <p><strong>解決方法：</strong></p>
-                <ol>
-                    <li>登入 <code>https://dashboard.ngrok.com/</code></li>
-                    <li>點左邊的 <strong>Your Authtoken</strong></li>
-                    <li>點 <strong>Reset</strong> 重設 token</li>
-                    <li>複製新的 token，重新執行：<br>
-                        <code>ngrok config add-authtoken 你的新token</code></li>
-                </ol>
-            </div>
-        </div>
-
-        <div class="slide">
-            <div class="content-card">
-                <h2>❌ 問題 7：502 Bad Gateway</h2>
-                <p><strong>看到的錯誤訊息：</strong></p>
-                <pre>502 Bad Gateway
-ngrok: upstream connection error</pre>
-                <p><strong>解決方法：</strong></p>
-                <ol>
-                    <li>確認 OpenClaw 正在執行：<code>openclaw gateway status</code></li>
-                    <li>如果沒在跑，啟動它：<code>openclaw gateway start</code></li>
-                    <li>確認 ngrok 連接的 port 正確：<code>ngrok http 18789</code></li>
-                    <li>重新啟動 OpenClaw：<code>openclaw gateway restart</code></li>
-                </ol>
+                <h2>📝 第二步：註冊 ngrok 帳號</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>在 PowerShell 輸入以下指令開啟網頁：</p>
+                    <pre>start https://dashboard.ngrok.com/signup</pre>
+                    <p style="color: #666; font-size: 16px;">（或直接複製網址貼到瀏覽器）</p>
+                </div>
                 <div class="box warning">
-                    <strong>⚠️ 注意：</strong>ngrok 和 OpenClaw 都要同時執行才會正常！
+                    <strong>⚠️ 注意：</strong>不要直接在 PowerShell 輸入網址！會出現錯誤。要用 <code>start</code> 指令。
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>可以用 Google 帳號註冊（比較快）</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>登入後，點左邊的 <strong>Your Authtoken</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">4</span>看到一串很長的文字，點旁邊的 <strong>複製</strong> 按鈕</p>
                 </div>
             </div>
         </div>
 
         <div class="slide">
             <div class="content-card">
-                <h2>❌ 問題 8：LINE 機器人沒回應</h2>
-                <h3>可能原因 1：ngrok 已經關了</h3>
-                <p>解決：重新開 ngrok，然後更新 LINE Webhook URL</p>
-                <pre>ngrok http 18789</pre>
-                <h3>可能原因 2：OpenClaw 沒在跑</h3>
-                <pre>openclaw gateway start</pre>
-                <h3>可能原因 3：還沒配對</h3>
-                <p>傳訊息給機器人取得配對碼，然後執行：</p>
-                <pre>openclaw pairing approve line 配對碼</pre>
+                <h2>🔧 第三步：設定 ngrok</h2>
+                <div class="box warning">
+                    <strong>重要：關掉 PowerShell，重新開一個新的！</strong>
+                </div>
+                <p>在新的 PowerShell 輸入（把 <code>你的token</code> 換成剛剛複製的那串）：</p>
+                <pre>ngrok config add-authtoken 你的token</pre>
+                <p>會顯示 <code>Authtoken saved to configuration file</code>。</p>
+                <div class="box success">
+                    ✅ ngrok 設定完成！
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>🔧 如果出現錯誤...</h2>
+                <p>如果看到 <code>unknown version '3'</code> 的錯誤：</p>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>按 <code>Windows 鍵 + R</code>，輸入 <code>notepad</code>，打開記事本</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>點 檔案 → 開啟，在檔案名稱輸入：</p>
+                    <pre>C:\Users\你的使用者名稱\AppData\Local\ngrok\ngrok.yml</pre>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>把內容改成：</p>
+                    <pre>version: "2"
+authtoken: 你的ngrok_token</pre>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">4</span>存檔</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>🔄 更新 ngrok（如果需要）</h2>
+                <p>如果看到版本太舊的錯誤，輸入：</p>
+                <pre>ngrok update</pre>
                 <div class="box info">
-                    <strong>💡 需要更多協助？</strong><br>
-                    可以詢問 <a href="https://gemini.google.com/gem/1tU1Fg7oNheh5UmRTbDPnWsSVDs_Z2bSA?usp=sharing" target="_blank" style="color: #2196f3;">Gemini 小幫手</a> 來解決問題！
+                    這會把 ngrok 更新到最新版本。
                 </div>
-            </div>
-        </div>
-
-        <div class="slide">
-            <div class="content-card">
-                <h2>📋 OpenClaw 常用指令</h2>
-                <table>
-                    <tr><th>你想做的事</th><th>輸入這個指令</th></tr>
-                    <tr><td>🚀 啟動龍蝦</td><td><code>openclaw gateway start</code></td></tr>
-                    <tr><td>🛑 關閉龍蝦</td><td><code>openclaw gateway stop</code></td></tr>
-                    <tr><td>🔄 重新啟動龍蝦</td><td><code>openclaw gateway restart</code></td></tr>
-                    <tr><td>📊 看龍蝦狀態</td><td><code>openclaw gateway status</code></td></tr>
-                    <tr><td>🔍 檢查有沒有問題</td><td><code>openclaw doctor</code></td></tr>
-                    <tr><td>✅ 批准 LINE 配對</td><td><code>openclaw pairing approve line 配對碼</code></td></tr>
-                    <tr><td>🔑 重新登入 OpenAI</td><td><code>codex login</code></td></tr>
-                </table>
-            </div>
-        </div>
-
-        <div class="slide">
-            <div class="content-card">
-                <h2>📋 ngrok 與 Node.js 指令</h2>
-                <h3>ngrok 指令</h3>
-                <table>
-                    <tr><th>你想做的事</th><th>輸入這個指令</th></tr>
-                    <tr><td>🌐 啟動 ngrok</td><td><code>ngrok http 18789</code></td></tr>
-                    <tr><td>🔄 更新 ngrok</td><td><code>ngrok update</code></td></tr>
-                    <tr><td>🛑 關閉 ngrok</td><td>按 <code>Ctrl + C</code></td></tr>
-                </table>
-                <h3>Node.js 指令</h3>
-                <table>
-                    <tr><th>你想做的事</th><th>輸入這個指令</th></tr>
-                    <tr><td>看 Node 版本</td><td><code>node -v</code></td></tr>
-                    <tr><td>安裝 Node 22</td><td><code>nvm install 22</code></td></tr>
-                    <tr><td>切換到 Node 22</td><td><code>nvm use 22</code></td></tr>
-                </table>
-            </div>
-        </div>
-
-        <div class="slide">
-            <div class="content-card">
-                <h2>🔄 關閉與重新啟動</h2>
-                <div class="box info">
-                    <strong>📋 快速指令摘要（每次開機都要做）：</strong><br>
-                    <code>openclaw gateway start</code> → 第一個視窗<br>
-                    <code>ngrok http 18789</code> → 第二個視窗<br>
-                    然後更新 LINE Webhook URL！
-                </div>
-                <h3>要關閉的時候</h3>
-                <ol>
-                    <li>在 ngrok 的視窗按 <code>Ctrl + C</code></li>
-                    <li>在另一個視窗輸入：<code>openclaw gateway stop</code></li>
-                </ol>
-                <h3>下次要啟動的時候</h3>
-                <ol>
-                    <li>開 PowerShell，輸入：<code>openclaw gateway start</code></li>
-                    <li>開另一個 PowerShell，輸入：<code>ngrok http 18789</code></li>
-                    <li><strong>重要！</strong>用指令開啟 LINE Developers：<br>
-                        <code>start https://developers.line.biz/</code><br>
-                        更新 Webhook URL（因為 ngrok 網址會變）</li>
-                </ol>
             </div>
         </div>
 
         <div class="slide">
             <div class="content-card" style="text-align: center;">
-                <span style="font-size: 80px;">📚</span>
-                <h2 style="border: none;">接下來看看應用範例！</h2>
-                <p style="font-size: 20px;">學會安裝後，來看看龍蝦可以幫你做什麼事！</p>
-                <div style="display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap;">
-                    <a href="Part9.html" style="font-size: 18px; padding: 20px 35px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);">
-                        ➡️ Part 9：生活與學習應用
-                    </a>
-                    <a href="Part10.html" style="font-size: 18px; padding: 20px 35px; background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(243, 156, 18, 0.4);">
-                        💼 Part 10：企業與商業應用
-                    </a>
-                </div>
+                <span style="font-size: 80px;">🎉</span>
+                <h2 style="border: none;">Part 8 完成！</h2>
+                <p style="font-size: 24px;">ngrok 已經安裝並設定好了！</p>
+                <p style="font-size: 20px;">接下來前往下一章設定 LINE Webhook！</p>
+                <a href="Part9.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);">
+                    ➡️ Part 9：設定 LINE Webhook
+                </a>
             </div>
         </div>
     </div>
@@ -262,8 +177,8 @@ ngrok: upstream connection error</pre>
     <script>
         let currentSlide = 0; const slides = document.querySelectorAll('.slide'); const totalSlides = slides.length;
         function init() { createIndicators(); showSlide(0); document.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') changeSlide(-1); if (e.key === 'ArrowRight') changeSlide(1); }); }
-        function createIndicators() { const c = document.getElementById('indicatorContainer'); slides.forEach((_, i) => { const d = document.createElement('div'); d.className = 'dot'; d.onclick = () => goToSlide(i); c.appendChild(d); }); }
-        function showSlide(i) { if (i < 0) i = 0; if (i >= totalSlides) i = totalSlides - 1; slides.forEach(s => s.classList.remove('active')); slides[i].classList.add('active'); currentSlide = i; document.querySelectorAll('.dot').forEach((d, j) => d.classList.toggle('active', j === i)); document.getElementById('prevBtn').disabled = i === 0; document.getElementById('nextBtn').disabled = i === totalSlides - 1; }
+        function createIndicators() { const container = document.getElementById('indicatorContainer'); slides.forEach((_, i) => { const dot = document.createElement('div'); dot.className = 'dot'; dot.onclick = () => goToSlide(i); container.appendChild(dot); }); }
+        function showSlide(index) { if (index < 0) index = 0; if (index >= totalSlides) index = totalSlides - 1; slides.forEach(s => s.classList.remove('active')); slides[index].classList.add('active'); currentSlide = index; document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index)); document.getElementById('prevBtn').disabled = currentSlide === 0; document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1; }
         function changeSlide(d) { showSlide(currentSlide + d); }
         function goToSlide(i) { showSlide(i); }
         function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }

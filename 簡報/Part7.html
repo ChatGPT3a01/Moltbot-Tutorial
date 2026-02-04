@@ -3,26 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Part 7 - 配對與測試</title>
+    <title>Part 7 - 建立 LINE 機器人帳號</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow: hidden; color: #333; }
-        .nav-bar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; z-index: 10000; }
+        .nav-bar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; z-index: 10000; }
         .nav-title { font-size: 22px; font-weight: 700; color: #fff; }
         .nav-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
-        .nav-btn { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; }
-        .nav-btn:hover { background: rgba(255, 255, 255, 0.4); }
-        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.25); color: white; width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); font-size: 24px; cursor: pointer; z-index: 9000; display: flex; align-items: center; justify-content: center; }
+        .nav-btn { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.4); transform: translateY(-2px); }
+        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.25); color: white; width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); font-size: 24px; cursor: pointer; z-index: 9000; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+        .nav-arrow:hover { background: rgba(255,255,255,0.5); transform: translateY(-50%) scale(1.1); }
         .prev-arrow { left: 30px; } .next-arrow { right: 30px; }
-        .nav-arrow:disabled { opacity: 0.3; }
-        .slide { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); display: none; align-items: center; justify-content: center; padding: 40px; }
-        .slide.active { display: flex; }
+        .nav-arrow:disabled { opacity: 0.3; cursor: not-allowed; }
+        .slide-container { width: 100%; height: 100vh; padding-top: 60px; position: relative; }
+        .slide { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); display: none; align-items: center; justify-content: center; padding: 40px; opacity: 0; transition: opacity 0.4s ease; }
+        .slide.active { display: flex; opacity: 1; }
         .content-card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); padding: 50px; max-width: 1200px; width: 95%; max-height: 88vh; overflow-y: auto; }
         h1 { color: #667eea; font-size: 48px; margin-bottom: 24px; text-align: center; }
         h2 { color: #764ba2; font-size: 36px; margin-bottom: 30px; border-bottom: 3px solid #667eea; padding-bottom: 12px; }
+        h3 { color: #667eea; font-size: 24px; margin: 25px 0 15px 0; }
         p, li { font-size: 20px; line-height: 1.8; color: #444; margin-bottom: 12px; }
         code { background: #f0f2f5; padding: 3px 8px; border-radius: 6px; font-family: 'Consolas', monospace; color: #d63384; font-weight: 600; }
-        pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 12px; margin: 20px 0; font-size: 16px; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 12px; overflow-x: auto; margin: 20px 0; font-size: 18px; }
         .box { padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 6px solid; font-size: 18px; }
         .info { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
         .success { background: #d4edda; border-color: #28a745; color: #155724; }
@@ -37,7 +40,7 @@
 </head>
 <body>
     <div class="nav-bar">
-        <div class="nav-title">✅ Part 7 - 配對與測試</div>
+        <div class="nav-title">💬 Part 7 - 建立 LINE 機器人帳號</div>
         <div class="nav-buttons">
             <a href="index.html" class="nav-btn">🏠 首頁</a>
             <a href="Part6.html" class="nav-btn">⬅️ 上一章</a>
@@ -52,91 +55,158 @@
     <div class="slide-container">
         <div class="slide active">
             <div class="content-card" style="text-align: center;">
-                <span style="font-size: 80px;">✅</span>
-                <h1>Part 7: 配對與測試</h1>
-                <h2 style="border: none; font-size: 28px; color: #666;">讓龍蝦認識你的 LINE 帳號</h2>
-            </div>
-        </div>
-
-        <div class="slide">
-            <div class="content-card">
-                <h2>📱 第一步：加機器人好友</h2>
-                <div class="step-box">
-                    <p><span class="step-number">1</span>在 LINE Developers 的 <strong>Messaging API</strong> 頁面</p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">2</span>找到 <strong>QR code</strong></p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">3</span>用手機打開 LINE，點右上角的 <strong>加好友</strong></p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">4</span>點 <strong>行動條碼</strong>，掃描電腦上的 QR code</p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">5</span>加機器人為好友</p>
+                <span style="font-size: 80px;">💬</span>
+                <h1>Part 7: 建立 LINE 機器人帳號</h1>
+                <h2 style="border: none; font-size: 28px; color: #666;">在 LINE Developers 建立你的機器人</h2>
+                <div style="margin-top: 40px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                    <span class="highlight">LINE Developers</span>
+                    <span class="highlight">Messaging API</span>
+                    <span class="highlight">Channel Secret</span>
                 </div>
             </div>
         </div>
 
         <div class="slide">
             <div class="content-card">
-                <h2>💬 第二步：傳訊息給機器人</h2>
-                <p>用手機 LINE 對機器人說：</p>
-                <pre>你好</pre>
-                <h3>機器人會回覆配對碼：</h3>
-                <pre>Clawdbot/Moltbot: access not configured.
-Your lineUserId: Uxxxxxxxxxxxxxxxx
-Pairing code: ABC123
-Ask the bot owner to approve with:
-clawdbot pairing approve line &lt;code&gt;</pre>
-                <div class="box info">
-                    記下那個 <strong>Pairing code</strong>（例如 <code>ABC123</code>）
+                <h2>🌐 第一步：進入 LINE Developers</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>打開瀏覽器</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>進入這個網址：</p>
+                    <pre>https://developers.line.biz/</pre>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>點右上角 <strong>Log in</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">4</span>用你的 LINE 帳號登入</p>
                 </div>
             </div>
         </div>
 
         <div class="slide">
             <div class="content-card">
-                <h2>🔓 第三步：批准配對</h2>
-                <p>回到電腦的 PowerShell（不是 ngrok 那個視窗），輸入：</p>
-                <pre>clawdbot pairing approve line ABC123</pre>
-                <p>（把 <code>ABC123</code> 換成你收到的配對碼）</p>
-                <div class="box success">
-                    會顯示 <code>Approved line sender Uxxxxxxxx</code>。
+                <h2>📦 第二步：建立 Provider</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>登入後，點 <strong>Create</strong>（或 <strong>建立</strong>）</p>
                 </div>
-            </div>
-        </div>
-
-        <div class="slide">
-            <div class="content-card">
-                <h2>🧪 第四步：測試</h2>
-                <p>再用 LINE 傳一次訊息：</p>
-                <pre>你好</pre>
-                <div class="box success">
-                    <strong>🎉 機器人應該會正常回覆了！</strong>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>輸入 Provider 名稱（例如：<code>我的機器人</code>）</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>點 <strong>Create</strong></p>
                 </div>
                 <div class="box info">
-                    如果機器人有回應你，恭喜！安裝成功！<br>
-                    你可以問它任何問題，它會用 AI 回答你！
+                    <strong>Provider</strong> 就像是一個「公司」或「開發者」的身分。
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>🤖 第三步：建立 Messaging API Channel</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>點 <strong>Create a Messaging API channel</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>填寫資料：</p>
+                    <ul>
+                        <li><strong>Channel name</strong>：機器人的名字（隨便取）</li>
+                        <li><strong>Channel description</strong>：機器人的說明（隨便寫）</li>
+                        <li><strong>Category</strong>：選一個類別</li>
+                        <li><strong>Subcategory</strong>：選一個子類別</li>
+                    </ul>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>勾選最下面的同意條款 ☑</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">4</span>點 <strong>Create</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>🔑 第四步：取得 Channel Secret</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>進入你剛建立的 Channel</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>點上面的 <strong>Basic settings</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>找到 <strong>Channel secret</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">4</span>點旁邊的 <strong>複製</strong> 按鈕</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">5</span>打開記事本，貼上，寫上「Channel Secret:」</p>
+                </div>
+                <div class="box warning">
+                    <strong>⚠️ 很重要！</strong> 這個值之後會用到，先記下來！
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>🎫 第五步：取得 Channel Access Token</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>點上面的 <strong>Messaging API</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>往下滑，找到 <strong>Channel access token (long-lived)</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>點 <strong>Issue</strong>（產生）</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">4</span>會出現一長串文字，點 <strong>複製</strong> 按鈕</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">5</span>貼到記事本，寫上「Channel Access Token:」</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>🆔 第六步：取得 Channel ID</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>回到 <strong>Basic settings</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>找到 <strong>Channel ID</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>複製下來，貼到記事本，寫上「Channel ID:」</p>
+                </div>
+                <div class="box success">
+                    <strong>現在你的記事本應該有三行：</strong>
+                    <pre style="background: #fff; color: #333; margin-top: 10px;">Channel ID: 1234567890
+Channel Secret: abcdef123456
+Channel Access Token: 很長一串英文數字...</pre>
                 </div>
             </div>
         </div>
 
         <div class="slide">
             <div class="content-card" style="text-align: center;">
-                <span style="font-size: 100px;">🎊</span>
-                <h2 style="border: none; font-size: 42px;">恭喜！安裝完成！</h2>
-                <p style="font-size: 24px; margin: 30px 0;">你已經成功安裝了 Clawdbot/Moltbot！</p>
-                <p style="font-size: 20px;">現在可以透過 LINE 跟你的 AI 龍蝦聊天了！</p>
-                <div style="display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap;">
-                    <a href="Part8.html" style="font-size: 18px; padding: 20px 35px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);">
-                        ➡️ Part 8：常見問題與指令表
-                    </a>
-                    <a href="Part9.html" style="font-size: 18px; padding: 20px 35px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);">
-                        📚 Part 9：生活與學習應用
-                    </a>
+                <span style="font-size: 80px;">🎉</span>
+                <h2 style="border: none;">Part 7 完成！</h2>
+                <p style="font-size: 24px;">你已經取得了三個重要的值：</p>
+                <div style="display: flex; justify-content: center; gap: 20px; margin: 30px 0; flex-wrap: wrap;">
+                    <span class="highlight" style="font-size: 18px; padding: 12px 20px;">✅ Channel ID</span>
+                    <span class="highlight" style="font-size: 18px; padding: 12px 20px;">✅ Channel Secret</span>
+                    <span class="highlight" style="font-size: 18px; padding: 12px 20px;">✅ Channel Access Token</span>
                 </div>
+                <p style="font-size: 20px;">接下來前往下一章安裝 ngrok！</p>
+                <a href="Part8.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);">
+                    ➡️ Part 8：安裝 ngrok
+                </a>
             </div>
         </div>
     </div>
@@ -147,12 +217,13 @@ clawdbot pairing approve line &lt;code&gt;</pre>
 
     <script>
         let currentSlide = 0; const slides = document.querySelectorAll('.slide'); const totalSlides = slides.length;
-        function init() { createIndicators(); showSlide(0); document.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') changeSlide(-1); if (e.key === 'ArrowRight') changeSlide(1); }); }
-        function createIndicators() { const c = document.getElementById('indicatorContainer'); slides.forEach((_, i) => { const d = document.createElement('div'); d.className = 'dot'; d.onclick = () => goToSlide(i); c.appendChild(d); }); }
-        function showSlide(i) { if (i < 0) i = 0; if (i >= totalSlides) i = totalSlides - 1; slides.forEach(s => s.classList.remove('active')); slides[i].classList.add('active'); currentSlide = i; document.querySelectorAll('.dot').forEach((d, j) => d.classList.toggle('active', j === i)); document.getElementById('prevBtn').disabled = i === 0; document.getElementById('nextBtn').disabled = i === totalSlides - 1; }
-        function changeSlide(d) { showSlide(currentSlide + d); }
-        function goToSlide(i) { showSlide(i); }
-        function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+        function init() { createIndicators(); showSlide(0); document.addEventListener('keydown', handleKeydown); }
+        function handleKeydown(e) { if (e.key === 'ArrowLeft') changeSlide(-1); if (e.key === 'ArrowRight') changeSlide(1); }
+        function createIndicators() { const container = document.getElementById('indicatorContainer'); slides.forEach((_, index) => { const dot = document.createElement('div'); dot.className = 'dot'; dot.onclick = () => goToSlide(index); container.appendChild(dot); }); }
+        function showSlide(index) { if (index < 0) index = 0; if (index >= totalSlides) index = totalSlides - 1; slides.forEach(slide => slide.classList.remove('active')); slides[index].classList.add('active'); currentSlide = index; document.querySelectorAll('.dot').forEach((dot, idx) => { dot.classList.toggle('active', idx === index); }); document.getElementById('prevBtn').disabled = currentSlide === 0; document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1; }
+        function changeSlide(direction) { showSlide(currentSlide + direction); }
+        function goToSlide(index) { showSlide(index); }
+        function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else if (document.exitFullscreen) document.exitFullscreen(); }
         init();
     </script>
 </body>

@@ -3,27 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Part 5 - 安裝 ngrok</title>
+    <title>Part 5 - 安裝基礎環境</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow: hidden; color: #333; }
-        .nav-bar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; z-index: 10000; }
+        .nav-bar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; z-index: 10000; }
         .nav-title { font-size: 22px; font-weight: 700; color: #fff; }
-        .nav-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+        .nav-buttons { display: flex; gap: 12px; }
         .nav-btn { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
-        .nav-btn:hover { background: rgba(255, 255, 255, 0.4); }
-        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.25); color: white; width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); font-size: 24px; cursor: pointer; z-index: 9000; display: flex; align-items: center; justify-content: center; }
-        .prev-arrow { left: 30px; } .next-arrow { right: 30px; }
-        .nav-arrow:disabled { opacity: 0.3; }
-        .slide-container { width: 100%; height: 100vh; padding-top: 60px; }
-        .slide { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); display: none; align-items: center; justify-content: center; padding: 40px; }
-        .slide.active { display: flex; }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.4); transform: translateY(-2px); }
+        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.25); color: white; width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); font-size: 24px; cursor: pointer; z-index: 9000; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+        .nav-arrow:hover { background: rgba(255,255,255,0.5); transform: translateY(-50%) scale(1.1); }
+        .prev-arrow { left: 30px; }
+        .next-arrow { right: 30px; }
+        .nav-arrow:disabled { opacity: 0.3; cursor: not-allowed; }
+        .slide-container { width: 100%; height: 100vh; padding-top: 60px; position: relative; }
+        .slide { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); display: none; align-items: center; justify-content: center; padding: 40px; opacity: 0; transition: opacity 0.4s ease; }
+        .slide.active { display: flex; opacity: 1; }
         .content-card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); padding: 50px; max-width: 1200px; width: 95%; max-height: 88vh; overflow-y: auto; }
         h1 { color: #667eea; font-size: 48px; margin-bottom: 24px; text-align: center; }
         h2 { color: #764ba2; font-size: 36px; margin-bottom: 30px; border-bottom: 3px solid #667eea; padding-bottom: 12px; }
+        h3 { color: #667eea; font-size: 24px; margin: 25px 0 15px 0; }
         p, li { font-size: 20px; line-height: 1.8; color: #444; margin-bottom: 12px; }
+        ul, ol { margin-left: 30px; margin-bottom: 20px; }
         code { background: #f0f2f5; padding: 3px 8px; border-radius: 6px; font-family: 'Consolas', monospace; color: #d63384; font-weight: 600; }
-        pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 12px; margin: 20px 0; font-size: 18px; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 12px; overflow-x: auto; margin: 20px 0; font-size: 18px; line-height: 1.6; font-family: 'Consolas', monospace; }
         .box { padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 6px solid; font-size: 18px; }
         .info { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
         .success { background: #d4edda; border-color: #28a745; color: #155724; }
@@ -38,133 +42,112 @@
 </head>
 <body>
     <div class="nav-bar">
-        <div class="nav-title">🌐 Part 5 - 安裝 ngrok</div>
+        <div class="nav-title">⚙️ Part 5 - 安裝基礎環境</div>
         <div class="nav-buttons">
             <a href="index.html" class="nav-btn">🏠 首頁</a>
             <a href="Part4.html" class="nav-btn">⬅️ 上一章</a>
             <a href="Part6.html" class="nav-btn">下一章 ➡️</a>
             <button class="nav-btn" onclick="toggleFullscreen()">🖥️ 全螢幕</button>
-            <a href="https://www.facebook.com/?locale=zh_TW" target="_blank" class="nav-btn">📘 FB</a>
-            <a href="https://www.youtube.com/@Liang-yt02" target="_blank" class="nav-btn">🎥 YT</a>
-            <a href="https://www.facebook.com/groups/2754139931432955?locale=zh_TW" target="_blank" class="nav-btn">👥 3A</a>
         </div>
     </div>
 
     <div class="slide-container">
+        <!-- Slide 1: 封面 -->
         <div class="slide active">
             <div class="content-card" style="text-align: center;">
-                <span style="font-size: 80px;">🌐</span>
-                <h1>Part 5: 安裝 ngrok</h1>
-                <h2 style="border: none; font-size: 28px; color: #666;">讓 LINE 能連到你的電腦</h2>
-            </div>
-        </div>
-
-        <div class="slide">
-            <div class="content-card">
-                <h2>🤔 什麼是 ngrok？</h2>
-                <p><strong>ngrok</strong> 是一個「隧道工具」。</p>
-                <div class="box info">
-                    <strong>簡單說：</strong><br>
-                    你的電腦在家裡，LINE 伺服器在外面。<br>
-                    ngrok 就像一條隧道，讓 LINE 可以「穿越」進來跟你的電腦說話！
-                </div>
-                <div class="box success">
-                    沒有 ngrok，LINE 就找不到你的電腦在哪裡。
+                <span style="font-size: 80px;">⚙️</span>
+                <h1>Part 5: 安裝基礎環境</h1>
+                <h2 style="border: none; font-size: 28px; color: #666;">一鍵安裝，超簡單！</h2>
+                <div style="margin-top: 40px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                    <span class="highlight">一鍵安裝腳本</span>
+                    <span class="highlight">自動安裝 Node.js</span>
+                    <span class="highlight">免手動設定</span>
                 </div>
             </div>
         </div>
 
+        <!-- Slide 2: 開啟 PowerShell -->
         <div class="slide">
             <div class="content-card">
-                <h2>📥 第一步：安裝 ngrok</h2>
-                <p>在 PowerShell 輸入：</p>
-                <pre>winget install ngrok.ngrok</pre>
-                <p>等它跑完，會顯示「已成功安裝」。</p>
-                <div class="box info">
-                    <strong>winget</strong> 是 Windows 內建的軟體安裝工具，很方便！
-                </div>
-            </div>
-        </div>
-
-        <div class="slide">
-            <div class="content-card">
-                <h2>📝 第二步：註冊 ngrok 帳號</h2>
+                <h2>🖥️ 第一步：開啟 PowerShell</h2>
                 <div class="step-box">
-                    <p><span class="step-number">1</span>在 PowerShell 輸入以下指令開啟網頁：</p>
-                    <pre>start https://dashboard.ngrok.com/signup</pre>
-                    <p style="color: #666; font-size: 16px;">（或直接複製網址貼到瀏覽器）</p>
+                    <p><span class="step-number">1</span>按下鍵盤的 <code>Windows 鍵</code></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>搜尋 <code>PowerShell</code></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>在 <strong>Windows PowerShell</strong> 上 <strong>按右鍵</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">4</span>選 <strong>以系統管理員身分執行</strong></p>
                 </div>
                 <div class="box warning">
-                    <strong>⚠️ 注意：</strong>不要直接在 PowerShell 輸入網址！會出現錯誤。要用 <code>start</code> 指令。
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">2</span>可以用 Google 帳號註冊（比較快）</p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">3</span>登入後，點左邊的 <strong>Your Authtoken</strong></p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">4</span>看到一串很長的文字，點旁邊的 <strong>複製</strong> 按鈕</p>
+                    <strong>⚠️ 重要：</strong>一定要用「系統管理員」身分，不然會安裝失敗！
                 </div>
             </div>
         </div>
 
+        <!-- Slide 3: 執行一鍵安裝 -->
         <div class="slide">
             <div class="content-card">
-                <h2>🔧 第三步：設定 ngrok</h2>
-                <div class="box warning">
-                    <strong>重要：關掉 PowerShell，重新開一個新的！</strong>
-                </div>
-                <p>在新的 PowerShell 輸入（把 <code>你的token</code> 換成剛剛複製的那串）：</p>
-                <pre>ngrok config add-authtoken 你的token</pre>
-                <p>會顯示 <code>Authtoken saved to configuration file</code>。</p>
+                <h2>🚀 第二步：執行一鍵安裝</h2>
+                <p>複製這行指令，貼到 PowerShell，按 Enter：</p>
+                <pre>iwr -useb https://openclaw.ai/install.ps1 | iex</pre>
                 <div class="box success">
-                    ✅ ngrok 設定完成！
+                    <strong>這個腳本會自動幫你安裝：</strong>
+                    <ul style="margin-top: 10px; margin-bottom: 0;">
+                        <li>Node.js 22</li>
+                        <li>OpenClaw</li>
+                        <li>所有必要的設定</li>
+                    </ul>
                 </div>
-            </div>
-        </div>
-
-        <div class="slide">
-            <div class="content-card">
-                <h2>🔧 如果出現錯誤...</h2>
-                <p>如果看到 <code>unknown version '3'</code> 的錯誤：</p>
-                <div class="step-box">
-                    <p><span class="step-number">1</span>按 <code>Windows 鍵 + R</code>，輸入 <code>notepad</code>，打開記事本</p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">2</span>點 檔案 → 開啟，在檔案名稱輸入：</p>
-                    <pre>C:\Users\你的使用者名稱\AppData\Local\ngrok\ngrok.yml</pre>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">3</span>把內容改成：</p>
-                    <pre>version: "2"
-authtoken: 你的ngrok_token</pre>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">4</span>存檔</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="slide">
-            <div class="content-card">
-                <h2>🔄 更新 ngrok（如果需要）</h2>
-                <p>如果看到版本太舊的錯誤，輸入：</p>
-                <pre>ngrok update</pre>
                 <div class="box info">
-                    這會把 ngrok 更新到最新版本。
+                    <strong>💡 安裝過程約 2-5 分鐘，請耐心等待！</strong>
                 </div>
             </div>
         </div>
 
+        <!-- Slide 4: 如果腳本被阻擋 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>❓ 如果腳本被阻擋？</h2>
+                <p>如果看到「執行原則」錯誤，先執行這行：</p>
+                <pre>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</pre>
+                <p>輸入 <code>Y</code> 確認，然後再執行安裝指令：</p>
+                <pre>iwr -useb https://openclaw.ai/install.ps1 | iex</pre>
+                <div class="box info">
+                    <strong>💡 這只需要做一次，以後就不用了！</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: 確認安裝成功 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>✅ 第三步：確認安裝成功</h2>
+                <p>安裝完成後，輸入這行確認：</p>
+                <pre>openclaw --version</pre>
+                <p>如果看到版本號，就代表成功了！</p>
+                <div class="box success">
+                    <strong>🎉 恭喜！環境安裝完成！</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: 完成 -->
         <div class="slide">
             <div class="content-card" style="text-align: center;">
                 <span style="font-size: 80px;">🎉</span>
                 <h2 style="border: none;">Part 5 完成！</h2>
-                <p style="font-size: 24px;">ngrok 已經安裝並設定好了！</p>
-                <p style="font-size: 20px;">接下來前往下一章設定 LINE Webhook！</p>
+                <p style="font-size: 24px;">環境已經準備好了！</p>
+                <div style="display: flex; justify-content: center; gap: 30px; margin: 30px 0; flex-wrap: wrap;">
+                    <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ Node.js 22</span>
+                    <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ OpenClaw</span>
+                </div>
+                <p style="font-size: 20px;">接下來進行初始化設定！</p>
                 <a href="Part6.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);">
-                    ➡️ Part 6：設定 LINE Webhook
+                    ➡️ Part 6：設定 OpenClaw
                 </a>
             </div>
         </div>
@@ -175,13 +158,16 @@ authtoken: 你的ngrok_token</pre>
     <div class="indicators" id="indicatorContainer"></div>
 
     <script>
-        let currentSlide = 0; const slides = document.querySelectorAll('.slide'); const totalSlides = slides.length;
-        function init() { createIndicators(); showSlide(0); document.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') changeSlide(-1); if (e.key === 'ArrowRight') changeSlide(1); }); }
-        function createIndicators() { const container = document.getElementById('indicatorContainer'); slides.forEach((_, i) => { const dot = document.createElement('div'); dot.className = 'dot'; dot.onclick = () => goToSlide(i); container.appendChild(dot); }); }
-        function showSlide(index) { if (index < 0) index = 0; if (index >= totalSlides) index = totalSlides - 1; slides.forEach(s => s.classList.remove('active')); slides[index].classList.add('active'); currentSlide = index; document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index)); document.getElementById('prevBtn').disabled = currentSlide === 0; document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1; }
-        function changeSlide(d) { showSlide(currentSlide + d); }
-        function goToSlide(i) { showSlide(i); }
-        function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        function init() { createIndicators(); showSlide(0); document.addEventListener('keydown', handleKeydown); }
+        function handleKeydown(e) { if (e.key === 'ArrowLeft') changeSlide(-1); if (e.key === 'ArrowRight') changeSlide(1); }
+        function createIndicators() { const container = document.getElementById('indicatorContainer'); slides.forEach((_, index) => { const dot = document.createElement('div'); dot.className = 'dot'; dot.onclick = () => goToSlide(index); container.appendChild(dot); }); }
+        function showSlide(index) { if (index < 0) index = 0; if (index >= totalSlides) index = totalSlides - 1; slides.forEach(slide => slide.classList.remove('active')); slides[index].classList.add('active'); currentSlide = index; document.querySelectorAll('.dot').forEach((dot, idx) => { dot.classList.toggle('active', idx === index); }); document.getElementById('prevBtn').disabled = currentSlide === 0; document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1; }
+        function changeSlide(direction) { showSlide(currentSlide + direction); }
+        function goToSlide(index) { showSlide(index); }
+        function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else if (document.exitFullscreen) document.exitFullscreen(); }
         init();
     </script>
 </body>

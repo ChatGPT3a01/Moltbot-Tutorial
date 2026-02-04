@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Part 3 - 設定 OpenClaw</title>
+    <title>Part 3 - 企業與商業應用</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow: hidden; color: #333; }
+        body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); min-height: 100vh; overflow: hidden; color: #333; }
         .nav-bar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; z-index: 10000; }
         .nav-title { font-size: 22px; font-weight: 700; color: #fff; }
         .nav-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -17,31 +17,25 @@
         .nav-arrow:disabled { opacity: 0.3; }
         .slide { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); display: none; align-items: center; justify-content: center; padding: 40px; }
         .slide.active { display: flex; }
-        .content-card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); padding: 50px; max-width: 1200px; width: 95%; max-height: 88vh; overflow-y: auto; }
-        h1 { color: #667eea; font-size: 48px; margin-bottom: 24px; text-align: center; }
-        h2 { color: #764ba2; font-size: 36px; margin-bottom: 30px; border-bottom: 3px solid #667eea; padding-bottom: 12px; }
-        h3 { color: #667eea; font-size: 24px; margin: 25px 0 15px 0; }
-        p, li { font-size: 20px; line-height: 1.8; color: #444; margin-bottom: 12px; }
-        code { background: #f0f2f5; padding: 3px 8px; border-radius: 6px; font-family: 'Consolas', monospace; color: #d63384; font-weight: 600; }
-        pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 12px; margin: 20px 0; font-size: 18px; }
-        .box { padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 6px solid; font-size: 18px; }
+        .content-card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); padding: 35px; max-width: 1200px; width: 95%; max-height: 88vh; overflow-y: auto; }
+        h1 { color: #11998e; font-size: 48px; margin-bottom: 24px; text-align: center; }
+        h2 { color: #0d7377; font-size: 28px; margin-bottom: 15px; border-bottom: 3px solid #11998e; padding-bottom: 10px; }
+        h3 { color: #11998e; font-size: 18px; margin: 12px 0 8px 0; }
+        p { font-size: 16px; line-height: 1.6; color: #444; margin-bottom: 8px; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 12px; border-radius: 10px; margin: 8px 0; font-size: 13px; white-space: pre-wrap; }
+        .box { padding: 12px; border-radius: 10px; margin: 12px 0; border-left: 5px solid; font-size: 15px; }
         .info { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
         .success { background: #d4edda; border-color: #28a745; color: #155724; }
         .warning { background: #fff3cd; border-color: #ffc107; color: #856404; }
-        .highlight { background: linear-gradient(120deg, #667eea 0%, #764ba2 100%); padding: 4px 12px; border-radius: 6px; font-weight: bold; color: white; }
-        .step-box { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); padding: 25px; border-radius: 15px; margin: 20px 0; border: 2px solid rgba(102, 126, 234, 0.3); }
-        .step-number { display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: white; width: 40px; height: 40px; border-radius: 50%; text-align: center; line-height: 40px; font-weight: bold; margin-right: 15px; }
-        .question-box { background: #f8f9fa; border: 2px solid #667eea; border-radius: 15px; padding: 20px; margin: 15px 0; }
-        .question-title { color: #667eea; font-weight: bold; margin-bottom: 10px; }
-        .answer { color: #28a745; font-weight: bold; }
-        .indicators { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 4000; padding: 10px 25px; background: rgba(0,0,0,0.3); border-radius: 30px; }
-        .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; }
+        .highlight { background: linear-gradient(120deg, #11998e 0%, #38ef7d 100%); padding: 4px 12px; border-radius: 6px; font-weight: bold; color: white; }
+        .indicators { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 4000; padding: 8px 20px; background: rgba(0,0,0,0.3); border-radius: 30px; }
+        .dot { width: 10px; height: 10px; background: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; }
         .dot.active { background: #fff; transform: scale(1.3); }
     </style>
 </head>
 <body>
     <div class="nav-bar">
-        <div class="nav-title">🤖 Part 3 - 設定 OpenClaw</div>
+        <div class="nav-title">💼 Part 3 - 企業與商業應用</div>
         <div class="nav-buttons">
             <a href="index.html" class="nav-btn">🏠 首頁</a>
             <a href="Part2.html" class="nav-btn">⬅️ 上一章</a>
@@ -51,142 +45,477 @@
     </div>
 
     <div class="slide-container">
-        <!-- Slide 1: 封面 -->
+        <!-- 封面 -->
         <div class="slide active">
             <div class="content-card" style="text-align: center;">
-                <span style="font-size: 80px;">🤖</span>
-                <h1>Part 3: 設定 OpenClaw</h1>
-                <h2 style="border: none; font-size: 28px; color: #666;">執行初始化設定精靈</h2>
-                <div style="margin-top: 40px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
-                    <span class="highlight">onboard 精靈</span>
-                    <span class="highlight">選擇 AI 模型</span>
-                    <span class="highlight">Gateway 服務</span>
+                <span style="font-size: 80px;">💼</span>
+                <h1>企業與商業應用</h1>
+                <h2 style="border: none; font-size: 24px; color: #666;">想當老闆？15 個商業實戰情境！</h2>
+                <div style="margin-top: 25px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+                    <span class="highlight">市場分析</span>
+                    <span class="highlight">商業計畫</span>
+                    <span class="highlight">數據分析</span>
+                    <span class="highlight">客服回覆</span>
+                    <span class="highlight">合約審查</span>
+                    <span class="highlight">行銷文案</span>
+                    <span class="highlight">面試準備</span>
+                    <span class="highlight">簡報設計</span>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 2: 執行初始化 -->
+        <!-- 情境 1 -->
         <div class="slide">
             <div class="content-card">
-                <h2>🚀 第一步：執行初始化設定</h2>
-                <p>在 PowerShell 輸入：</p>
-                <pre>openclaw onboard --install-daemon</pre>
-                <div class="box info">
-                    <strong>這個指令會：</strong>
-                    <ul style="margin-top: 10px; margin-bottom: 0;">
-                        <li>啟動設定精靈</li>
-                        <li>安裝 Gateway 背景服務</li>
-                        <li>設定 AI 模型</li>
-                    </ul>
-                </div>
+                <h2>📊 情境 1：市場分析報告</h2>
+                <h3>你說：</h3>
+                <pre>幫我分析台灣手搖飲料市場，包括市場規模、主要競爭者</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>📊 台灣手搖飲料市場分析
+
+【市場規模】
+- 年營業額：約 900 億新台幣
+- 店家數量：超過 25,000 家
+- 年成長率：約 5-8%
+
+【主要競爭者】
+1. 五十嵐 - 市佔率 12%，主打平價
+2. 清心福全 - 市佔率 10%，深耕南部
+3. CoCo 都可 - 國際化品牌
+4. 迷客夏 - 鮮奶茶定位，單價較高
+5. 可不可 - 社群行銷強
+
+【消費者趨勢】
+- 健康意識抬頭：低糖、鮮奶、無添加
+- 外送平台依賴度高：約 30% 訂單來自外送</pre>
             </div>
         </div>
 
-        <!-- Slide 3: 回答問題 1 -->
+        <!-- 情境 2 -->
         <div class="slide">
             <div class="content-card">
-                <h2>📝 回答設定問題</h2>
-                <div class="question-box">
-                    <div class="question-title">問題 1：I understand this is powerful and inherently risky. Continue?</div>
-                    <p>用方向鍵選 <span class="answer">Yes</span>，按 Enter</p>
-                </div>
-                <div class="question-box">
-                    <div class="question-title">問題 2：Onboarding mode</div>
-                    <p>選 <span class="answer">QuickStart</span>，按 Enter</p>
-                </div>
-                <div class="box info">
-                    <strong>💡 用方向鍵 ↑↓ 選擇，Enter 確認</strong>
-                </div>
+                <h2>📝 情境 2：商業計畫書大綱</h2>
+                <h3>你說：</h3>
+                <pre>我想開一家寵物美容店，幫我寫商業計畫書大綱</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>🐾 寵物美容店商業計畫書
+
+一、執行摘要
+- 事業名稱：毛小孩沙龍
+- 服務：寵物洗澡、美容、造型
+- 預估投資：80-150 萬
+
+二、市場分析
+- 台灣寵物數量超過 300 萬隻
+- 寵物美容市場年成長 15%
+
+三、定價策略
+| 服務 | 小型犬 | 大型犬 |
+| 基礎洗澡 | 500 | 1000 |
+| 全套美容 | 800 | 1800 |
+
+四、行銷策略
+- Instagram 展示作品
+- 首次消費 8 折優惠</pre>
             </div>
         </div>
 
-        <!-- Slide 4: 回答問題 2 -->
+        <!-- 情境 3 -->
         <div class="slide">
             <div class="content-card">
-                <h2>📝 選擇 AI 模型</h2>
-                <div class="question-box">
-                    <div class="question-title">問題 3：Model/auth provider</div>
-                    <p>選 <span class="answer">OpenAI (Codex OAuth + API key)</span>，按 Enter</p>
-                </div>
-                <div class="question-box">
-                    <div class="question-title">問題 4：OpenAI auth method</div>
-                    <p>選 <span class="answer">OpenAI Codex OAuth (ChatGPT OAuth)</span>，按 Enter</p>
-                </div>
-                <div class="box warning">
-                    <strong>⚠️ 瀏覽器會自動打開</strong>，請登入你的 ChatGPT 帳號！
-                </div>
+                <h2>📧 情境 3：專業商業郵件</h2>
+                <h3>你說：</h3>
+                <pre>幫我寫英文郵件給國外客戶，告訴他們出貨延遲一週</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>Subject: Shipping Update - Order #12345
+
+Dear Mr. Johnson,
+
+I am writing to inform you about a delay with your order.
+
+Due to unexpected high demand, your shipment will be
+delayed by approximately one week. The new estimated
+delivery date is February 15, 2026.
+
+We sincerely apologize. To express our appreciation,
+we would like to offer you a 10% discount on your
+next order.
+
+Best regards,
+[Your Name]
+
+---
+【中文翻譯】因需求量增加，出貨延遲一週，
+提供下次訂單 9 折優惠作為補償。</pre>
             </div>
         </div>
 
-        <!-- Slide 5: 登入 ChatGPT -->
+        <!-- 情境 4 -->
         <div class="slide">
             <div class="content-card">
-                <h2>🔐 登入 ChatGPT</h2>
-                <div class="step-box">
-                    <p><span class="step-number">1</span>瀏覽器會自動打開 ChatGPT 登入頁面</p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">2</span>登入你的 ChatGPT 帳號</p>
-                </div>
-                <div class="step-box">
-                    <p><span class="step-number">3</span>授權完成後，回到 PowerShell</p>
-                </div>
-                <div class="box success">
-                    <strong>✅ PowerShell 會自動繼續下一步！</strong>
-                </div>
+                <h2>📈 情境 4：數據分析與建議</h2>
+                <h3>你說：</h3>
+                <pre>我的網站有 5000 訪客、300 註冊、50 付費，每人消費 800 元，幫我分析</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>📈 網站數據分析報告
+
+【關鍵指標】
+- 總營收：50 × 800 = 40,000 元
+- 訪客→註冊：300÷5000 = 6% ✅ 良好（業界 2-5%）
+- 註冊→付費：50÷300 = 16.7% ✅ 優秀（業界 5-10%）
+- 整體轉換：50÷5000 = 1%
+
+【發現】
+✅ 產品有吸引力（註冊到付費轉換高）
+⚠️ 訪客到註冊可再提升
+
+【建議】
+1. 優化註冊頁面，減少填寫欄位
+2. 加入社群帳號一鍵註冊
+3. 提供首次註冊優惠</pre>
             </div>
         </div>
 
-        <!-- Slide 6: 繼續設定 -->
+        <!-- 情境 5 -->
         <div class="slide">
             <div class="content-card">
-                <h2>📝 繼續回答問題</h2>
-                <div class="question-box">
-                    <div class="question-title">問題 5：Default model</div>
-                    <p>選 <span class="answer">Keep current</span>，按 Enter</p>
-                </div>
-                <div class="question-box">
-                    <div class="question-title">問題 6：Select channel (QuickStart)</div>
-                    <p>找到 <span class="answer">LINE (Messaging API)</span>，按 Enter</p>
-                </div>
-                <div class="question-box">
-                    <div class="question-title">問題 7：Install LINE plugin?</div>
-                    <p>選 <span class="answer">Skip for now</span>，按 Enter</p>
-                </div>
+                <h2>💬 情境 5：客服回覆範本</h2>
+                <h3>你說：</h3>
+                <pre>客人抱怨商品有瑕疵要退貨，幫我寫專業有誠意的回覆</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>親愛的顧客您好：
+
+非常感謝您的來信，對於商品有瑕疵深感抱歉。
+
+【處理方案】請選擇：
+
+方案 A：全額退款
+- 退回商品後 3 個工作天內退款
+
+方案 B：換貨
+- 優先寄出全新商品 + 小禮物致歉
+
+方案 C：部分退款
+- 保留商品，退還 30% 金額
+
+我們將派專人到府收件（免運費）。
+請回覆選擇的方案，或來電 0800-XXX-XXX。
+
+再次致歉，期待能為您提供更好的服務。
+
+[公司名稱] 客服團隊</pre>
             </div>
         </div>
 
-        <!-- Slide 7: 最後設定 -->
+        <!-- 情境 6 -->
         <div class="slide">
             <div class="content-card">
-                <h2>📝 最後幾個問題</h2>
-                <div class="question-box">
-                    <div class="question-title">問題 8：Configure skills now?</div>
-                    <p>選 <span class="answer">No</span>，按 Enter</p>
-                </div>
-                <div class="question-box">
-                    <div class="question-title">問題 9：Enable hooks?</div>
-                    <p>按空白鍵選 <span class="answer">Skip for now</span>，按 Enter</p>
-                </div>
-                <div class="box success">
-                    <strong>🎉 看到 "Gateway service installed" 就成功了！</strong>
+                <h2>👔 情境 6：面試問題準備</h2>
+                <h3>你說：</h3>
+                <pre>我要面試行銷企劃工作，幫我準備可能的問題和回答</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>💼 行銷企劃面試準備
+
+【問題 1】請介紹你做過最成功的行銷專案
+→ 用 STAR 法則：情境→任務→行動→結果
+→ 強調具體數據：流量增加多少、轉換率提升多少
+
+【問題 2】如何規劃新產品上市行銷？
+→ 市場調查 → 目標客群 → 定位 → 通路 → 預算
+
+【問題 3】預算有限怎麼做行銷？
+→ 高 CP 值管道：社群、SEO、內容行銷
+→ 善用 UGC（用戶生成內容）
+
+【加分技巧】
+- 帶作品集（截圖、數據報告）
+- 事先研究該公司的行銷風格</pre>
+            </div>
+        </div>
+
+        <!-- 情境 7 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📜 情境 7：合約條款審查</h2>
+                <h3>你說：</h3>
+                <pre>幫我看這段合約有沒有問題：
+「乙方同意甲方得隨時變更服務內容，乙方不得異議。」</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>⚠️ 合約條款分析 - 發現問題！
+
+【問題 1】「隨時變更服務內容」
+❌ 對方可以任意改變承諾的服務
+❌ 你付錢買的東西，可能說變就變
+
+【問題 2】「不得異議」
+❌ 剝奪你的申訴權利
+❌ 即使對方亂改，你也不能反對
+
+【建議修改】
+「甲方如需變更服務內容，應於 30 日前書面通知
+乙方。乙方如不同意，得於 14 日內終止合約並
+請求退還未使用服務之費用。」
+
+⚠️ 重要合約建議請律師看過</pre>
+            </div>
+        </div>
+
+        <!-- 情境 8 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>💰 情境 8：投資理財分析</h2>
+                <h3>你說：</h3>
+                <pre>我有 10 萬元想投資，風險承受度中等，幫我分析</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>💰 10 萬元投資配置建議（中等風險）
+
+【建議配置】
+- 50% 穩健型（5 萬）：高股息 ETF（如 0056）
+- 35% 成長型（3.5 萬）：台股 ETF（如 0050）
+- 15% 現金預備（1.5 萬）：高利活存
+
+【預估年報酬】
+- 保守：5-8%（約 5,000-8,000 元）
+- 樂觀：10-12%（約 10,000-12,000 元）
+
+【新手注意】
+1. 不要借錢投資
+2. 定期定額比單筆好
+3. 長期持有，不要頻繁買賣
+4. 先存好 3-6 個月生活費
+
+⚠️ 投資有風險，以上僅供參考</pre>
+            </div>
+        </div>
+
+        <!-- 情境 9 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📊 情境 9：簡報大綱設計</h2>
+                <h3>你說：</h3>
+                <pre>幫我設計 5 頁簡報大綱，主題是咖啡訂閱服務</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>☕ 咖啡訂閱服務簡報（5 頁）
+
+【第 1 頁：封面】
+標題：「每天一杯好咖啡 - [品牌] 訂閱服務」
+
+【第 2 頁：市場痛點】
+🏃 太忙沒時間買 / 🤔 不會挑怕踩雷 / 📦 買太多不新鮮
+
+【第 3 頁：服務方案】
+| 輕量版 $399 | 標準版 $699 | 重度版 $1199 |
+
+【第 4 頁：我們的優勢】
+🌱 產地直送 / 🔥 新鮮烘焙 / 📦 彈性方便
+
+【第 5 頁：行動呼籲】
+🎁 首月 5 折優惠碼 + QR Code</pre>
+            </div>
+        </div>
+
+        <!-- 情境 10 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>🔍 情境 10：程式碼審查</h2>
+                <h3>你說：</h3>
+                <pre>幫我看這段程式碼有沒有問題：
+query = "SELECT * FROM users WHERE username='" + username + "'"</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>🚨 嚴重安全漏洞！SQL Injection
+
+【問題】
+這段程式碼容易被 SQL 注入攻擊！
+駭客輸入 ' OR '1'='1 就能繞過驗證
+
+【正確寫法】
+# 使用參數化查詢
+query = "SELECT * FROM users WHERE username = %s"
+cursor.execute(query, (username,))
+
+【額外建議】
+1. 密碼不要存明碼，用 bcrypt 加密
+2. 加入登入失敗次數限制
+3. 使用 HTTPS 保護傳輸
+
+⚠️ 這種漏洞可能讓整個資料庫被偷走！</pre>
+            </div>
+        </div>
+
+        <!-- 情境 11 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📋 情境 11：會議記錄整理</h2>
+                <h3>你說：</h3>
+                <pre>幫我把這段會議內容整理成重點：
+「今天討論了新產品上市時間，決定延後到三月，因為工廠說產能不夠...」</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>📋 會議記錄
+
+日期：2026/02/04
+主題：新產品上市討論
+
+【決議事項】
+1. 上市時間：原定 2 月 → 延後至 3 月
+2. 延後原因：工廠產能不足
+
+【待辦事項】
+□ 通知行銷部調整宣傳時程
+□ 聯繫工廠確認 3 月產能
+□ 更新專案時程表
+
+【下次會議】
+日期：待定
+議題：確認最終上市日期</pre>
+            </div>
+        </div>
+
+        <!-- 情境 12 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>✍️ 情境 12：行銷文案撰寫</h2>
+                <h3>你說：</h3>
+                <pre>幫我寫一段 IG 貼文，宣傳我們的手作蛋糕，要吸引人</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>🎂 【限量手作・每日新鮮出爐】
+
+「每一口，都是幸福的滋味 ✨」
+
+我們的蛋糕堅持：
+🥚 使用牧場直送新鮮雞蛋
+🍓 當季水果手工製作
+🚫 無添加防腐劑
+
+📍 門市地址：台北市 XX 路 XX 號
+⏰ 營業時間：10:00-20:00
+📱 私訊預訂享 9 折
+
+#手作蛋糕 #生日蛋糕 #台北甜點 #限量 #每日新鮮
+
+---
+💡 文案重點：強調品質、製造稀缺感、明確 CTA</pre>
+            </div>
+        </div>
+
+        <!-- 情境 13 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📞 情境 13：電話銷售話術</h2>
+                <h3>你說：</h3>
+                <pre>幫我寫電話推銷保險的開場白，不要讓客戶馬上掛電話</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>📞 電話開場白（不被秒掛版）
+
+【開場】
+「王先生您好，我是 XX 保險的小林。
+打擾您 30 秒，想請教一個問題就好。」
+
+【引起興趣】
+「請問您有聽過『保費不變、保障加倍』的方案嗎？
+最近很多像您這樣的 [職業] 都在問這個。」
+
+【快速說明】
+「只需要每天一杯咖啡的錢，就能多一份保障。
+方便的話，我可以用 LINE 傳資料給您參考？」
+
+【要點】
+✅ 先問問題，讓客戶有參與感
+✅ 快速說重點，不囉嗦
+✅ 提供低壓力的下一步（傳資料）</pre>
+            </div>
+        </div>
+
+        <!-- 情境 14 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📄 情境 14：求職履歷優化</h2>
+                <h3>你說：</h3>
+                <pre>幫我優化這段工作經驗描述：
+「負責公司的社群媒體，發文、回覆留言」</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>📄 履歷優化建議
+
+【原本】
+「負責公司的社群媒體，發文、回覆留言」
+
+【優化後】
+「社群媒體營運專員（2024.01 - 2025.12）
+• 經營 Facebook、Instagram 雙平台，粉絲數成長 150%
+• 規劃每月內容行事曆，維持每週 5 篇發文頻率
+• 即時回覆客戶留言與私訊，平均回覆時間 < 30 分鐘
+• 策劃 3 檔線上活動，累計觸及人數達 50,000+」
+
+【優化重點】
+✅ 加入具體數據
+✅ 用動詞開頭（經營、規劃、策劃）
+✅ 展現成果而非只是任務</pre>
+            </div>
+        </div>
+
+        <!-- 情境 15 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>🤝 情境 15：商業談判策略</h2>
+                <h3>你說：</h3>
+                <pre>供應商要漲價 20%，幫我想談判策略</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>🤝 供應商漲價談判策略
+
+【準備工作】
+1. 調查市場行情，了解其他供應商報價
+2. 計算漲價對你的成本影響
+3. 準備 B 方案（備選供應商）
+
+【談判策略】
+1. 先傾聽對方漲價原因
+2. 表達長期合作誠意
+3. 提出替代方案：
+   - 接受 10% 漲幅（折衷）
+   - 增加訂購量換取原價
+   - 延長付款期限換取較低漲幅
+
+【談判話術】
+「我們合作這麼久，希望能找到雙贏的方案。
+如果維持原價，我們可以承諾下半年增加 30% 訂單。」
+
+💡 永遠要有備選方案，才有談判籌碼</pre>
+            </div>
+        </div>
+
+        <!-- 小技巧 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>💡 跟龍蝦聊天的小技巧</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px;">
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 4px solid #11998e;">
+                        <h3>1. 說清楚你要什麼</h3>
+                        <p>❌「幫我寫信」</p>
+                        <p>✅「幫我寫一封英文道歉信給客戶，因為出貨延遲」</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 4px solid #11998e;">
+                        <h3>2. 可以請它改</h3>
+                        <p>「再短一點」「更正式一點」「加一些數據」</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 4px solid #11998e;">
+                        <h3>3. 可以追問</h3>
+                        <p>「為什麼？」「還有其他方法嗎？」「舉個例子」</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 4px solid #11998e;">
+                        <h3>4. 設定角色</h3>
+                        <p>「假裝你是律師」「用老闆的角度分析」</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 8: 完成 -->
+        <!-- 結尾 -->
         <div class="slide">
             <div class="content-card" style="text-align: center;">
-                <span style="font-size: 80px;">🎉</span>
-                <h2 style="border: none;">Part 3 完成！</h2>
-                <p style="font-size: 24px;">OpenClaw 已經設定好了！</p>
-                <div style="display: flex; justify-content: center; gap: 30px; margin: 30px 0; flex-wrap: wrap;">
-                    <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ Gateway 服務已安裝</span>
-                    <span class="highlight" style="font-size: 22px; padding: 15px 25px;">✅ AI 模型已設定</span>
-                </div>
-                <p style="font-size: 20px;">接下來建立 LINE 機器人帳號！</p>
-                <a href="Part4.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px;">
-                    ➡️ Part 4：建立 LINE 機器人帳號
+                <span style="font-size: 80px;">🚀</span>
+                <h2 style="border: none;">看完這些應用，心動了嗎？</h2>
+                <p style="font-size: 20px;">現在就開始安裝 OpenClaw，讓龍蝦成為你的 AI 助手！</p>
+                <a href="Part4.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; text-decoration: none; border-radius: 50px;">
+                    ➡️ Part 4：虛擬機安裝（推薦）
                 </a>
             </div>
         </div>
@@ -197,16 +526,13 @@
     <div class="indicators" id="indicatorContainer"></div>
 
     <script>
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.slide');
-        const totalSlides = slides.length;
-        function init() { createIndicators(); showSlide(0); document.addEventListener('keydown', handleKeydown); }
-        function handleKeydown(e) { if (e.key === 'ArrowLeft') changeSlide(-1); if (e.key === 'ArrowRight') changeSlide(1); }
-        function createIndicators() { const container = document.getElementById('indicatorContainer'); slides.forEach((_, index) => { const dot = document.createElement('div'); dot.className = 'dot'; dot.onclick = () => goToSlide(index); container.appendChild(dot); }); }
-        function showSlide(index) { if (index < 0) index = 0; if (index >= totalSlides) index = totalSlides - 1; slides.forEach(slide => slide.classList.remove('active')); slides[index].classList.add('active'); currentSlide = index; document.querySelectorAll('.dot').forEach((dot, idx) => { dot.classList.toggle('active', idx === index); }); document.getElementById('prevBtn').disabled = currentSlide === 0; document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1; }
-        function changeSlide(direction) { showSlide(currentSlide + direction); }
-        function goToSlide(index) { showSlide(index); }
-        function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else if (document.exitFullscreen) document.exitFullscreen(); }
+        let currentSlide = 0; const slides = document.querySelectorAll('.slide'); const totalSlides = slides.length;
+        function init() { createIndicators(); showSlide(0); document.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') changeSlide(-1); if (e.key === 'ArrowRight') changeSlide(1); }); }
+        function createIndicators() { const c = document.getElementById('indicatorContainer'); slides.forEach((_, i) => { const d = document.createElement('div'); d.className = 'dot'; d.onclick = () => goToSlide(i); c.appendChild(d); }); }
+        function showSlide(i) { if (i < 0) i = 0; if (i >= totalSlides) i = totalSlides - 1; slides.forEach(s => s.classList.remove('active')); slides[i].classList.add('active'); currentSlide = i; document.querySelectorAll('.dot').forEach((d, j) => d.classList.toggle('active', j === i)); document.getElementById('prevBtn').disabled = i === 0; document.getElementById('nextBtn').disabled = i === totalSlides - 1; }
+        function changeSlide(d) { showSlide(currentSlide + d); }
+        function goToSlide(i) { showSlide(i); }
+        function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
         init();
     </script>
 </body>
