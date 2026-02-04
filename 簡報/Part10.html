@@ -85,11 +85,11 @@
                 <p>用手機 LINE 對機器人說：</p>
                 <pre>你好</pre>
                 <h3>機器人會回覆配對碼：</h3>
-                <pre>Clawdbot/Moltbot: access not configured.
+                <pre>OpenClaw: access not configured.
 Your lineUserId: Uxxxxxxxxxxxxxxxx
 Pairing code: ABC123
 Ask the bot owner to approve with:
-clawdbot pairing approve line &lt;code&gt;</pre>
+openclaw pairing approve line &lt;code&gt;</pre>
                 <div class="box info">
                     記下那個 <strong>Pairing code</strong>（例如 <code>ABC123</code>）
                 </div>
@@ -100,7 +100,7 @@ clawdbot pairing approve line &lt;code&gt;</pre>
             <div class="content-card">
                 <h2>🔓 第三步：批准配對</h2>
                 <p>回到電腦的 PowerShell（不是 ngrok 那個視窗），輸入：</p>
-                <pre>clawdbot pairing approve line ABC123</pre>
+                <pre>openclaw pairing approve line ABC123</pre>
                 <p>（把 <code>ABC123</code> 換成你收到的配對碼）</p>
                 <div class="box success">
                     會顯示 <code>Approved line sender Uxxxxxxxx</code>。
@@ -127,7 +127,7 @@ clawdbot pairing approve line &lt;code&gt;</pre>
             <div class="content-card" style="text-align: center;">
                 <span style="font-size: 100px;">🎊</span>
                 <h2 style="border: none; font-size: 42px;">恭喜！安裝完成！</h2>
-                <p style="font-size: 24px; margin: 30px 0;">你已經成功安裝了 Clawdbot/Moltbot！</p>
+                <p style="font-size: 24px; margin: 30px 0;">你已經成功安裝了 OpenClaw！</p>
                 <p style="font-size: 20px;">現在可以透過 LINE 跟你的 AI 龍蝦聊天了！</p>
                 <div style="display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap;">
                     <a href="Part11.html" style="font-size: 18px; padding: 20px 35px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);">
