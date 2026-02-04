@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill 教學 - Google Drive 自動上傳 (rclone)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); min-height: 100vh; overflow: hidden; color: #333; }
+        .nav-bar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; z-index: 10000; }
+        .nav-title { font-size: 22px; font-weight: 700; color: #fff; }
+        .nav-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+        .nav-btn { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.4); }
+        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.25); color: white; width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); font-size: 24px; cursor: pointer; z-index: 9000; display: flex; align-items: center; justify-content: center; }
+        .prev-arrow { left: 30px; } .next-arrow { right: 30px; }
+        .nav-arrow:disabled { opacity: 0.3; }
+        .slide { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); display: none; align-items: center; justify-content: center; padding: 40px; }
+        .slide.active { display: flex; }
+        .content-card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); padding: 40px; max-width: 1200px; width: 95%; max-height: 88vh; overflow-y: auto; }
+        h1 { color: #4facfe; font-size: 42px; margin-bottom: 20px; text-align: center; }
+        h2 { color: #00b4db; font-size: 28px; margin-bottom: 20px; border-bottom: 3px solid #4facfe; padding-bottom: 10px; }
+        h3 { color: #4facfe; font-size: 20px; margin: 15px 0 10px 0; }
+        p, li { font-size: 17px; line-height: 1.7; color: #444; margin-bottom: 10px; }
+        code { background: #f0f2f5; padding: 3px 8px; border-radius: 6px; font-family: 'Consolas', monospace; color: #d63384; font-weight: 600; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 12px; margin: 15px 0; font-size: 14px; overflow-x: auto; white-space: pre-wrap; }
+        .box { padding: 15px; border-radius: 12px; margin: 15px 0; border-left: 6px solid; font-size: 16px; }
+        .info { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
+        .success { background: #d4edda; border-color: #28a745; color: #155724; }
+        .warning { background: #fff3cd; border-color: #ffc107; color: #856404; }
+        .highlight { background: linear-gradient(120deg, #4facfe 0%, #00f2fe 100%); padding: 4px 12px; border-radius: 6px; font-weight: bold; color: white; }
+        .step-box { background: linear-gradient(135deg, rgba(79, 172, 254, 0.1), rgba(0, 242, 254, 0.1)); padding: 20px; border-radius: 15px; margin: 15px 0; border: 2px solid rgba(79, 172, 254, 0.3); }
+        .step-number { display: inline-block; background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; width: 36px; height: 36px; border-radius: 50%; text-align: center; line-height: 36px; font-weight: bold; margin-right: 12px; }
+        .indicators { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 4000; padding: 10px 20px; background: rgba(0,0,0,0.3); border-radius: 30px; }
+        .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; }
+        .dot.active { background: #fff; transform: scale(1.3); }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 2px solid #ddd; padding: 12px; text-align: left; }
+        th { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+        tr:nth-child(even) { background: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-title">☁️ Skill 教學 - Google Drive 自動上傳</div>
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-btn">🏠 首頁</a>
+            <a href="Skill-DiskAudit.html" class="nav-btn">⬅️ 上一個 Skill</a>
+            <button class="nav-btn" onclick="toggleFullscreen()">🖥️ 全螢幕</button>
+        </div>
+    </div>
+
+    <div class="slide-container">
+        <!-- 封面 -->
+        <div class="slide active">
+            <div class="content-card" style="text-align: center;">
+                <span style="font-size: 80px;">☁️</span>
+                <h1>rclone + Google Drive</h1>
+                <h2 style="border: none; font-size: 24px; color: #666;">讓龍蝦自動上傳檔案到雲端</h2>
+                <div style="margin-top: 25px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+                    <span class="highlight">自動上傳</span>
+                    <span class="highlight">分享連結</span>
+                    <span class="highlight">遠端取檔</span>
+                    <span class="highlight">備份同步</span>
+                </div>
+                <p style="margin-top: 30px; font-size: 18px;">人在外面也能叫龍蝦傳檔案給你！</p>
+            </div>
+        </div>
+
+        <!-- 為什麼需要 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>🤔 為什麼需要這個功能？</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span><strong>人在外面</strong> - 不在電腦旁邊，但需要主機上的檔案</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span><strong>LINE 限制</strong> - LINE 無法直接傳送某些格式的檔案</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span><strong>自動備份</strong> - 讓龍蝦定期把重要檔案備份到雲端</p>
+                </div>
+                <div class="box info">
+                    <strong>💡 解決方案：</strong><br>
+                    用 rclone 把檔案上傳到 Google Drive，然後給你分享連結！
+                </div>
+            </div>
+        </div>
+
+        <!-- 安裝 rclone -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📥 第一步：安裝 rclone</h2>
+                <p>在 PowerShell（系統管理員）執行：</p>
+                <pre># 方法一：用 winget 安裝（推薦）
+winget install Rclone.Rclone
+
+# 方法二：用 Chocolatey 安裝
+choco install rclone
+
+# 方法三：用 Scoop 安裝
+scoop install rclone</pre>
+                <p>安裝完成後，確認版本：</p>
+                <pre>rclone version</pre>
+                <div class="box success">
+                    <strong>✅ 預期輸出：</strong><br>
+                    <code>rclone v1.73.0</code>（或更新版本）
+                </div>
+            </div>
+        </div>
+
+        <!-- 設定 rclone -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>⚙️ 第二步：開始設定 rclone</h2>
+                <p>在 PowerShell 輸入：</p>
+                <pre>rclone config</pre>
+                <p>你會看到這個畫面：</p>
+                <pre>No remotes found, make a new one?
+n) New remote
+s) Set configuration password
+q) Quit config
+n/s/q></pre>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>輸入 <code>n</code>（New remote）然後按 Enter</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>輸入名稱：<code>gdrive</code> 然後按 Enter</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 選擇 Google Drive -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>⚙️ 第三步：選擇 Google Drive</h2>
+                <p>在 Storage 選單中，找到 <code>Google Drive</code>：</p>
+                <pre>Option Storage.
+Type of storage to configure.
+...
+23 / Google Cloud Storage (this is not Google Drive)
+   \ (google cloud storage)
+24 / Google Drive        <-- 找這個！
+   \ (drive)
+25 / Google Photos
+   \ (google photos)
+...
+Storage></pre>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>輸入 <code>24</code>（或 <code>drive</code>）然後按 Enter</p>
+                </div>
+                <div class="box warning">
+                    <strong>⚠️ 注意：</strong>數字可能因版本不同而變化，請找「Google Drive」那一項！
+                </div>
+            </div>
+        </div>
+
+        <!-- Client ID 設定 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>⚙️ 第四步：Client ID 設定</h2>
+                <p>接下來會問你幾個問題，大部分直接按 Enter 用預設值：</p>
+                <pre>Option client_id.
+Google Application Client Id
+Enter a value. Press Enter to leave empty.
+client_id></pre>
+                <div class="step-box">
+                    <p><span class="step-number">4</span><code>client_id</code> → 直接按 Enter（留空）</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">5</span><code>client_secret</code> → 直接按 Enter（留空）</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">6</span><code>scope</code> → 輸入 <code>1</code>（Full access）</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">7</span><code>root_folder_id</code> → 直接按 Enter（留空）</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">8</span><code>service_account_file</code> → 直接按 Enter（留空）</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 進階設定 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>⚙️ 第五步：進階設定與授權</h2>
+                <pre>Edit advanced config?
+y) Yes
+n) No (default)
+y/n></pre>
+                <div class="step-box">
+                    <p><span class="step-number">9</span><code>Edit advanced config?</code> → 輸入 <code>n</code></p>
+                </div>
+                <pre>Use auto config?
+y) Yes (default)
+n) No
+y/n></pre>
+                <div class="step-box">
+                    <p><span class="step-number">10</span><code>Use auto config?</code> → 看情況選擇：<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• 在電腦前有瀏覽器：輸入 <code>y</code>（會自動開瀏覽器登入）<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• 遠端/無瀏覽器：輸入 <code>n</code>（會給你一個網址，用手機登入）</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Google 授權 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>🔐 第六步：Google 授權</h2>
+                <h3>如果選 y（自動設定）：</h3>
+                <p>瀏覽器會自動打開 Google 登入頁面，登入後按「允許」。</p>
+
+                <h3>如果選 n（手動設定）：</h3>
+                <p>你會看到一個網址：</p>
+                <pre>If your browser doesn't open automatically go to the following link:
+https://accounts.google.com/o/oauth2/auth?access_type=offline&client_id=...
+
+Enter verification code></pre>
+                <div class="step-box">
+                    <p><span class="step-number">11</span>用手機或電腦打開那個網址</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">12</span>登入 Google 帳號，按「允許」</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">13</span>複製授權碼，貼回 PowerShell 按 Enter</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 完成設定 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>✅ 第七步：完成設定</h2>
+                <pre>Configure this as a Shared Drive (Team Drive)?
+y) Yes
+n) No (default)
+y/n></pre>
+                <div class="step-box">
+                    <p><span class="step-number">14</span><code>Shared Drive?</code> → 輸入 <code>n</code>（除非你要用共用雲端硬碟）</p>
+                </div>
+                <p>最後確認設定：</p>
+                <pre>Configuration complete.
+Options:
+- type: drive
+- scope: drive
+- token: {"access_token":"..."}
+
+Keep this "gdrive" remote?
+y) Yes this is OK (default)
+e) Edit this remote
+d) Delete this remote
+y/e/d></pre>
+                <div class="step-box">
+                    <p><span class="step-number">15</span>輸入 <code>y</code> 確認，然後輸入 <code>q</code> 退出</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 測試上傳 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>🧪 測試：上傳檔案到 Google Drive</h2>
+                <p>測試上傳一個檔案：</p>
+                <pre># 上傳單一檔案到根目錄
+rclone copy "C:\Users\user\test.txt" gdrive:
+
+# 上傳到指定資料夾
+rclone copy "C:\Users\user\test.txt" gdrive:OpenClaw-Uploads
+
+# 上傳整個資料夾
+rclone copy "C:\Users\user\Documents\MyFolder" gdrive:MyFolder</pre>
+                <p>查看雲端檔案：</p>
+                <pre># 列出雲端根目錄
+rclone ls gdrive:
+
+# 列出指定資料夾
+rclone ls gdrive:OpenClaw-Uploads</pre>
+                <div class="box success">
+                    <strong>✅ 成功！</strong>如果沒有錯誤訊息，檔案就已經上傳到你的 Google Drive 了！
+                </div>
+            </div>
+        </div>
+
+        <!-- 上傳腳本 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📜 建立上傳腳本</h2>
+                <p>建立 <code>gdrive-upload.ps1</code> 腳本：</p>
+                <pre># gdrive-upload.ps1
+# 上傳檔案到 Google Drive 並產生分享連結
+
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$FilePath,
+    [string]$RemoteFolder = "OpenClaw-Uploads"
+)
+
+$fileName = Split-Path $FilePath -Leaf
+
+# 上傳檔案
+Write-Host "正在上傳 $fileName ..." -ForegroundColor Cyan
+rclone copy $FilePath "gdrive:$RemoteFolder"
+
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "上傳成功！" -ForegroundColor Green
+
+    # 產生分享連結
+    $link = rclone link "gdrive:$RemoteFolder/$fileName"
+    Write-Host "分享連結：$link" -ForegroundColor Yellow
+
+    # 複製到剪貼簿
+    $link | Set-Clipboard
+    Write-Host "（已複製到剪貼簿）" -ForegroundColor Gray
+} else {
+    Write-Host "上傳失敗！" -ForegroundColor Red
+}</pre>
+            </div>
+        </div>
+
+        <!-- 使用方式 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>🚀 如何使用</h2>
+                <h3>方法一：跟龍蝦說</h3>
+                <pre>把 disk-audit.zip 上傳到我的 Google Drive</pre>
+                <p>龍蝦會執行上傳，然後回覆你分享連結。</p>
+
+                <h3>方法二：手動執行腳本</h3>
+                <pre># 上傳檔案
+& "$env:USERPROFILE\.openclaw\workspace\gdrive-upload.ps1" -FilePath "C:\path\to\file.zip"
+
+# 上傳到指定資料夾
+& "$env:USERPROFILE\.openclaw\workspace\gdrive-upload.ps1" -FilePath "C:\file.zip" -RemoteFolder "Backups"</pre>
+
+                <h3>方法三：直接用 rclone 指令</h3>
+                <pre># 上傳
+rclone copy "C:\file.zip" gdrive:OpenClaw-Uploads
+
+# 產生連結
+rclone link "gdrive:OpenClaw-Uploads/file.zip"</pre>
+            </div>
+        </div>
+
+        <!-- 常用指令 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📋 rclone 常用指令</h2>
+                <table>
+                    <tr><th>你想做的事</th><th>指令</th></tr>
+                    <tr>
+                        <td>上傳檔案</td>
+                        <td><code>rclone copy 本地路徑 gdrive:遠端路徑</code></td>
+                    </tr>
+                    <tr>
+                        <td>下載檔案</td>
+                        <td><code>rclone copy gdrive:遠端路徑 本地路徑</code></td>
+                    </tr>
+                    <tr>
+                        <td>同步資料夾</td>
+                        <td><code>rclone sync 本地 gdrive:遠端</code></td>
+                    </tr>
+                    <tr>
+                        <td>列出檔案</td>
+                        <td><code>rclone ls gdrive:資料夾</code></td>
+                    </tr>
+                    <tr>
+                        <td>產生分享連結</td>
+                        <td><code>rclone link gdrive:檔案路徑</code></td>
+                    </tr>
+                    <tr>
+                        <td>刪除檔案</td>
+                        <td><code>rclone delete gdrive:檔案路徑</code></td>
+                    </tr>
+                    <tr>
+                        <td>查看設定</td>
+                        <td><code>rclone config</code></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- 完成 -->
+        <div class="slide">
+            <div class="content-card" style="text-align: center;">
+                <span style="font-size: 80px;">🎉</span>
+                <h2 style="border: none;">Google Drive 自動上傳完成！</h2>
+                <p style="font-size: 20px; margin: 20px 0;">現在龍蝦可以幫你上傳檔案到 Google Drive 了！</p>
+                <div class="box success" style="text-align: left;">
+                    <strong>📋 快速複習：</strong><br>
+                    1. 安裝 rclone<br>
+                    2. 執行 <code>rclone config</code> 設定 Google Drive<br>
+                    3. Google 授權登入<br>
+                    4. 跟龍蝦說「上傳 xxx 到 Google Drive」
+                </div>
+                <div class="box info" style="text-align: left;">
+                    <strong>💡 應用場景：</strong><br>
+                    • 人在外面，叫龍蝦傳檔案給你<br>
+                    • 定期備份重要資料到雲端<br>
+                    • 分享大檔案給朋友
+                </div>
+                <a href="index.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; text-decoration: none; border-radius: 50px;">
+                    🏠 回到首頁
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <button class="nav-arrow prev-arrow" id="prevBtn" onclick="changeSlide(-1)">❮</button>
+    <button class="nav-arrow next-arrow" id="nextBtn" onclick="changeSlide(1)">❯</button>
+    <div class="indicators" id="indicatorContainer"></div>
+
+    <script>
+        let currentSlide = 0; const slides = document.querySelectorAll('.slide'); const totalSlides = slides.length;
+        function init() { createIndicators(); showSlide(0); document.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') changeSlide(-1); if (e.key === 'ArrowRight') changeSlide(1); }); }
+        function createIndicators() { const c = document.getElementById('indicatorContainer'); slides.forEach((_, i) => { const d = document.createElement('div'); d.className = 'dot'; d.onclick = () => goToSlide(i); c.appendChild(d); }); }
+        function showSlide(i) { if (i < 0) i = 0; if (i >= totalSlides) i = totalSlides - 1; slides.forEach(s => s.classList.remove('active')); slides[i].classList.add('active'); currentSlide = i; document.querySelectorAll('.dot').forEach((d, j) => d.classList.toggle('active', j === i)); document.getElementById('prevBtn').disabled = i === 0; document.getElementById('nextBtn').disabled = i === totalSlides - 1; }
+        function changeSlide(d) { showSlide(currentSlide + d); }
+        function goToSlide(i) { showSlide(i); }
+        function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+        init();
+    </script>
+</body>
+</html>

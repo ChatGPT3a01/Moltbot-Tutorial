@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill 教學 - Browser Relay 網頁操作</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); min-height: 100vh; overflow: hidden; color: #333; }
+        .nav-bar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; z-index: 10000; }
+        .nav-title { font-size: 22px; font-weight: 700; color: #555; }
+        .nav-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+        .nav-btn { background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(255, 255, 255, 0.6); color: #555; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.8); }
+        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.5); color: #555; width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.6); font-size: 24px; cursor: pointer; z-index: 9000; display: flex; align-items: center; justify-content: center; }
+        .prev-arrow { left: 30px; } .next-arrow { right: 30px; }
+        .nav-arrow:disabled { opacity: 0.3; }
+        .slide { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); display: none; align-items: center; justify-content: center; padding: 40px; }
+        .slide.active { display: flex; }
+        .content-card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2); padding: 40px; max-width: 1200px; width: 95%; max-height: 88vh; overflow-y: auto; }
+        h1 { color: #e8a4c4; font-size: 42px; margin-bottom: 20px; text-align: center; }
+        h2 { color: #7ecec6; font-size: 28px; margin-bottom: 20px; border-bottom: 3px solid #e8a4c4; padding-bottom: 10px; }
+        h3 { color: #e8a4c4; font-size: 20px; margin: 15px 0 10px 0; }
+        p, li { font-size: 17px; line-height: 1.7; color: #444; margin-bottom: 10px; }
+        code { background: #f0f2f5; padding: 3px 8px; border-radius: 6px; font-family: 'Consolas', monospace; color: #d63384; font-weight: 600; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 12px; margin: 15px 0; font-size: 14px; overflow-x: auto; white-space: pre-wrap; }
+        .box { padding: 15px; border-radius: 12px; margin: 15px 0; border-left: 6px solid; font-size: 16px; }
+        .info { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
+        .success { background: #d4edda; border-color: #28a745; color: #155724; }
+        .warning { background: #fff3cd; border-color: #ffc107; color: #856404; }
+        .danger { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .highlight { background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%); padding: 4px 12px; border-radius: 6px; font-weight: bold; color: #555; }
+        .step-box { background: linear-gradient(135deg, rgba(168, 237, 234, 0.2), rgba(254, 214, 227, 0.2)); padding: 20px; border-radius: 15px; margin: 15px 0; border: 2px solid rgba(232, 164, 196, 0.3); }
+        .step-number { display: inline-block; background: linear-gradient(135deg, #a8edea, #fed6e3); color: #555; width: 36px; height: 36px; border-radius: 50%; text-align: center; line-height: 36px; font-weight: bold; margin-right: 12px; }
+        .indicators { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 4000; padding: 10px 20px; background: rgba(0,0,0,0.2); border-radius: 30px; }
+        .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.5); border-radius: 50%; cursor: pointer; }
+        .dot.active { background: #fff; transform: scale(1.3); }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 2px solid #ddd; padding: 12px; text-align: left; }
+        th { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #555; }
+        tr:nth-child(even) { background: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-title">🌐 Skill 教學 - Browser Relay 網頁操作</div>
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-btn">🏠 首頁</a>
+            <a href="Skill-GoogleDrive.html" class="nav-btn">⬅️ 上一個 Skill</a>
+            <button class="nav-btn" onclick="toggleFullscreen()">🖥️ 全螢幕</button>
+        </div>
+    </div>
+
+    <div class="slide-container">
+        <!-- 封面 -->
+        <div class="slide active">
+            <div class="content-card" style="text-align: center;">
+                <span style="font-size: 80px;">🌐</span>
+                <h1>Browser Relay</h1>
+                <h2 style="border: none; font-size: 24px; color: #666;">讓龍蝦幫你操作網頁</h2>
+                <div style="margin-top: 25px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+                    <span class="highlight">查資料</span>
+                    <span class="highlight">自動填表</span>
+                    <span class="highlight">網頁截圖</span>
+                    <span class="highlight">自動登入</span>
+                </div>
+                <p style="margin-top: 30px; font-size: 18px;">把瀏覽器控制權交給龍蝦，幫你完成網頁操作！</p>
+            </div>
+        </div>
+
+        <!-- 兩種模式 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>🔍 網頁瀏覽的兩種模式</h2>
+                <div class="step-box">
+                    <h3>模式一：抓取網頁內容（不需要擴充套件）</h3>
+                    <p>龍蝦可以直接讀取公開網頁的內容，例如：</p>
+                    <ul>
+                        <li>查電影場次</li>
+                        <li>查新聞</li>
+                        <li>抓取網頁資料</li>
+                    </ul>
+                    <p><strong>使用方式：</strong>直接跟龍蝦說「幫我查 xxx 網站的 xxx」</p>
+                </div>
+                <div class="step-box">
+                    <h3>模式二：操作瀏覽器（需要 Browser Relay）</h3>
+                    <p>龍蝦可以接管你的瀏覽器，幫你：</p>
+                    <ul>
+                        <li>點按鈕、填表單</li>
+                        <li>登入網站（用你已登入的帳號）</li>
+                        <li>操作需要互動的網頁</li>
+                    </ul>
+                    <p><strong>前提：</strong>需要安裝 Browser Relay 擴充套件</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 安全說明 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>⚠️ 安全須知（重要！）</h2>
+                <div class="box danger">
+                    <strong>🔐 高權限操作！</strong><br>
+                    Browser Relay 讓龍蝦可以操作你的瀏覽器，包括：<br>
+                    • 看到你登入中的網站<br>
+                    • 操作你的 Google、銀行等帳號<br>
+                    • 點按任何按鈕、填寫任何表單
+                </div>
+                <div class="box warning">
+                    <strong>建議的安全做法：</strong><br>
+                    1. 只在需要的時候才按「Attach/ON」<br>
+                    2. 操作完畢後立刻關閉連線<br>
+                    3. 敏感操作（如銀行、付款）不要讓龍蝦代操作<br>
+                    4. 隨時可以收回控制權（關閉分頁或擴充套件）
+                </div>
+                <div class="box info">
+                    <strong>💡 龍蝦的承諾：</strong><br>
+                    龍蝦只會做你明確指定的事，不會偷偷亂動外部東西。
+                </div>
+            </div>
+        </div>
+
+        <!-- 安裝方法說明 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📥 安裝 Browser Relay 擴充套件</h2>
+                <div class="box info">
+                    <strong>💡 重要說明：</strong><br>
+                    OpenClaw Browser Relay <strong>不在 Chrome 線上應用程式商店</strong>！<br>
+                    需要用「載入已解壓縮」的方式手動安裝。
+                </div>
+                <h3>安裝步驟概覽：</h3>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>準備擴充套件檔案</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>在 Chrome 開啟開發人員模式</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>載入已解壓縮的擴充套件</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">4</span>釘選到工具列</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第一步：準備檔案 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📂 第一步：準備擴充套件檔案</h2>
+                <p>在 PowerShell 執行：</p>
+                <pre># 嘗試安裝擴充套件
+openclaw browser extension install</pre>
+                <p>如果成功，會顯示安裝完成。接著查看路徑：</p>
+                <pre># 查看擴充套件路徑
+openclaw browser extension path</pre>
+                <div class="box warning">
+                    <strong>⚠️ 如果出現錯誤：</strong><br>
+                    <code>Error: Bundled Chrome extension is missing</code><br><br>
+                    這代表你的 OpenClaw 版本可能沒有內建擴充套件。<br>
+                    請看下一頁的「手動下載方案」。
+                </div>
+            </div>
+        </div>
+
+        <!-- 手動下載方案 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📥 備用方案：手動建立擴充套件</h2>
+                <p>如果 <code>openclaw browser extension install</code> 失敗，可以手動建立：</p>
+                <pre># 建立擴充套件資料夾
+mkdir "$env:USERPROFILE\.openclaw\browser\chrome-extension" -Force
+cd "$env:USERPROFILE\.openclaw\browser\chrome-extension"</pre>
+                <p>建立 <code>manifest.json</code> 檔案：</p>
+                <pre>{
+  "manifest_version": 3,
+  "name": "OpenClaw Browser Relay",
+  "version": "1.0.0",
+  "description": "讓 OpenClaw 龍蝦操作瀏覽器",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["&lt;all_urls&gt;"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}</pre>
+                <div class="box info">
+                    <strong>💡 提示：</strong>完整的擴充套件檔案可能需要從 OpenClaw 官方文件下載。
+                </div>
+            </div>
+        </div>
+
+        <!-- 第二步：Chrome 設定 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>🔧 第二步：在 Chrome 載入擴充套件</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>打開 Chrome，在網址列輸入：<br>
+                    <code>chrome://extensions/</code></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>右上角打開 <strong>「開發人員模式」</strong>（Developer mode）</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>左上角點 <strong>「載入已解壓縮」</strong>（Load unpacked）</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">4</span>選擇擴充套件資料夾：<br>
+                    <code>C:\Users\你的使用者名稱\.openclaw\browser\chrome-extension</code></p>
+                </div>
+                <div class="box success">
+                    <strong>✅ 成功！</strong>你會在擴充套件列表看到 OpenClaw Browser Relay。
+                </div>
+            </div>
+        </div>
+
+        <!-- 第三步：釘選擴充套件 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>📌 第三步：釘選擴充套件到工具列</h2>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>點 Chrome 右上角的 <strong>拼圖圖示</strong>（擴充功能）</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>找到 <strong>OpenClaw Browser Relay</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>點旁邊的 <strong>圖釘</strong> 把它釘選到工具列</p>
+                </div>
+                <p>釘選後，工具列會出現 OpenClaw 的圖示（可能是龍蝦或螃蟹圖案）。</p>
+                <div class="box info">
+                    <strong>💡 提示：</strong>釘選後會更方便，每次要讓龍蝦操作只要點一下圖示就好。
+                </div>
+            </div>
+        </div>
+
+        <!-- 如何使用 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>🚀 如何使用 Browser Relay</h2>
+                <h3>讓龍蝦操作網頁的步驟：</h3>
+                <div class="step-box">
+                    <p><span class="step-number">1</span>用 Chrome 開一個分頁（例如 google.com）</p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">2</span>點工具列上的 <strong>OpenClaw 圖示</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">3</span>讓它顯示 <strong>已連線 / ON / 已附加</strong></p>
+                </div>
+                <div class="step-box">
+                    <p><span class="step-number">4</span>回 LINE 跟龍蝦說你要做什麼，例如：<br>
+                    「幫我在這個網頁填寫表單」<br>
+                    「幫我登入 Google」<br>
+                    「幫我截圖這個網頁」</p>
+                </div>
+                <div class="box warning">
+                    <strong>⚠️ 注意：</strong>你必須先按「Attach/ON」，龍蝦才看得到也才能操作那個分頁！
+                </div>
+            </div>
+        </div>
+
+        <!-- 不需要 Browser Relay 的情況 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>✨ 不需要 Browser Relay 也能做的事</h2>
+                <p>以下操作龍蝦可以直接做，不需要安裝擴充套件：</p>
+                <table>
+                    <tr><th>你想做的事</th><th>跟龍蝦說</th></tr>
+                    <tr>
+                        <td>查公開網頁內容</td>
+                        <td>「幫我查 xxx 網站的 xxx」</td>
+                    </tr>
+                    <tr>
+                        <td>抓取新聞標題</td>
+                        <td>「幫我查今天的科技新聞」</td>
+                    </tr>
+                    <tr>
+                        <td>查電影場次</td>
+                        <td>「查 xxx 電影院的場次」</td>
+                    </tr>
+                    <tr>
+                        <td>讀取網頁 HTML</td>
+                        <td>「抓取這個網址的內容：xxx」</td>
+                    </tr>
+                    <tr>
+                        <td>網路爬蟲</td>
+                        <td>「爬取 xxx 網站的資料」</td>
+                    </tr>
+                </table>
+                <div class="box success">
+                    <strong>💡 大部分查資料的需求，不需要 Browser Relay！</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- 需要 Browser Relay 的情況 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>🔐 需要 Browser Relay 才能做的事</h2>
+                <p>以下操作需要安裝 Browser Relay：</p>
+                <table>
+                    <tr><th>情境</th><th>說明</th></tr>
+                    <tr>
+                        <td>登入網站</td>
+                        <td>需要用你已登入的帳號做操作</td>
+                    </tr>
+                    <tr>
+                        <td>填寫表單</td>
+                        <td>需要在網頁上填寫並送出表單</td>
+                    </tr>
+                    <tr>
+                        <td>點按鈕</td>
+                        <td>需要點擊網頁上的按鈕觸發動作</td>
+                    </tr>
+                    <tr>
+                        <td>Google OAuth 授權</td>
+                        <td>需要在 Google 登入頁面按「允許」</td>
+                    </tr>
+                    <tr>
+                        <td>操作 SPA 網站</td>
+                        <td>單頁應用程式需要 JavaScript 互動</td>
+                    </tr>
+                </table>
+                <div class="box info">
+                    <strong>💡 範例對話：</strong><br>
+                    你：「幫我在 rclone config 的 Google 授權頁面按允許」<br>
+                    龍蝦：「好，我需要你先把 Browser Relay 連線，然後開那個授權頁面...」
+                </div>
+            </div>
+        </div>
+
+        <!-- 常見問題 -->
+        <div class="slide">
+            <div class="content-card">
+                <h2>❓ 常見問題</h2>
+                <h3>Q1：龍蝦說「看不到分頁」怎麼辦？</h3>
+                <p>A：確認你有點 OpenClaw 圖示，並且顯示 ON/已連線。如果還是不行，重新整理網頁後再試一次。</p>
+
+                <h3>Q2：Chrome 線上商店找不到擴充套件？</h3>
+                <p>A：正常！這個擴充套件不在商店，要用「載入已解壓縮」的方式手動安裝。</p>
+
+                <h3>Q3：怎麼關閉連線？</h3>
+                <p>A：再點一次 OpenClaw 圖示，讓它變成 OFF，或直接關掉那個分頁。</p>
+
+                <h3>Q4：擴充套件檔案找不到？</h3>
+                <p>A：可能你的 OpenClaw 版本沒有內建。可以嘗試重新安裝 OpenClaw，或等官方更新。</p>
+            </div>
+        </div>
+
+        <!-- 完成 -->
+        <div class="slide">
+            <div class="content-card" style="text-align: center;">
+                <span style="font-size: 80px;">🎉</span>
+                <h2 style="border: none;">Browser Relay 設定完成！</h2>
+                <p style="font-size: 20px; margin: 20px 0;">現在龍蝦可以幫你操作網頁了！</p>
+                <div class="box success" style="text-align: left;">
+                    <strong>📋 快速複習：</strong><br>
+                    1. 安裝擴充套件（載入已解壓縮）<br>
+                    2. 釘選到工具列<br>
+                    3. 開目標網頁，點圖示 Attach/ON<br>
+                    4. 跟龍蝦說你要做什麼
+                </div>
+                <div class="box warning" style="text-align: left;">
+                    <strong>⚠️ 記住：</strong><br>
+                    • 只在需要時才開啟連線<br>
+                    • 敏感操作不要讓龍蝦代操作<br>
+                    • 隨時可以收回控制權
+                </div>
+                <a href="index.html" style="display: inline-block; margin-top: 30px; font-size: 18px; padding: 20px 40px; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #555; text-decoration: none; border-radius: 50px;">
+                    🏠 回到首頁
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <button class="nav-arrow prev-arrow" id="prevBtn" onclick="changeSlide(-1)">❮</button>
+    <button class="nav-arrow next-arrow" id="nextBtn" onclick="changeSlide(1)">❯</button>
+    <div class="indicators" id="indicatorContainer"></div>
+
+    <script>
+        let currentSlide = 0; const slides = document.querySelectorAll('.slide'); const totalSlides = slides.length;
+        function init() { createIndicators(); showSlide(0); document.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') changeSlide(-1); if (e.key === 'ArrowRight') changeSlide(1); }); }
+        function createIndicators() { const c = document.getElementById('indicatorContainer'); slides.forEach((_, i) => { const d = document.createElement('div'); d.className = 'dot'; d.onclick = () => goToSlide(i); c.appendChild(d); }); }
+        function showSlide(i) { if (i < 0) i = 0; if (i >= totalSlides) i = totalSlides - 1; slides.forEach(s => s.classList.remove('active')); slides[i].classList.add('active'); currentSlide = i; document.querySelectorAll('.dot').forEach((d, j) => d.classList.toggle('active', j === i)); document.getElementById('prevBtn').disabled = i === 0; document.getElementById('nextBtn').disabled = i === totalSlides - 1; }
+        function changeSlide(d) { showSlide(currentSlide + d); }
+        function goToSlide(i) { showSlide(i); }
+        function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+        init();
+    </script>
+</body>
+</html>
