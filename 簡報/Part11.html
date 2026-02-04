@@ -215,6 +215,83 @@ ngrok: upstream connection error</pre>
 
         <div class="slide">
             <div class="content-card">
+                <h2>🔐 Pairing 配對模式說明</h2>
+                <h3>你說：</h3>
+                <pre>什麼是 pairing？</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>Pairing 是 OpenClaw 的「配對」機制 🔐
+
+📌 用途：
+   控制「誰可以跟這隻龍蝦講話」
+
+📌 運作方式：
+   1. 新使用者傳訊息給機器人
+   2. 機器人回覆一組 pairing code（配對碼）
+   3. 管理員在終端機執行：
+      openclaw pairing approve line &lt;code&gt;
+   4. 該使用者就被加入白名單，可以正常對話
+
+📌 好處：
+   ✅ 避免陌生人濫用你的 AI
+   ✅ 保護 API 額度
+   ✅ 可隨時撤銷存取權限</pre>
+                <div class="box info">
+                    <strong>💡 白名單機制！</strong><br>
+                    只有經過配對的使用者才能使用你的龍蝦 AI！
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>⚙️ 背景執行設定</h2>
+                <h3>你說：</h3>
+                <pre>設定一下：以後系統維護類的操作在背景做，不要給我看過程</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>收到 ✅
+
+已設定：系統維護類操作（如更新、清理、備份等）
+會在背景執行，只在完成時回報結果。
+
+如果你想臨時看進度，可以說「顯示目前背景任務」。</pre>
+                <div class="box success">
+                    <strong>🎯 更清爽的體驗！</strong><br>
+                    不用看一堆執行過程，只看結果就好！
+                </div>
+                <div class="box info">
+                    <strong>💡 你還可以這樣說：</strong><br>
+                    • 「顯示目前背景任務」- 查看進行中的任務<br>
+                    • 「取消背景任務」- 停止執行中的任務
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
+                <h2>🤖 查詢使用的 AI 模型</h2>
+                <h3>你說：</h3>
+                <pre>你現在使用哪個 AI？</pre>
+                <h3>龍蝦會回覆：</h3>
+                <pre>目前正在使用的是：
+
+🔹 模型：gpt-5.2（或 openai-codex）
+🔹 提供者：OpenAI
+🔹 特色：
+   - 更強的推理能力
+   - 支援多模態（文字、圖片）
+   - 更長的上下文記憶</pre>
+                <div class="box info">
+                    <strong>💡 可更換 AI 模型！</strong><br>
+                    龍蝦支援多種 AI 後端，可以在設定檔中調整：<br>
+                    • OpenAI (gpt-5.2, openai-codex)<br>
+                    • Gemini (gemini-2.5-flash, gemini-2.5-pro)<br>
+                    • Groq (llama-3.3-70b-versatile)
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="content-card">
                 <h2>🔄 關閉與重新啟動</h2>
                 <div class="box info">
                     <strong>📋 快速指令摘要（每次開機都要做）：</strong><br>
