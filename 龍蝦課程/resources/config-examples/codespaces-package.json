@@ -1,0 +1,11 @@
+{
+  "name": "openclaw-cloud",
+  "version": "1.0.0",
+  "description": "OpenClaw on GitHub Codespaces",
+  "dependencies": {
+    "openclaw": "latest"
+  },
+  "scripts": {
+    "start": "openclaw gateway start"
+  }
+}

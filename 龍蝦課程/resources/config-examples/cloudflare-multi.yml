@@ -1,0 +1,17 @@
+# Cloudflare Tunnel 設定檔（CH14 雙龍蝦版）
+# 存放位置：~/.cloudflared/config.yml
+
+tunnel: 你的隧道ID
+credentials-file: C:\Users\你的名稱\.cloudflared\你的隧道ID.json
+
+ingress:
+  # 龍蝦 A（生活助手）— port 18789
+  - hostname: lobster.你的域名.com
+    service: http://localhost:18789
+
+  # 龍蝦 B（工作秘書）— port 18790
+  - hostname: lobster-work.你的域名.com
+    service: http://localhost:18790
+
+  # 預設回應
+  - service: http_status:404

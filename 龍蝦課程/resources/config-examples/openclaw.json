@@ -1,0 +1,15 @@
+{
+  "line": {
+    "channelId": "你的_Channel_ID",
+    "channelSecret": "你的_Channel_Secret",
+    "channelAccessToken": "你的_Channel_Access_Token"
+  },
+  "llm": {
+    "provider": "google",
+    "model": "gemini-3-flash",
+    "apiKey": "你的_Gemini_API_Key"
+  },
+  "gateway": {
+    "port": 18789
+  }
+}

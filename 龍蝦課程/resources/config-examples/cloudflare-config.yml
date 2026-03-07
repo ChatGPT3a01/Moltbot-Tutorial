@@ -1,0 +1,10 @@
+# Cloudflare Tunnel 設定檔（CH12 單龍蝦版）
+# 存放位置：~/.cloudflared/config.yml
+
+tunnel: 你的隧道ID
+credentials-file: C:\Users\你的名稱\.cloudflared\你的隧道ID.json
+
+ingress:
+  - hostname: lobster.你的域名.com
+    service: http://localhost:18789
+  - service: http_status:404
