@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloudflare Tunnel 隧道概念圖</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: #ffffff;
+    font-family: 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 30px 0;
+  }
+
+  .container {
+    width: 1200px;
+    background: #ffffff;
+    padding: 40px 50px 50px;
+  }
+
+  /* ===== 標題 ===== */
+  .main-title {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 900;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+  }
+
+  .main-subtitle {
+    text-align: center;
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 36px;
+  }
+
+  /* ===== 對比區塊 ===== */
+  .comparison-section {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 44px;
+  }
+
+  .compare-card {
+    flex: 1;
+    border-radius: 14px;
+    padding: 22px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .compare-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+  }
+
+  /* 舊方式 ngrok */
+  .compare-old {
+    background: #fef2f2;
+    border: 2px solid #fca5a5;
+  }
+
+  .compare-old::before {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+  }
+
+  .compare-old .compare-badge {
+    background: #ef4444;
+  }
+
+  /* 新方式 Cloudflare */
+  .compare-new {
+    background: #f0fdf4;
+    border: 2px solid #86efac;
+  }
+
+  .compare-new::before {
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+  }
+
+  .compare-new .compare-badge {
+    background: #16a34a;
+  }
+
+  .compare-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .compare-badge {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+  }
+
+  .compare-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1a1a2e;
+  }
+
+  .compare-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .compare-list li {
+    font-size: 16px;
+    color: #333;
+    padding: 6px 0;
+    padding-left: 28px;
+    position: relative;
+    line-height: 1.6;
+  }
+
+  .compare-old .compare-list li::before {
+    content: '\2716';
+    position: absolute;
+    left: 0;
+    color: #ef4444;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .compare-new .compare-list li::before {
+    content: '\2714';
+    position: absolute;
+    left: 0;
+    color: #16a34a;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .compare-old .compare-list li strong {
+    color: #dc2626;
+  }
+
+  .compare-new .compare-list li strong {
+    color: #15803d;
+  }
+
+  /* ===== VS 分隔 ===== */
+  .vs-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 52px;
+  }
+
+  .vs-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  }
+
+  /* ===== 隧道架構圖 ===== */
+  .diagram-label {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+  }
+
+  .diagram-section {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 44px 40px 40px;
+    position: relative;
+  }
+
+  .diagram-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+  }
+
+  /* 節點共用 */
+  .node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  .node-icon-wrap {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    position: relative;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  }
+
+  .node-icon {
+    font-size: 52px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  }
+
+  .node-label {
+    font-size: 20px;
+    font-weight: 800;
+    color: #1a1a2e;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  .node-desc {
+    font-size: 14px;
+    color: #64748b;
+    text-align: center;
+    max-width: 180px;
+    line-height: 1.5;
+  }
+
+  .node-tag {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  /* LINE 節點 - 綠色 */
+  .node-line .node-icon-wrap {
+    background: linear-gradient(135deg, #06c755, #00b900);
+  }
+
+  .node-line .node-tag {
+    background: #dcfce7;
+    color: #15803d;
+  }
+
+  /* Cloudflare 節點 - 橘色 */
+  .node-cf .node-icon-wrap {
+    background: linear-gradient(135deg, #f6821f, #faad3f);
+  }
+
+  .node-cf .node-tag {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+  }
+
+  /* 電腦節點 - 藍色 */
+  .node-pc .node-icon-wrap {
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  }
+
+  .node-pc .node-tag {
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+
+  /* ===== 箭頭連線 ===== */
+  .arrow-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 200px;
+    padding: 0 10px;
+    position: relative;
+  }
+
+  .arrow-label-top {
+    font-size: 13px;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 8px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .arrow-line-wrap {
+    width: 100%;
+    height: 48px;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .arrow-line {
+    width: 100%;
+    height: 4px;
+    position: relative;
+  }
+
+  .arrow-line-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 2px;
+  }
+
+  /* 左邊箭頭（LINE -> CF） */
+  .arrow-left .arrow-line-inner {
+    background: linear-gradient(90deg, #06c755, #f6821f);
+  }
+
+  /* 右邊箭頭（CF -> PC） */
+  .arrow-right .arrow-line-inner {
+    background: linear-gradient(90deg, #f6821f, #3b82f6);
+  }
+
+  /* 箭頭頭部 */
+  .arrow-head {
+    position: absolute;
+    right: -2px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 14px solid;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+  }
+
+  .arrow-left .arrow-head {
+    border-left-color: #f6821f;
+  }
+
+  .arrow-right .arrow-head {
+    border-left-color: #3b82f6;
+  }
+
+  /* 回程箭頭 */
+  .arrow-return {
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: 2px;
+  }
+
+  .arrow-left .arrow-return {
+    background: linear-gradient(270deg, #06c755, #f6821f);
+  }
+
+  .arrow-right .arrow-return {
+    background: linear-gradient(270deg, #f6821f, #3b82f6);
+  }
+
+  .arrow-return-head {
+    position: absolute;
+    left: -2px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-right: 12px solid;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+  }
+
+  .arrow-left .arrow-return-head {
+    border-right-color: #06c755;
+  }
+
+  .arrow-right .arrow-return-head {
+    border-right-color: #f6821f;
+  }
+
+  .arrow-label-bottom {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 8px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* 加密標示 */
+  .encrypt-badge {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fef3c7;
+    border: 1.5px solid #f59e0b;
+    color: #92400e;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 12px;
+    border-radius: 12px;
+    white-space: nowrap;
+    z-index: 2;
+  }
+
+  /* ===== 底部說明 ===== */
+  .footer-note {
+    margin-top: 28px;
+    text-align: center;
+    padding: 16px 24px;
+    background: #fffbeb;
+    border: 1.5px solid #fde68a;
+    border-radius: 10px;
+  }
+
+  .footer-note p {
+    font-size: 15px;
+    color: #92400e;
+    line-height: 1.7;
+  }
+
+  .footer-note strong {
+    color: #b45309;
+  }
+
+  /* ===== 網址示意 ===== */
+  .url-example {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 24px;
+  }
+
+  .url-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+
+  .url-box-old {
+    background: #fef2f2;
+    border: 1.5px solid #fca5a5;
+    color: #991b1b;
+  }
+
+  .url-box-new {
+    background: #f0fdf4;
+    border: 1.5px solid #86efac;
+    color: #166534;
+  }
+
+  .url-box code {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+
+  .url-box-old code {
+    text-decoration: line-through;
+    color: #b91c1c;
+  }
+
+  .url-box-new code {
+    color: #15803d;
+  }
+
+  .url-label {
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  /* ===== 圖標 SVG ===== */
+  .icon-svg {
+    width: 56px;
+    height: 56px;
+  }
+
+  .icon-svg-sm {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 標題 -->
+  <div class="main-title">Cloudflare Tunnel 隧道概念圖</div>
+  <div class="main-subtitle">告別 ngrok，擁抱永久固定網址的安全隧道方案</div>
+
+  <!-- ===== 對比區塊 ===== -->
+  <div class="comparison-section">
+
+    <!-- 舊方式 ngrok -->
+    <div class="compare-card compare-old">
+      <div class="compare-header">
+        <span class="compare-badge">舊方式</span>
+        <span class="compare-title">ngrok</span>
+      </div>
+      <ul class="compare-list">
+        <li><strong>臨時網址</strong>，每次啟動都不同</li>
+        <li>重新開機後<strong>網址就失效</strong></li>
+        <li>免費版有<strong>連線數限制</strong>（40 次/分鐘）</li>
+        <li>每次都要<strong>重新設定</strong> LINE Webhook</li>
+        <li>網址格式：<code style="color:#b91c1c">xxxx-random.ngrok.io</code></li>
+      </ul>
+    </div>
+
+    <!-- VS -->
+    <div class="vs-divider">
+      <div class="vs-circle">VS</div>
+    </div>
+
+    <!-- 新方式 Cloudflare Tunnel -->
+    <div class="compare-card compare-new">
+      <div class="compare-header">
+        <span class="compare-badge">新方式</span>
+        <span class="compare-title">Cloudflare Tunnel</span>
+      </div>
+      <ul class="compare-list">
+        <li><strong>固定網址</strong>，永遠不會改變</li>
+        <li>重開機後<strong>自動重連</strong>，網址不變</li>
+        <li><strong>無連線限制</strong>，完全免費</li>
+        <li>LINE Webhook <strong>設定一次就好</strong></li>
+        <li>網址格式：<code style="color:#15803d">你的名稱.cfpages.dev</code></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- ===== 網址對比示意 ===== -->
+  <div class="url-example">
+    <div class="url-box url-box-old">
+      <span class="url-label">ngrok：</span>
+      <code>https://a1b2-random.ngrok.io/line/webhook</code>
+    </div>
+    <div class="url-box url-box-new">
+      <span class="url-label">Cloudflare：</span>
+      <code>https://lobster.example.com/line/webhook</code>
+    </div>
+  </div>
+
+  <!-- ===== 架構圖 ===== -->
+  <div style="margin-top: 40px;">
+    <div class="diagram-label">Cloudflare Tunnel 運作架構</div>
+    <div class="diagram-section">
+      <div class="diagram-flow">
+
+        <!-- 節點 1: LINE 伺服器 -->
+        <div class="node node-line">
+          <div class="node-icon-wrap">
+            <!-- LINE icon -->
+            <svg class="icon-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="8" y="8" width="48" height="48" rx="12" fill="white" fill-opacity="0.2"/>
+              <path d="M32 12C20.954 12 12 19.163 12 28c0 7.395 6.275 13.607 14.888 15.27.58.125 1.37.383 1.57.879.18.45.118 1.155.058 1.61l-.254 1.524c-.078.45-.358 1.76 1.542.96s10.24-6.03 13.97-10.326h.001C47.285 34.048 52 31.274 52 28c0-8.837-8.954-16-20-16z" fill="white"/>
+              <path d="M27.5 24.5h-1a.5.5 0 00-.5.5v6a.5.5 0 00.5.5h1a.5.5 0 00.5-.5v-6a.5.5 0 00-.5-.5z" fill="#06C755"/>
+              <path d="M37.5 24.5h-1a.5.5 0 00-.5.5v3.56l-2.87-3.83a.5.5 0 00-.4-.23h-1a.5.5 0 00-.5.5v6a.5.5 0 00.5.5h1a.5.5 0 00.5-.5v-3.56l2.87 3.83a.5.5 0 00.4.23h1a.5.5 0 00.5-.5v-6a.5.5 0 00-.5-.5z" fill="#06C755"/>
+              <path d="M24.5 30h-3v-5a.5.5 0 00-.5-.5h-1a.5.5 0 00-.5.5v6a.5.5 0 00.5.5h4.5a.5.5 0 00.5-.5v-1a.5.5 0 00-.5-.5z" fill="#06C755"/>
+              <path d="M44 30h-3v-1.5h3a.5.5 0 00.5-.5v-1a.5.5 0 00-.5-.5h-3V25h3a.5.5 0 00.5-.5v-1a.5.5 0 00-.5-.5h-4.5a.5.5 0 00-.5.5v7.5a.5.5 0 00.5.5H44a.5.5 0 00.5-.5v-1a.5.5 0 00-.5-.5z" fill="#06C755"/>
+            </svg>
+          </div>
+          <div class="node-label">LINE 伺服器</div>
+          <div class="node-desc">LINE Platform<br>接收使用者訊息</div>
+          <span class="node-tag">Webhook 發送端</span>
+        </div>
+
+        <!-- 箭頭 1: LINE -> Cloudflare -->
+        <div class="arrow-connector arrow-left">
+          <div class="arrow-label-top">HTTPS 請求</div>
+          <div class="arrow-line-wrap">
+            <div class="arrow-line">
+              <div class="arrow-line-inner"></div>
+              <div class="arrow-head"></div>
+              <div class="encrypt-badge">TLS 加密</div>
+            </div>
+          </div>
+          <div class="arrow-line-wrap" style="margin-top: 4px;">
+            <div class="arrow-line" style="position: relative;">
+              <div class="arrow-return">
+                <div class="arrow-return-head"></div>
+              </div>
+            </div>
+          </div>
+          <div class="arrow-label-bottom">回應訊息</div>
+        </div>
+
+        <!-- 節點 2: Cloudflare -->
+        <div class="node node-cf">
+          <div class="node-icon-wrap">
+            <!-- Cloud icon -->
+            <svg class="icon-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M44 42H22c-5.523 0-10-4.477-10-10 0-4.842 3.441-8.881 8.015-9.806C21.16 16.958 26.128 13 32 13c7.18 0 13.03 5.636 13.383 12.717C50.068 27.15 54 31.852 54 37.5 54 40 51.5 42 48 42h-4z" fill="white" fill-opacity="0.3"/>
+              <path d="M46 40H20c-4.418 0-8-3.582-8-8 0-3.866 2.754-7.088 6.405-7.822C19.42 19.36 25.222 16 32 16c6.5 0 12.077 3.888 14.286 9.385C50.192 26.59 53 30.16 53 34.5c0 2.5-2.5 5.5-7 5.5z" fill="white" fill-opacity="0.35"/>
+              <!-- Shield lock icon -->
+              <rect x="26" y="30" width="12" height="10" rx="2" fill="white" fill-opacity="0.9"/>
+              <path d="M30 30v-2a2 2 0 114 0v2" stroke="white" stroke-opacity="0.9" stroke-width="1.5" fill="none"/>
+              <circle cx="32" cy="35" r="1.5" fill="#f6821f"/>
+            </svg>
+          </div>
+          <div class="node-label">Cloudflare 全球網路</div>
+          <div class="node-desc">全球 300+ 節點<br>最近的資料中心處理</div>
+          <span class="node-tag">加密隧道</span>
+        </div>
+
+        <!-- 箭頭 2: Cloudflare -> PC -->
+        <div class="arrow-connector arrow-right">
+          <div class="arrow-label-top">加密隧道連線</div>
+          <div class="arrow-line-wrap">
+            <div class="arrow-line">
+              <div class="arrow-line-inner"></div>
+              <div class="arrow-head"></div>
+              <div class="encrypt-badge">cloudflared</div>
+            </div>
+          </div>
+          <div class="arrow-line-wrap" style="margin-top: 4px;">
+            <div class="arrow-line" style="position: relative;">
+              <div class="arrow-return">
+                <div class="arrow-return-head"></div>
+              </div>
+            </div>
+          </div>
+          <div class="arrow-label-bottom">回傳資料</div>
+        </div>
+
+        <!-- 節點 3: 你的電腦 -->
+        <div class="node node-pc">
+          <div class="node-icon-wrap">
+            <!-- Computer icon -->
+            <svg class="icon-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Monitor -->
+              <rect x="12" y="14" width="40" height="28" rx="3" fill="white" fill-opacity="0.3" stroke="white" stroke-width="2"/>
+              <rect x="15" y="17" width="34" height="20" rx="1" fill="white" fill-opacity="0.15"/>
+              <!-- Stand -->
+              <rect x="26" y="42" width="12" height="4" rx="1" fill="white" fill-opacity="0.4"/>
+              <rect x="22" y="46" width="20" height="3" rx="1.5" fill="white" fill-opacity="0.4"/>
+              <!-- Terminal cursor -->
+              <rect x="20" y="22" width="8" height="2" rx="1" fill="white" fill-opacity="0.7"/>
+              <rect x="20" y="26" width="14" height="2" rx="1" fill="white" fill-opacity="0.5"/>
+              <rect x="20" y="30" width="5" height="2" rx="1" fill="white" fill-opacity="0.7"/>
+            </svg>
+          </div>
+          <div class="node-label">你的電腦</div>
+          <div class="node-desc">Windows / Linux / Mac<br>執行 OpenClaw Gateway</div>
+          <span class="node-tag">OpenClaw Gateway :18789</span>
+        </div>
+
+      </div>
+
+      <!-- 底部說明 -->
+      <div class="footer-note">
+        <p>
+          <strong>cloudflared</strong> 是安裝在你電腦上的小程式，它會<strong>主動向外</strong>建立加密隧道連線到 Cloudflare，<br>
+          因此<strong>不需要開放任何防火牆埠號</strong>，也不需要固定 IP，安全又方便！
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

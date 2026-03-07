@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多重分身架構圖 - CH14</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: #ffffff;
+    font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 40px 0;
+  }
+
+  .diagram-container {
+    width: 1200px;
+    background: #ffffff;
+    padding: 48px 40px 40px;
+  }
+
+  /* ===== 標題區 ===== */
+  .main-title {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .main-title h1 {
+    font-size: 32px;
+    font-weight: 900;
+    color: #1a1a2e;
+    letter-spacing: 2px;
+  }
+
+  .subtitle {
+    text-align: center;
+    margin-bottom: 44px;
+  }
+
+  .subtitle .highlight-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 8px 28px;
+    border-radius: 24px;
+    letter-spacing: 3px;
+  }
+
+  /* ===== 電腦外框 ===== */
+  .computer-frame {
+    border: 3px solid #cbd5e1;
+    border-radius: 20px;
+    padding: 32px 28px 28px;
+    position: relative;
+    background: #f8fafc;
+    margin-bottom: 32px;
+  }
+
+  .computer-label {
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 6px 24px;
+    border-radius: 20px;
+    white-space: nowrap;
+    letter-spacing: 1px;
+  }
+
+  /* ===== 三條通道 ===== */
+  .channels {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .channel-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    height: 88px;
+  }
+
+  /* --- LINE Bot 卡片 --- */
+  .bot-card {
+    width: 220px;
+    min-width: 220px;
+    height: 80px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+    position: relative;
+    z-index: 2;
+  }
+
+  .bot-card .bot-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+  }
+
+  .bot-card .bot-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.4;
+  }
+
+  .bot-card .bot-name {
+    font-size: 17px;
+    font-weight: 800;
+  }
+
+  .bot-card .bot-type {
+    font-size: 12px;
+    opacity: 0.85;
+    font-weight: 600;
+  }
+
+  .bot-card .bot-badge {
+    position: absolute;
+    top: -8px;
+    right: -6px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 2px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+
+  /* 三條通道的不同顏色 */
+  .channel-a .bot-card { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+  .channel-a .bot-badge { color: #f5576c; }
+
+  .channel-b .bot-card { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+  .channel-b .bot-badge { color: #0ea5e9; }
+
+  .channel-c .bot-card { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+  .channel-c .bot-badge { color: #10b981; }
+
+  /* --- 連線箭頭 --- */
+  .connector {
+    flex: 1;
+    height: 6px;
+    position: relative;
+    margin: 0 -2px;
+    z-index: 1;
+  }
+
+  .connector::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 6px;
+    transform: translateY(-50%);
+    border-radius: 3px;
+  }
+
+  .connector .arrow-label {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+
+  .connector .arrow-head {
+    position: absolute;
+    right: -2px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+  }
+
+  .channel-a .connector::before { background: linear-gradient(90deg, #f5576c, #e74694); }
+  .channel-a .arrow-label { color: #e74694; }
+  .channel-a .arrow-head { border-left: 14px solid #e74694; }
+
+  .channel-b .connector::before { background: linear-gradient(90deg, #4facfe, #00c6fb); }
+  .channel-b .arrow-label { color: #0891b2; }
+  .channel-b .arrow-head { border-left: 14px solid #00c6fb; }
+
+  .channel-c .connector::before { background: linear-gradient(90deg, #43e97b, #38d9a9); }
+  .channel-c .arrow-label { color: #059669; }
+  .channel-c .arrow-head { border-left: 14px solid #38d9a9; }
+
+  /* --- Gateway 卡片 --- */
+  .gateway-card {
+    width: 200px;
+    min-width: 200px;
+    height: 80px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.10);
+    position: relative;
+    z-index: 2;
+    border: 3px solid;
+  }
+
+  .gateway-card .gw-name {
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .gateway-card .gw-port {
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 2px;
+    opacity: 0.75;
+  }
+
+  .gateway-card .gw-icon {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  }
+
+  .channel-a .gateway-card { background: #fff0f3; border-color: #f5576c; color: #be123c; }
+  .channel-b .gateway-card { background: #eff6ff; border-color: #4facfe; color: #0369a1; }
+  .channel-c .gateway-card { background: #ecfdf5; border-color: #43e97b; color: #047857; }
+
+  /* --- 第二段連線 --- */
+  .connector2 {
+    flex: 0.6;
+    height: 6px;
+    position: relative;
+    margin: 0 -2px;
+    z-index: 1;
+  }
+
+  .connector2::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 6px;
+    transform: translateY(-50%);
+    border-radius: 3px;
+  }
+
+  .connector2 .arrow-head {
+    position: absolute;
+    right: -2px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+  }
+
+  .channel-a .connector2::before { background: linear-gradient(90deg, #e74694, #c026d3); }
+  .channel-a .connector2 .arrow-head { border-left: 14px solid #c026d3; }
+
+  .channel-b .connector2::before { background: linear-gradient(90deg, #00c6fb, #3b82f6); }
+  .channel-b .connector2 .arrow-head { border-left: 14px solid #3b82f6; }
+
+  .channel-c .connector2::before { background: linear-gradient(90deg, #38d9a9, #06b6d4); }
+  .channel-c .connector2 .arrow-head { border-left: 14px solid #06b6d4; }
+
+  /* --- Workspace 卡片 --- */
+  .workspace-card {
+    width: 200px;
+    min-width: 200px;
+    height: 80px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.10);
+    position: relative;
+    z-index: 2;
+    border: 2px dashed;
+  }
+
+  .workspace-card .ws-name {
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  .workspace-card .ws-detail {
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 3px;
+    opacity: 0.7;
+  }
+
+  .workspace-card .ws-icon {
+    font-size: 18px;
+    margin-bottom: 2px;
+  }
+
+  .channel-a .workspace-card { background: #fdf2f8; border-color: #e74694; color: #9d174d; }
+  .channel-b .workspace-card { background: #f0f9ff; border-color: #0ea5e9; color: #075985; }
+  .channel-c .workspace-card { background: #f0fdf4; border-color: #10b981; color: #065f46; }
+
+  /* ===== 底部說明區 ===== */
+  .info-section {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .info-card {
+    flex: 1;
+    background: #f1f5f9;
+    border-radius: 12px;
+    padding: 18px 20px;
+    border-left: 5px solid;
+  }
+
+  .info-card h3 {
+    font-size: 15px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .info-card ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .info-card ul li {
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.7;
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .info-card ul li::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: #94a3b8;
+    font-weight: 700;
+  }
+
+  .info-card:nth-child(1) { border-left-color: #8b5cf6; }
+  .info-card:nth-child(1) h3 { color: #6d28d9; }
+
+  .info-card:nth-child(2) { border-left-color: #f59e0b; }
+  .info-card:nth-child(2) h3 { color: #b45309; }
+
+  .info-card:nth-child(3) { border-left-color: #10b981; }
+  .info-card:nth-child(3) h3 { color: #047857; }
+
+  /* ===== 底部標語 ===== */
+  .footer-note {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 12px;
+    color: #94a3b8;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<div class="diagram-container">
+
+  <!-- 標題 -->
+  <div class="main-title">
+    <h1>多重分身架構圖</h1>
+  </div>
+  <div class="subtitle">
+    <span class="highlight-badge">一台電腦，三個人格，三個 LINE Bot</span>
+  </div>
+
+  <!-- 電腦外框 -->
+  <div class="computer-frame">
+    <div class="computer-label">Your Computer (Windows / Linux / Mac)</div>
+
+    <div class="channels">
+
+      <!-- ===== 通道 A：小蝦（活潑版）===== -->
+      <div class="channel-row channel-a">
+        <div class="bot-card">
+          <span class="bot-icon">🦞</span>
+          <div class="bot-info">
+            <span class="bot-name">小蝦</span>
+            <span class="bot-type">LINE Bot - 活潑版</span>
+          </div>
+          <span class="bot-badge">LINE</span>
+        </div>
+
+        <div class="connector">
+          <span class="arrow-label">LINE Webhook</span>
+          <span class="arrow-head"></span>
+        </div>
+
+        <div class="gateway-card">
+          <span class="gw-icon">&#9881;</span>
+          <span class="gw-name">Gateway A</span>
+          <span class="gw-port">port 18789</span>
+        </div>
+
+        <div class="connector2">
+          <span class="arrow-head"></span>
+        </div>
+
+        <div class="workspace-card">
+          <span class="ws-icon">&#128193;</span>
+          <span class="ws-name">workspace-A/</span>
+          <span class="ws-detail">IDENTITY + SOUL + SKILLS</span>
+        </div>
+      </div>
+
+      <!-- ===== 通道 B：龍蝦秘書（專業版）===== -->
+      <div class="channel-row channel-b">
+        <div class="bot-card">
+          <span class="bot-icon">🦞</span>
+          <div class="bot-info">
+            <span class="bot-name">龍蝦秘書</span>
+            <span class="bot-type">LINE Bot - 專業版</span>
+          </div>
+          <span class="bot-badge">LINE</span>
+        </div>
+
+        <div class="connector">
+          <span class="arrow-label">LINE Webhook</span>
+          <span class="arrow-head"></span>
+        </div>
+
+        <div class="gateway-card">
+          <span class="gw-icon">&#9881;</span>
+          <span class="gw-name">Gateway B</span>
+          <span class="gw-port">port 18790</span>
+        </div>
+
+        <div class="connector2">
+          <span class="arrow-head"></span>
+        </div>
+
+        <div class="workspace-card">
+          <span class="ws-icon">&#128193;</span>
+          <span class="ws-name">workspace-B/</span>
+          <span class="ws-detail">IDENTITY + SOUL + SKILLS</span>
+        </div>
+      </div>
+
+      <!-- ===== 通道 C：小勳（女友版）===== -->
+      <div class="channel-row channel-c">
+        <div class="bot-card">
+          <span class="bot-icon">🦞</span>
+          <div class="bot-info">
+            <span class="bot-name">小勳</span>
+            <span class="bot-type">LINE Bot - 女友版</span>
+          </div>
+          <span class="bot-badge">LINE</span>
+        </div>
+
+        <div class="connector">
+          <span class="arrow-label">LINE Webhook</span>
+          <span class="arrow-head"></span>
+        </div>
+
+        <div class="gateway-card">
+          <span class="gw-icon">&#9881;</span>
+          <span class="gw-name">Gateway C</span>
+          <span class="gw-port">port 18791</span>
+        </div>
+
+        <div class="connector2">
+          <span class="arrow-head"></span>
+        </div>
+
+        <div class="workspace-card">
+          <span class="ws-icon">&#128193;</span>
+          <span class="ws-name">workspace-C/</span>
+          <span class="ws-detail">IDENTITY + SOUL + SKILLS</span>
+        </div>
+      </div>
+
+    </div><!-- /channels -->
+  </div><!-- /computer-frame -->
+
+  <!-- 底部說明 -->
+  <div class="info-section">
+    <div class="info-card">
+      <h3>&#128640; 獨立 Gateway</h3>
+      <ul>
+        <li>每個 Gateway 是獨立的服務程序</li>
+        <li>各自監聽不同的 port</li>
+        <li>互不干擾，可單獨重啟</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <h3>&#128100; 獨立人格</h3>
+      <ul>
+        <li>每個 workspace 有自己的 IDENTITY.md</li>
+        <li>不同的 SOUL.md 定義行為準則</li>
+        <li>完全不同的說話風格與個性</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <h3>&#128295; 獨立技能</h3>
+      <ul>
+        <li>每個 workspace 有自己的 skills/</li>
+        <li>可針對用途安裝不同技能包</li>
+        <li>各自的排程、記憶、工具互相獨立</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    OpenClaw Multi-Gateway Architecture &mdash; 阿亮老師 教學講義
+  </div>
+
+</div><!-- /diagram-container -->
+
+</body>
+</html>

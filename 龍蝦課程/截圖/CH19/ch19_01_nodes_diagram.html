@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nodes 多機協作架構圖</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #F6F8FB;
+    font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 30px 0;
+  }
+
+  .page {
+    width: 1200px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    overflow: hidden;
+  }
+
+  /* ── 標題列 ── */
+  .header {
+    background: linear-gradient(135deg, #1A3A5C 0%, #2D6A9F 100%);
+    color: #fff;
+    text-align: center;
+    padding: 28px 40px;
+  }
+  .header h1 {
+    font-size: 28px;
+    letter-spacing: 2px;
+  }
+  .header p {
+    margin-top: 6px;
+    font-size: 15px;
+    opacity: 0.85;
+  }
+
+  /* ── 架構圖區 ── */
+  .diagram-area {
+    position: relative;
+    width: 1200px;
+    height: 700px;
+    overflow: visible;
+  }
+
+  /* SVG 連線層 */
+  .diagram-area svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* 節點共用 */
+  .node {
+    position: absolute;
+    z-index: 2;
+    text-align: center;
+  }
+  .node-box {
+    border-radius: 16px;
+    padding: 18px 22px;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.10);
+    transition: transform 0.2s;
+  }
+  .node-icon {
+    font-size: 48px;
+    line-height: 1.1;
+  }
+  .node-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-top: 6px;
+  }
+  .node-subtitle {
+    font-size: 13px;
+    margin-top: 2px;
+    opacity: 0.7;
+  }
+  .node-caps {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+  }
+  .cap-tag {
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* ── Primary ── */
+  .primary { left: 450px; top: 260px; width: 300px; }
+  .primary .node-box {
+    background: linear-gradient(135deg, #E8F4FD 0%, #D0E8F7 100%);
+    border: 2.5px solid #2D6A9F;
+  }
+  .primary .node-title { color: #1A3A5C; }
+  .primary .cap-tag {
+    background: #2D6A9F;
+    color: #fff;
+  }
+
+  /* ── 通訊管道 ── */
+  .channels { left: 390px; top: 30px; width: 420px; }
+  .channels .node-box {
+    background: linear-gradient(135deg, #F0FAF0 0%, #DFF2DF 100%);
+    border: 2px solid #4CAF50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    padding: 16px 28px;
+  }
+  .channel-item {
+    text-align: center;
+  }
+  .channel-item .ch-icon { font-size: 36px; }
+  .channel-item .ch-label { font-size: 13px; font-weight: 600; color: #2E7D32; margin-top: 2px; }
+
+  /* ── Worker A ── */
+  .worker-a { left: 80px; top: 440px; width: 300px; }
+  .worker-a .node-box {
+    background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%);
+    border: 2px solid #F9A825;
+  }
+  .worker-a .node-title { color: #E65100; }
+  .worker-a .cap-tag {
+    background: #F9A825;
+    color: #fff;
+  }
+
+  /* ── Worker B ── */
+  .worker-b { left: 820px; top: 440px; width: 300px; }
+  .worker-b .node-box {
+    background: linear-gradient(135deg, #F3E5F5 0%, #E1BEE7 100%);
+    border: 2px solid #8E24AA;
+  }
+  .worker-b .node-title { color: #6A1B9A; }
+  .worker-b .cap-tag {
+    background: #8E24AA;
+    color: #fff;
+  }
+
+  /* ── 用戶節點 ── */
+  .user-node { left: 30px; top: 40px; width: 200px; }
+  .user-node .node-box {
+    background: #fff;
+    border: 2px solid #78909C;
+  }
+  .user-node .node-title { color: #37474F; }
+
+  /* ── 連線標籤 ── */
+  .line-label {
+    position: absolute;
+    z-index: 3;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #B0BEC5;
+    color: #546E7F;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  /* ── 資料流向說明 ── */
+  .flow-section {
+    padding: 24px 50px 8px;
+  }
+  .flow-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1A3A5C;
+    margin-bottom: 14px;
+  }
+  .flow-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    background: linear-gradient(90deg, #EEF5FB 0%, #F8F4FF 100%);
+    border-radius: 12px;
+    padding: 18px 24px;
+    border: 1px solid #D0DEE8;
+  }
+  .flow-step {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1A3A5C;
+    padding: 6px 14px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #B0C4D8;
+    white-space: nowrap;
+  }
+  .flow-arrow {
+    font-size: 20px;
+    color: #2D6A9F;
+    margin: 0 4px;
+    flex-shrink: 0;
+  }
+
+  /* ── 對比表格 ── */
+  .table-section {
+    padding: 28px 50px 36px;
+  }
+  .table-section h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1A3A5C;
+    margin-bottom: 14px;
+  }
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .compare-table thead th {
+    background: #1A3A5C;
+    color: #fff;
+    padding: 12px 18px;
+    text-align: left;
+    font-weight: 600;
+  }
+  .compare-table thead th:first-child { border-radius: 8px 0 0 0; }
+  .compare-table thead th:last-child  { border-radius: 0 8px 0 0; }
+  .compare-table tbody td {
+    padding: 11px 18px;
+    border-bottom: 1px solid #E0E7EE;
+    color: #333;
+    vertical-align: top;
+  }
+  .compare-table tbody tr:nth-child(even) td {
+    background: #F6F9FC;
+  }
+  .compare-table tbody tr:last-child td:first-child { border-radius: 0 0 0 8px; }
+  .compare-table tbody tr:last-child td:last-child  { border-radius: 0 0 8px 0; }
+  .tag-primary {
+    display: inline-block;
+    background: #2D6A9F;
+    color: #fff;
+    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  .tag-worker {
+    display: inline-block;
+    background: #F9A825;
+    color: #fff;
+    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 標題 -->
+  <div class="header">
+    <h1>Nodes 多機協作架構圖</h1>
+    <p>OpenClaw 分散式節點協作 — 一台雲端主控，多台本地 Worker 分工執行</p>
+  </div>
+
+  <!-- ===== 架構圖 ===== -->
+  <div class="diagram-area">
+
+    <!-- SVG 連線 -->
+    <svg viewBox="0 0 1200 700" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#2D6A9F"/>
+        </marker>
+        <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#4CAF50"/>
+        </marker>
+        <marker id="arrow-gray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#78909C"/>
+        </marker>
+      </defs>
+
+      <!-- 用戶 → 通訊管道 -->
+      <line x1="210" y1="82" x2="388" y2="82"
+            stroke="#78909C" stroke-width="2.2" stroke-dasharray="7,4"
+            marker-end="url(#arrow-gray)"/>
+
+      <!-- 通訊管道 → Primary -->
+      <line x1="600" y1="130" x2="600" y2="258"
+            stroke="#4CAF50" stroke-width="2.5" stroke-dasharray="7,4"
+            marker-end="url(#arrow-green)"/>
+
+      <!-- Primary → Worker A -->
+      <line x1="480" y1="400" x2="330" y2="440"
+            stroke="#F9A825" stroke-width="2.2" stroke-dasharray="7,4"
+            marker-end="url(#arrow-blue)"/>
+
+      <!-- Primary → Worker B -->
+      <line x1="720" y1="400" x2="870" y2="440"
+            stroke="#8E24AA" stroke-width="2.2" stroke-dasharray="7,4"
+            marker-end="url(#arrow-blue)"/>
+
+      <!-- Worker A → Primary（回報） -->
+      <line x1="350" y1="440" x2="500" y2="400"
+            stroke="#F9A825" stroke-width="1.5" stroke-dasharray="4,4"
+            marker-end="url(#arrow-blue)" opacity="0.5"/>
+
+      <!-- Worker B → Primary（回報） -->
+      <line x1="850" y1="440" x2="700" y2="400"
+            stroke="#8E24AA" stroke-width="1.5" stroke-dasharray="4,4"
+            marker-end="url(#arrow-blue)" opacity="0.5"/>
+
+      <!-- Worker A ↔ Worker B 虛線 -->
+      <line x1="380" y1="530" x2="820" y2="530"
+            stroke="#B0BEC5" stroke-width="1.5" stroke-dasharray="6,5"/>
+    </svg>
+
+    <!-- 連線標籤 -->
+    <div class="line-label" style="left:270px; top:60px;">用戶發送訊息</div>
+    <div class="line-label" style="left:622px; top:185px;">Webhook 轉發</div>
+    <div class="line-label" style="left:330px; top:408px;">指派任務</div>
+    <div class="line-label" style="left:760px; top:408px;">指派任務</div>
+    <div class="line-label" style="left:540px; top:515px;">加密通訊（P2P）</div>
+
+    <!-- 用戶節點 -->
+    <div class="node user-node">
+      <div class="node-box">
+        <div class="node-icon">👤</div>
+        <div class="node-title">使用者</div>
+        <div class="node-subtitle">透過 LINE 等 App 對話</div>
+      </div>
+    </div>
+
+    <!-- 通訊管道 -->
+    <div class="node channels">
+      <div class="node-box">
+        <div class="channel-item">
+          <div class="ch-icon">💬</div>
+          <div class="ch-label">LINE</div>
+        </div>
+        <div class="channel-item">
+          <div class="ch-icon">✈️</div>
+          <div class="ch-label">Telegram</div>
+        </div>
+        <div class="channel-item">
+          <div class="ch-icon">🌐</div>
+          <div class="ch-label">Web Chat</div>
+        </div>
+        <div class="channel-item">
+          <div class="ch-icon">📡</div>
+          <div class="ch-label">API</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Primary Node -->
+    <div class="node primary">
+      <div class="node-box">
+        <div class="node-icon">☁️</div>
+        <div class="node-title">Primary Node（主控節點）</div>
+        <div class="node-subtitle">雲端伺服器 ・ 24 小時在線</div>
+        <div class="node-caps">
+          <span class="cap-tag">接收訊息</span>
+          <span class="cap-tag">AI 推理</span>
+          <span class="cap-tag">任務分派</span>
+          <span class="cap-tag">結果彙整</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Worker A -->
+    <div class="node worker-a">
+      <div class="node-box">
+        <div class="node-icon">🖥️</div>
+        <div class="node-title">Worker A（家裡桌機）</div>
+        <div class="node-subtitle">桌上型電腦 ・ 高效能硬體</div>
+        <div class="node-caps">
+          <span class="cap-tag">螢幕截圖</span>
+          <span class="cap-tag">檔案操作</span>
+          <span class="cap-tag">列印文件</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Worker B -->
+    <div class="node worker-b">
+      <div class="node-box">
+        <div class="node-icon">💻</div>
+        <div class="node-title">Worker B（辦公室筆電）</div>
+        <div class="node-subtitle">筆記型電腦 ・ 隨身攜帶</div>
+        <div class="node-caps">
+          <span class="cap-tag">瀏覽器操作</span>
+          <span class="cap-tag">Office 文件</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /diagram-area -->
+
+  <!-- ===== 資料流向 ===== -->
+  <div class="flow-section">
+    <div class="flow-title">資料流向（完整循環）</div>
+    <div class="flow-bar">
+      <span class="flow-step">👤 用戶</span>
+      <span class="flow-arrow">&#10140;</span>
+      <span class="flow-step">💬 LINE</span>
+      <span class="flow-arrow">&#10140;</span>
+      <span class="flow-step">☁️ Primary</span>
+      <span class="flow-arrow">&#10140;</span>
+      <span class="flow-step">🔀 分派任務</span>
+      <span class="flow-arrow">&#10140;</span>
+      <span class="flow-step">🖥️💻 Worker</span>
+      <span class="flow-arrow">&#10140;</span>
+      <span class="flow-step">📋 執行回報</span>
+      <span class="flow-arrow">&#10140;</span>
+      <span class="flow-step">☁️ Primary</span>
+      <span class="flow-arrow">&#10140;</span>
+      <span class="flow-step">💬 LINE</span>
+      <span class="flow-arrow">&#10140;</span>
+      <span class="flow-step">👤 用戶</span>
+    </div>
+  </div>
+
+  <!-- ===== 對比表格 ===== -->
+  <div class="table-section">
+    <h2>Primary Node vs Worker Node 角色對比</h2>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th style="width:18%;">比較項目</th>
+          <th style="width:41%;"><span class="tag-primary">Primary Node</span> 主控節點</th>
+          <th style="width:41%;"><span class="tag-worker">Worker Node</span> 工作節點</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>部署位置</strong></td>
+          <td>雲端伺服器（如 GitHub Codespaces、VPS）</td>
+          <td>本地電腦（家裡桌機、辦公室筆電等）</td>
+        </tr>
+        <tr>
+          <td><strong>運行時間</strong></td>
+          <td>24 小時不間斷運行</td>
+          <td>需要時才開機，可隨時上下線</td>
+        </tr>
+        <tr>
+          <td><strong>主要職責</strong></td>
+          <td>接收用戶訊息、AI 推理、任務分派與結果彙整</td>
+          <td>執行 Primary 指派的具體任務（截圖、檔案、列印等）</td>
+        </tr>
+        <tr>
+          <td><strong>通訊管道</strong></td>
+          <td>直接對接 LINE / Telegram 等 Webhook</td>
+          <td>僅與 Primary 通訊，不直接面對用戶</td>
+        </tr>
+        <tr>
+          <td><strong>硬體需求</strong></td>
+          <td>低（僅需網路和基本運算）</td>
+          <td>依任務而定（可利用本地 GPU、印表機等資源）</td>
+        </tr>
+        <tr>
+          <td><strong>安全性</strong></td>
+          <td>持有 API 金鑰、管道憑證</td>
+          <td>僅持有與 Primary 通訊的加密金鑰</td>
+        </tr>
+        <tr>
+          <td><strong>數量</strong></td>
+          <td>通常 1 台</td>
+          <td>可多台，各自負責不同能力</td>
+        </tr>
+        <tr>
+          <td><strong>離線影響</strong></td>
+          <td>全系統停擺，用戶無法互動</td>
+          <td>僅該 Worker 負責的任務暫停，其餘正常</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>

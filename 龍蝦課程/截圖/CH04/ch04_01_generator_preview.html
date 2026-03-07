@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>ch04_01_generator_preview</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    font-family: 'Microsoft JhengHei', 'Segoe UI', sans-serif;
+  }
+
+  .browser-window {
+    width: 1200px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.12);
+    background: #ffffff;
+  }
+
+  /* -- 瀏覽器標題列 -- */
+  .browser-bar {
+    background: #f3f4f6;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    gap: 10px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .browser-dots {
+    display: flex;
+    gap: 7px;
+  }
+  .browser-dots span {
+    width: 12px; height: 12px; border-radius: 50%;
+  }
+  .dot-r { background: #ef4444; }
+  .dot-y { background: #f59e0b; }
+  .dot-g { background: #22c55e; }
+  .url-bar {
+    flex: 1;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 20px;
+    padding: 5px 16px;
+    font-size: 13px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .url-bar .lock-icon { color: #22c55e; font-size: 12px; }
+
+  /* -- 頁面標題 -- */
+  .page-header {
+    background: linear-gradient(135deg, #ff6b35 0%, #e63946 50%, #d62828 100%);
+    padding: 28px 40px;
+    text-align: center;
+  }
+  .page-header h1 {
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  .page-header p {
+    color: rgba(255,255,255,0.85);
+    font-size: 14px;
+    margin-top: 6px;
+  }
+
+  /* -- 主要內容區 -- */
+  .main-content {
+    display: flex;
+    gap: 28px;
+    padding: 28px 32px;
+    background: #fafbfc;
+  }
+
+  /* -- 左側表單 -- */
+  .form-panel {
+    flex: 1;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px 28px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border: 1px solid #e5e7eb;
+  }
+  .form-panel h2 {
+    font-size: 18px;
+    color: #1f2937;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ff6b35;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .form-group {
+    margin-bottom: 18px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 14px;
+    color: #374151;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .form-group .required { color: #ef4444; }
+  .form-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Microsoft JhengHei', sans-serif;
+    color: #1f2937;
+    background: #f9fafb;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus {
+    border-color: #ff6b35;
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.12);
+  }
+  .form-input.filled {
+    border-color: #ff6b35;
+    background: #fff;
+  }
+  .form-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Microsoft JhengHei', sans-serif;
+    color: #1f2937;
+    background: #f9fafb;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+  }
+  .form-select.filled {
+    border-color: #ff6b35;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+  }
+  .tag-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .tag {
+    padding: 5px 14px;
+    border-radius: 16px;
+    font-size: 13px;
+    border: 1.5px solid #d1d5db;
+    background: #f9fafb;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tag.selected {
+    background: #ff6b35;
+    color: #fff;
+    border-color: #ff6b35;
+  }
+
+  /* -- 右側預覽卡 -- */
+  .preview-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .preview-panel h2 {
+    font-size: 18px;
+    color: #1f2937;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .preview-badge {
+    font-size: 11px;
+    background: #dcfce7;
+    color: #16a34a;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+
+  .profile-card {
+    background: linear-gradient(145deg, #fff5f0 0%, #ffffff 40%, #fef3f2 100%);
+    border-radius: 16px;
+    padding: 0;
+    box-shadow: 0 4px 16px rgba(230, 57, 70, 0.1), 0 1px 4px rgba(0,0,0,0.05);
+    border: 1px solid #fecaca;
+    overflow: hidden;
+    flex: 1;
+  }
+  .card-header {
+    background: linear-gradient(135deg, #e63946, #ff6b35);
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .avatar {
+    width: 64px;
+    height: 64px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    border: 3px solid rgba(255,255,255,0.4);
+  }
+  .card-header-info h3 {
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .card-header-info .subtitle {
+    color: rgba(255,255,255,0.85);
+    font-size: 13px;
+    margin-top: 2px;
+  }
+  .card-body {
+    padding: 22px 28px;
+  }
+  .card-field {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 14px;
+    gap: 10px;
+  }
+  .card-field-icon {
+    font-size: 18px;
+    margin-top: 1px;
+  }
+  .card-field-label {
+    font-size: 12px;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .card-field-value {
+    font-size: 15px;
+    color: #1f2937;
+    font-weight: 500;
+  }
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .card-tag {
+    background: #fef3f2;
+    color: #e63946;
+    border: 1px solid #fecaca;
+    padding: 3px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .card-divider {
+    border: none;
+    border-top: 1px dashed #fecaca;
+    margin: 16px 0;
+  }
+  .card-quote {
+    background: #fef9f6;
+    border-left: 3px solid #ff6b35;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin-top: 12px;
+  }
+  .card-quote p {
+    color: #92400e;
+    font-size: 14px;
+    font-style: italic;
+  }
+
+  /* -- 底部按鈕區 -- */
+  .bottom-actions {
+    display: flex;
+    gap: 12px;
+    padding: 20px 32px 28px;
+    justify-content: center;
+    background: #fafbfc;
+  }
+  .btn {
+    padding: 12px 32px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Microsoft JhengHei', sans-serif;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #e63946, #ff6b35);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+  }
+  .btn-secondary {
+    background: #ffffff;
+    color: #374151;
+    border: 1.5px solid #d1d5db;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .btn-icon {
+    font-size: 18px;
+  }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .browser-window { box-shadow: 1px 1px 4px rgba(0,0,0,0.15); }
+  }
+</style>
+</head>
+<body>
+<div class="browser-window">
+  <!-- 瀏覽器列 -->
+  <div class="browser-bar">
+    <div class="browser-dots">
+      <span class="dot-r"></span>
+      <span class="dot-y"></span>
+      <span class="dot-g"></span>
+    </div>
+    <div class="url-bar">
+      <span class="lock-icon">&#x1F512;</span>
+      lobster-workspace-generator.vercel.app
+    </div>
+  </div>
+
+  <!-- 頁面標題 -->
+  <div class="page-header">
+    <h1>&#x1F99E; &#x9F8D;&#x8766; AI &#x4EBA;&#x683C;&#x6A94;&#x6848;&#x7522;&#x751F;&#x5668;</h1>
+    <p>&#x5FEB;&#x901F;&#x5EFA;&#x7ACB;&#x5C6C;&#x65BC;&#x4F60;&#x7684; AI &#x52A9;&#x7406;&#x4EBA;&#x683C;&#x6A94;&#x6848;</p>
+  </div>
+
+  <!-- 主要內容 -->
+  <div class="main-content">
+    <!-- 左側：表單 -->
+    <div class="form-panel">
+      <h2>&#x270F;&#xFE0F; 基本設定</h2>
+
+      <div class="form-group">
+        <label>角色名稱 <span class="required">*</span></label>
+        <input class="form-input filled" type="text" value="小龍蝦" readonly>
+      </div>
+
+      <div class="form-group">
+        <label>個性風格 <span class="required">*</span></label>
+        <select class="form-select filled">
+          <option selected>活潑幽默</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>說話語氣</label>
+        <select class="form-select filled">
+          <option selected>親切口語化</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>專長領域（可複選）</label>
+        <div class="tag-group">
+          <span class="tag selected">&#x1F4DA; 教育教學</span>
+          <span class="tag selected">&#x2600;&#xFE0F; 天氣查詢</span>
+          <span class="tag">&#x1F4C5; 行程管理</span>
+          <span class="tag selected">&#x1F4AC; 日常對話</span>
+          <span class="tag">&#x1F4DD; 待辦事項</span>
+          <span class="tag">&#x1F4CA; 資料分析</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右側：即時預覽 -->
+    <div class="preview-panel">
+      <h2>&#x1F440; 即時預覽 <span class="preview-badge">LIVE</span></h2>
+
+      <div class="profile-card">
+        <div class="card-header">
+          <div class="avatar">&#x1F99E;</div>
+          <div class="card-header-info">
+            <h3>小龍蝦</h3>
+            <div class="subtitle">AI 智慧助理 &middot; OpenClaw</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-field">
+            <span class="card-field-icon">&#x1F3AD;</span>
+            <div>
+              <div class="card-field-label">個性風格</div>
+              <div class="card-field-value">活潑幽默</div>
+            </div>
+          </div>
+          <div class="card-field">
+            <span class="card-field-icon">&#x1F4AC;</span>
+            <div>
+              <div class="card-field-label">說話語氣</div>
+              <div class="card-field-value">親切口語化</div>
+            </div>
+          </div>
+          <div class="card-field">
+            <span class="card-field-icon">&#x1F3AF;</span>
+            <div>
+              <div class="card-field-label">專長領域</div>
+              <div class="card-tags">
+                <span class="card-tag">&#x1F4DA; 教育教學</span>
+                <span class="card-tag">&#x2600;&#xFE0F; 天氣查詢</span>
+                <span class="card-tag">&#x1F4AC; 日常對話</span>
+              </div>
+            </div>
+          </div>
+          <hr class="card-divider">
+          <div class="card-quote">
+            <p>「嗨！我是小龍蝦，你的 AI 小助手～有什麼需要幫忙的嗎？」</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部按鈕 -->
+  <div class="bottom-actions">
+    <button class="btn btn-primary">
+      <span class="btn-icon">&#x1F4E5;</span> 下載 ZIP
+    </button>
+    <button class="btn btn-secondary">
+      <span class="btn-icon">&#x1F4CB;</span> 複製到剪貼板
+    </button>
+  </div>
+</div>
+</body>
+</html>

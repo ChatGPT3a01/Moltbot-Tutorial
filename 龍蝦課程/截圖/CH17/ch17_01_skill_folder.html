@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>ch17_01_skill_folder</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+  }
+
+  .explorer-window {
+    width: 800px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.12);
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+  }
+
+  /* -- Windows 11 標題列 -- */
+  .win-titlebar {
+    background: #f3f3f3;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 0 12px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .win-titlebar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .win-titlebar-icon {
+    font-size: 14px;
+  }
+  .win-titlebar-text {
+    font-size: 12px;
+    color: #1a1a1a;
+  }
+  .win-controls {
+    display: flex;
+    height: 32px;
+  }
+  .win-ctrl-btn {
+    width: 46px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #1a1a1a;
+    cursor: default;
+  }
+  .win-ctrl-btn:hover { background: #e5e5e5; }
+  .win-ctrl-btn.close:hover { background: #e81123; color: #fff; }
+
+  /* -- 工具列 -- */
+  .win-toolbar {
+    background: #fbfbfb;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-bottom: 1px solid #e8e8e8;
+    font-size: 12px;
+    color: #616161;
+  }
+  .toolbar-btn {
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: default;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .toolbar-btn:hover { background: #e8e8e8; }
+  .toolbar-sep {
+    width: 1px;
+    height: 20px;
+    background: #e0e0e0;
+    margin: 0 4px;
+  }
+
+  /* -- 路徑列 -- */
+  .win-pathbar {
+    background: #ffffff;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    border-bottom: 1px solid #e8e8e8;
+  }
+  .path-segment {
+    font-size: 13px;
+    color: #1a1a1a;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: default;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .path-segment:hover { background: #f0f0f0; }
+  .path-arrow {
+    font-size: 10px;
+    color: #999;
+  }
+  .path-icon { font-size: 14px; }
+
+  /* -- 檔案列表 -- */
+  .file-list {
+    padding: 8px 0;
+    min-height: 300px;
+  }
+
+  .file-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 20px 5px 20px;
+    cursor: default;
+    font-size: 14px;
+    line-height: 1.6;
+    user-select: none;
+  }
+  .file-item:hover { background: #f5f5f5; }
+  .file-item.indent-0 { padding-left: 20px; }
+  .file-item.indent-1 { padding-left: 44px; }
+  .file-item.indent-2 { padding-left: 68px; }
+  .file-item.indent-3 { padding-left: 92px; }
+
+  .file-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    width: 22px;
+    text-align: center;
+  }
+  .file-icon.folder { color: #f59e0b; }
+  .file-icon.md { color: #3b82f6; }
+  .file-icon.js { color: #f59e0b; }
+
+  .file-name {
+    color: #1a1a1a;
+    flex-shrink: 0;
+  }
+  .file-annotation {
+    color: #9ca3af;
+    font-size: 13px;
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .file-annotation .arrow {
+    color: #d1d5db;
+    font-size: 12px;
+  }
+
+  /* -- 展開線 -- */
+  .tree-line {
+    display: inline-block;
+    width: 1px;
+    height: 100%;
+    background: #e5e7eb;
+  }
+
+  /* -- 狀態列 -- */
+  .win-statusbar {
+    background: #f3f3f3;
+    padding: 4px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #e0e0e0;
+    font-size: 12px;
+    color: #666;
+  }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .explorer-window { box-shadow: 1px 1px 4px rgba(0,0,0,0.15); }
+  }
+</style>
+</head>
+<body>
+<div class="explorer-window">
+  <!-- 標題列 -->
+  <div class="win-titlebar">
+    <div class="win-titlebar-left">
+      <span class="win-titlebar-icon">&#x1F4C1;</span>
+      <span class="win-titlebar-text">skills</span>
+    </div>
+    <div class="win-controls">
+      <div class="win-ctrl-btn">&#x2500;</div>
+      <div class="win-ctrl-btn">&#x25A1;</div>
+      <div class="win-ctrl-btn close">&#x2715;</div>
+    </div>
+  </div>
+
+  <!-- 工具列 -->
+  <div class="win-toolbar">
+    <span class="toolbar-btn">&#x2190;</span>
+    <span class="toolbar-btn">&#x2192;</span>
+    <span class="toolbar-btn">&#x2191;</span>
+    <span class="toolbar-sep"></span>
+    <span class="toolbar-btn">&#x2702; 剪下</span>
+    <span class="toolbar-btn">&#x1F4CB; 貼上</span>
+    <span class="toolbar-btn">&#x1F5D1;&#xFE0F; 刪除</span>
+    <span class="toolbar-sep"></span>
+    <span class="toolbar-btn">&#x1F504; 重新整理</span>
+  </div>
+
+  <!-- 路徑列 -->
+  <div class="win-pathbar">
+    <span class="path-segment"><span class="path-icon">&#x1F4BB;</span> 此電腦</span>
+    <span class="path-arrow">&#x276F;</span>
+    <span class="path-segment">openclaw</span>
+    <span class="path-arrow">&#x276F;</span>
+    <span class="path-segment">workspace</span>
+    <span class="path-arrow">&#x276F;</span>
+    <span class="path-segment" style="font-weight:600;">skills</span>
+  </div>
+
+  <!-- 檔案列表 -->
+  <div class="file-list">
+    <!-- skills/ 根目錄 -->
+    <div class="file-item indent-0">
+      <span class="file-icon folder">&#x1F4C1;</span>
+      <span class="file-name" style="font-weight:600;">skills/</span>
+    </div>
+
+    <!-- attendance/ -->
+    <div class="file-item indent-1">
+      <span class="file-icon folder">&#x1F4C1;</span>
+      <span class="file-name">attendance/</span>
+    </div>
+    <div class="file-item indent-2">
+      <span class="file-icon md">&#x1F4C4;</span>
+      <span class="file-name">SKILL.md</span>
+      <span class="file-annotation"><span class="arrow">&#x2190;</span> 技能定義檔（出缺席管理）</span>
+    </div>
+
+    <!-- weather/ -->
+    <div class="file-item indent-1">
+      <span class="file-icon folder">&#x1F4C1;</span>
+      <span class="file-name">weather/</span>
+    </div>
+    <div class="file-item indent-2">
+      <span class="file-icon md">&#x1F4C4;</span>
+      <span class="file-name">SKILL.md</span>
+      <span class="file-annotation"><span class="arrow">&#x2190;</span> 技能定義檔（天氣查詢）</span>
+    </div>
+    <div class="file-item indent-2">
+      <span class="file-icon folder">&#x1F4C1;</span>
+      <span class="file-name">scripts/</span>
+    </div>
+    <div class="file-item indent-3">
+      <span class="file-icon js">&#x1F4C4;</span>
+      <span class="file-name">fetch.js</span>
+      <span class="file-annotation"><span class="arrow">&#x2190;</span> API 呼叫腳本</span>
+    </div>
+
+    <!-- todo/ -->
+    <div class="file-item indent-1">
+      <span class="file-icon folder">&#x1F4C1;</span>
+      <span class="file-name">todo/</span>
+    </div>
+    <div class="file-item indent-2">
+      <span class="file-icon md">&#x1F4C4;</span>
+      <span class="file-name">SKILL.md</span>
+      <span class="file-annotation"><span class="arrow">&#x2190;</span> 技能定義檔（待辦事項）</span>
+    </div>
+  </div>
+
+  <!-- 狀態列 -->
+  <div class="win-statusbar">
+    <span>3 個資料夾, 4 個檔案</span>
+    <span>&#x1F4C2; 本機磁碟 (C:)</span>
+  </div>
+</div>
+</body>
+</html>

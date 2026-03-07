@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CH21 - 事件驅動 vs 排程對比圖</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #ffffff;
+            font-family: 'Microsoft JhengHei', 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 40px 0;
+        }
+        .container {
+            width: 1200px;
+            background: #ffffff;
+            padding: 50px;
+        }
+        .title {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .title h1 {
+            font-size: 36px;
+            color: #1a1a2e;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 50px;
+        }
+
+        /* === 左右對比區 === */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 80px 1fr;
+            gap: 0;
+            align-items: stretch;
+            margin-bottom: 40px;
+        }
+
+        /* 左邊：排程 */
+        .panel {
+            border-radius: 20px;
+            padding: 36px 32px;
+            border: 3px solid;
+        }
+        .panel-schedule {
+            background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
+            border-color: #f59e0b;
+        }
+        .panel-event {
+            background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+            border-color: #3b82f6;
+        }
+
+        .panel-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .panel-icon {
+            font-size: 72px;
+            display: block;
+            margin-bottom: 12px;
+        }
+        .panel-title {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .panel-schedule .panel-title { color: #b45309; }
+        .panel-event .panel-title { color: #1d4ed8; }
+
+        .panel-subtitle {
+            font-size: 15px;
+            color: #888;
+        }
+
+        /* 比喻說明 */
+        .metaphor {
+            text-align: center;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .panel-schedule .metaphor {
+            background: #fff8ee;
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+        .panel-event .metaphor {
+            background: #f0f7ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+        }
+        .metaphor-icon {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        /* 特徵列表 */
+        .features {
+            margin-bottom: 24px;
+        }
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+        .feature-check {
+            font-size: 18px;
+            margin-top: 2px;
+        }
+        .panel-schedule .feature-check { color: #f59e0b; }
+        .panel-event .feature-check { color: #3b82f6; }
+        .feature-text {
+            font-size: 15px;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        /* 範例卡片 */
+        .examples-title {
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid;
+        }
+        .panel-schedule .examples-title { color: #b45309; border-color: #fde68a; }
+        .panel-event .examples-title { color: #1d4ed8; border-color: #bfdbfe; }
+
+        .example-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+        .panel-schedule .example-card {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+        }
+        .panel-event .example-card {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+        }
+        .example-emoji {
+            font-size: 30px;
+            flex-shrink: 0;
+        }
+        .example-info {
+            flex: 1;
+        }
+        .example-name {
+            font-size: 15px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 2px;
+        }
+        .example-desc {
+            font-size: 13px;
+            color: #777;
+        }
+
+        /* 中間 VS */
+        .vs-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .vs-badge {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(102,126,234,0.4);
+        }
+
+        /* === 底部整合說明 === */
+        .integration-section {
+            background: #f8f9fc;
+            border-radius: 20px;
+            padding: 36px 40px;
+            border: 1px solid #e8eaf0;
+        }
+        .integration-section h2 {
+            font-size: 22px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .integration-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+        .int-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 24px;
+            text-align: center;
+            border: 2px solid #e8eaf0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        }
+        .int-card-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+        .int-card-title {
+            font-size: 17px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .int-card-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .int-card-highlight {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .highlight-schedule {
+            background: #fff7ed;
+            color: #b45309;
+            border: 1px solid #fde68a;
+        }
+        .highlight-event {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+        .highlight-both {
+            background: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 標題 -->
+        <div class="title">
+            <h1>&#9200; 排程 vs &#128276; 事件驅動</h1>
+        </div>
+        <div class="subtitle">兩種自動化觸發方式，各有所長</div>
+
+        <!-- 左右對比 -->
+        <div class="comparison">
+
+            <!-- 左邊：排程（鬧鐘） -->
+            <div class="panel panel-schedule">
+                <div class="panel-header">
+                    <span class="panel-icon">&#9200;</span>
+                    <div class="panel-title">排程觸發</div>
+                    <div class="panel-subtitle">Schedule-based / Cron</div>
+                </div>
+
+                <div class="metaphor">
+                    <span class="metaphor-icon">&#128276;</span>
+                    <strong>就像「鬧鐘」</strong><br>
+                    不管你醒不醒，時間到了就會響！<br>
+                    固定時間、準時執行，風雨無阻。
+                </div>
+
+                <div class="features">
+                    <div class="feature-item">
+                        <span class="feature-check">&#10004;</span>
+                        <span class="feature-text">固定時間自動觸發</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-check">&#10004;</span>
+                        <span class="feature-text">用 Cron 表達式設定頻率</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-check">&#10004;</span>
+                        <span class="feature-text">適合定期重複的例行工作</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-check">&#10004;</span>
+                        <span class="feature-text">不需要外部訊號，自己倒數計時</span>
+                    </div>
+                </div>
+
+                <div class="examples-title">&#128204; 實際範例</div>
+
+                <div class="example-card">
+                    <span class="example-emoji">&#127749;</span>
+                    <div class="example-info">
+                        <div class="example-name">每天 06:30 早安報告</div>
+                        <div class="example-desc">天氣 + 行程 + 新聞，起床就看到</div>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <span class="example-emoji">&#128202;</span>
+                    <div class="example-info">
+                        <div class="example-name">每週一到五 16:30 收盤提醒</div>
+                        <div class="example-desc">台股收盤後自動推送漲跌摘要</div>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <span class="example-emoji">&#127769;</span>
+                    <div class="example-info">
+                        <div class="example-name">每天 22:00 晚安報告</div>
+                        <div class="example-desc">明日行程預告，安心入睡</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 中間 VS -->
+            <div class="vs-divider">
+                <div class="vs-badge">VS</div>
+            </div>
+
+            <!-- 右邊：事件驅動（門鈴） -->
+            <div class="panel panel-event">
+                <div class="panel-header">
+                    <span class="panel-icon">&#128682;</span>
+                    <div class="panel-title">事件驅動</div>
+                    <div class="panel-subtitle">Event-driven / Trigger</div>
+                </div>
+
+                <div class="metaphor">
+                    <span class="metaphor-icon">&#128422;</span>
+                    <strong>就像「門鈴」</strong><br>
+                    有人按門鈴才會響！<br>
+                    有事件發生時才觸發，沒事就安靜等待。
+                </div>
+
+                <div class="features">
+                    <div class="feature-item">
+                        <span class="feature-check">&#10004;</span>
+                        <span class="feature-text">有事件發生時才觸發</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-check">&#10004;</span>
+                        <span class="feature-text">即時回應，不浪費資源</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-check">&#10004;</span>
+                        <span class="feature-text">適合不可預期的突發狀況</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-check">&#10004;</span>
+                        <span class="feature-text">需要外部訊號（Webhook / API）</span>
+                    </div>
+                </div>
+
+                <div class="examples-title">&#128204; 實際範例</div>
+
+                <div class="example-card">
+                    <span class="example-emoji">&#128231;</span>
+                    <div class="example-info">
+                        <div class="example-name">收到重要 Email 時通知</div>
+                        <div class="example-desc">偵測到特定寄件者，立刻推送到 LINE</div>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <span class="example-emoji">&#9888;&#65039;</span>
+                    <div class="example-info">
+                        <div class="example-name">天氣警報即時通知</div>
+                        <div class="example-desc">氣象局發布警報，龍蝦立刻告訴你</div>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <span class="example-emoji">&#128172;</span>
+                    <div class="example-info">
+                        <div class="example-name">LINE 收到訊息即時回覆</div>
+                        <div class="example-desc">有人傳訊息，龍蝦馬上 AI 回覆</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部：龍蝦兩者兼具 -->
+        <div class="integration-section">
+            <h2>&#129438; 龍蝦的強大之處：兩者兼具！</h2>
+            <div class="integration-cards">
+                <div class="int-card">
+                    <div class="int-card-icon">&#9200;</div>
+                    <div class="int-card-title">HEARTBEAT.md</div>
+                    <div class="int-card-desc">
+                        設定排程任務<br>
+                        用 Cron 表達式定義<br>
+                        固定時間自動執行
+                    </div>
+                    <span class="int-card-highlight highlight-schedule">排程觸發</span>
+                </div>
+                <div class="int-card">
+                    <div class="int-card-icon">&#128172;</div>
+                    <div class="int-card-title">LINE Webhook</div>
+                    <div class="int-card-desc">
+                        使用者傳訊息時觸發<br>
+                        即時對話 AI 回應<br>
+                        不需預先排程
+                    </div>
+                    <span class="int-card-highlight highlight-event">事件驅動</span>
+                </div>
+                <div class="int-card">
+                    <div class="int-card-icon">&#128170;</div>
+                    <div class="int-card-title">雙模式協作</div>
+                    <div class="int-card-desc">
+                        排程負責「例行播報」<br>
+                        事件負責「即時互動」<br>
+                        兩者完美搭配
+                    </div>
+                    <span class="int-card-highlight highlight-both">最佳組合</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>Browser Sandbox 概念圖</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    padding: 30px 0;
+  }
+  .container {
+    width: 1200px;
+    background: #fff;
+    padding: 40px 50px 50px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 32px;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 45px;
+  }
+  /* 雙欄對比 */
+  .compare-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 0;
+    align-items: stretch;
+  }
+  .vs-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .vs-badge {
+    background: #1a1a2e;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .mode-card {
+    border-radius: 20px;
+    padding: 32px 28px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .mode-card.sandbox {
+    background: linear-gradient(135deg, #e8f8f5, #d1f2eb);
+    border: 3px solid #1abc9c;
+  }
+  .mode-card.direct {
+    background: linear-gradient(135deg, #fef5e7, #fdebd0);
+    border: 3px solid #e67e22;
+  }
+  .mode-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .mode-icon {
+    font-size: 40px;
+  }
+  .mode-label {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 4px 16px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .sandbox .mode-label {
+    background: #1abc9c;
+    color: #fff;
+  }
+  .direct .mode-label {
+    background: #e67e22;
+    color: #fff;
+  }
+  .mode-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-top: 6px;
+  }
+  .sandbox .mode-title { color: #0e6655; }
+  .direct .mode-title { color: #935116; }
+  .mode-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  /* 流程圖 */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 24px;
+  }
+  .flow-node {
+    width: 100%;
+    max-width: 340px;
+    padding: 16px 20px;
+    border-radius: 14px;
+    text-align: center;
+    position: relative;
+  }
+  .flow-node .fn-icon { font-size: 32px; display: block; margin-bottom: 4px; }
+  .flow-node .fn-title { font-size: 17px; font-weight: 700; }
+  .flow-node .fn-desc { font-size: 13px; margin-top: 2px; opacity: 0.8; }
+
+  .node-lobster {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: #fff;
+  }
+  .node-sandbox-browser {
+    background: #fff;
+    border: 3px dashed #1abc9c;
+    color: #0e6655;
+    position: relative;
+  }
+  .node-sandbox-browser::before {
+    content: '&#x1F6E1;';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 24px;
+  }
+  .node-peekaboo {
+    background: #fff;
+    border: 3px solid #e67e22;
+    color: #935116;
+  }
+  .node-real-browser {
+    background: #fff;
+    border: 3px solid #e67e22;
+    color: #935116;
+  }
+  .node-website {
+    background: linear-gradient(135deg, #74b9ff, #0984e3);
+    color: #fff;
+  }
+
+  /* 箭頭 */
+  .flow-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 36px;
+    justify-content: center;
+    position: relative;
+  }
+  .flow-arrow .arrow-shaft {
+    width: 3px;
+    height: 20px;
+    background: #888;
+  }
+  .flow-arrow .arrow-head {
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 10px solid #888;
+  }
+  .flow-arrow .arrow-label {
+    position: absolute;
+    right: -80px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: #999;
+    white-space: nowrap;
+  }
+  .sandbox .flow-arrow .arrow-shaft { background: #1abc9c; }
+  .sandbox .flow-arrow .arrow-head { border-top-color: #1abc9c; }
+  .direct .flow-arrow .arrow-shaft { background: #e67e22; }
+  .direct .flow-arrow .arrow-head { border-top-color: #e67e22; }
+
+  /* 優缺點 */
+  .pros-cons {
+    border-top: 2px solid rgba(0,0,0,0.08);
+    padding-top: 18px;
+  }
+  .pc-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .pc-list {
+    list-style: none;
+    padding: 0;
+  }
+  .pc-list li {
+    font-size: 14px;
+    line-height: 1.8;
+    padding-left: 24px;
+    position: relative;
+    color: #333;
+  }
+  .pc-list li::before {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 14px;
+  }
+  .pc-list li.pro::before { content: '\2705'; }
+  .pc-list li.con::before { content: '\26A0\FE0F'; }
+
+  /* 底部總結 */
+  .summary-bar {
+    margin-top: 35px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .summary-item {
+    padding: 20px 24px;
+    border-radius: 14px;
+    text-align: center;
+  }
+  .summary-item.s-sandbox {
+    background: #d5f5e3;
+    border: 2px solid #1abc9c;
+  }
+  .summary-item.s-direct {
+    background: #fdebd0;
+    border: 2px solid #e67e22;
+  }
+  .summary-item .si-icon { font-size: 28px; }
+  .summary-item .si-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 6px 0 4px;
+  }
+  .summary-item .si-desc {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+  }
+  .s-sandbox .si-title { color: #0e6655; }
+  .s-direct .si-title { color: #935116; }
+
+  .footer-note {
+    text-align: center;
+    margin-top: 28px;
+    font-size: 13px;
+    color: #999;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Browser Sandbox 概念圖</h1>
+  <p class="subtitle">龍蝦操作瀏覽器的兩種模式 — 沙盒隔離 vs 直接操控</p>
+
+  <div class="compare-wrapper">
+    <!-- 左：沙盒模式 -->
+    <div class="mode-card sandbox">
+      <div class="mode-header">
+        <span class="mode-label">模式 A</span>
+        <div class="mode-icon">&#x1F6E1;&#xFE0F;</div>
+        <div class="mode-title">沙盒模式（安全模式）</div>
+        <div class="mode-subtitle">Sandbox Browser</div>
+      </div>
+
+      <div class="flow">
+        <div class="flow-node node-lobster">
+          <span class="fn-icon">&#x1F99E;</span>
+          <span class="fn-title">龍蝦 AI</span>
+          <span class="fn-desc">下達瀏覽器指令</span>
+        </div>
+        <div class="flow-arrow">
+          <div class="arrow-shaft"></div>
+          <div class="arrow-head"></div>
+        </div>
+        <div class="flow-node node-sandbox-browser">
+          <span class="fn-icon">&#x1F4E6;</span>
+          <span class="fn-title">沙盒瀏覽器</span>
+          <span class="fn-desc">隔離環境，獨立運作<br>不碰你的真實瀏覽器</span>
+        </div>
+        <div class="flow-arrow">
+          <div class="arrow-shaft"></div>
+          <div class="arrow-head"></div>
+        </div>
+        <div class="flow-node node-website">
+          <span class="fn-icon">&#x1F310;</span>
+          <span class="fn-title">目標網站</span>
+          <span class="fn-desc">以全新身分訪問</span>
+        </div>
+      </div>
+
+      <div class="pros-cons">
+        <div class="pc-title">優點與限制</div>
+        <ul class="pc-list">
+          <li class="pro">安全隔離，不影響你的瀏覽器</li>
+          <li class="pro">全自動執行，無需人工介入</li>
+          <li class="pro">不怕搞亂你的書籤或設定</li>
+          <li class="con">看不到你已登入的帳號</li>
+          <li class="con">無法存取瀏覽器的 Cookie</li>
+          <li class="con">需要另外登入網站帳號</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- VS 分隔 -->
+    <div class="vs-divider">
+      <div class="vs-badge">VS</div>
+    </div>
+
+    <!-- 右：直接模式 -->
+    <div class="mode-card direct">
+      <div class="mode-header">
+        <span class="mode-label">模式 B</span>
+        <div class="mode-icon">&#x1F3AF;</div>
+        <div class="mode-title">直接模式</div>
+        <div class="mode-subtitle">Peekaboo + Real Browser</div>
+      </div>
+
+      <div class="flow">
+        <div class="flow-node node-lobster">
+          <span class="fn-icon">&#x1F99E;</span>
+          <span class="fn-title">龍蝦 AI</span>
+          <span class="fn-desc">下達桌面操作指令</span>
+        </div>
+        <div class="flow-arrow">
+          <div class="arrow-shaft"></div>
+          <div class="arrow-head"></div>
+        </div>
+        <div class="flow-node node-peekaboo">
+          <span class="fn-icon">&#x1F441;&#xFE0F;</span>
+          <span class="fn-title">Peekaboo</span>
+          <span class="fn-desc">桌面操控中介層<br>截圖 + 滑鼠 + 鍵盤</span>
+        </div>
+        <div class="flow-arrow">
+          <div class="arrow-shaft"></div>
+          <div class="arrow-head"></div>
+        </div>
+        <div class="flow-node node-real-browser">
+          <span class="fn-icon">&#x1F5A5;&#xFE0F;</span>
+          <span class="fn-title">你的真實瀏覽器</span>
+          <span class="fn-desc">Chrome / Edge / Firefox<br>保有你的登入狀態</span>
+        </div>
+        <div class="flow-arrow">
+          <div class="arrow-shaft"></div>
+          <div class="arrow-head"></div>
+        </div>
+        <div class="flow-node node-website">
+          <span class="fn-icon">&#x1F310;</span>
+          <span class="fn-title">目標網站</span>
+          <span class="fn-desc">以你的帳號身分訪問</span>
+        </div>
+      </div>
+
+      <div class="pros-cons">
+        <div class="pc-title">優點與限制</div>
+        <ul class="pc-list">
+          <li class="pro">可使用你已登入的帳號</li>
+          <li class="pro">看到真實畫面，所見即所得</li>
+          <li class="pro">能操作任何桌面應用程式</li>
+          <li class="con">需注意安全規則（別亂按）</li>
+          <li class="con">操作時螢幕會被佔用</li>
+          <li class="con">需要安裝 Peekaboo 工具</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部總結 -->
+  <div class="summary-bar">
+    <div class="summary-item s-sandbox">
+      <div class="si-icon">&#x1F6E1;&#xFE0F;</div>
+      <div class="si-title">適合場景：自動化任務</div>
+      <div class="si-desc">
+        爬資料、填表單、測試網頁<br>
+        不需要帳號登入的自動化工作
+      </div>
+    </div>
+    <div class="summary-item s-direct">
+      <div class="si-icon">&#x1F3AF;</div>
+      <div class="si-title">適合場景：帳號操作</div>
+      <div class="si-desc">
+        管理 Google 日曆、操作 LINE<br>
+        需要你的登入身分的任務
+      </div>
+    </div>
+  </div>
+
+  <p class="footer-note">CH18 Desktop Agent 教學 | 阿亮老師 教學講義</p>
+</div>
+</body>
+</html>

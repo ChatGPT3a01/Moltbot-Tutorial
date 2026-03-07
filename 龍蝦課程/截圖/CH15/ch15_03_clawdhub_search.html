@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>ch15_03_clawdhub_search</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+  }
+  .terminal-window {
+    width: 1200px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .title-bar {
+    background: #2d2d2d;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    user-select: none;
+  }
+  .title-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .terminal-icon {
+    width: 16px;
+    height: 16px;
+    position: relative;
+  }
+  .terminal-icon::before {
+    content: '';
+    display: block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #0078d4;
+    border-radius: 2px;
+    background: transparent;
+  }
+  .terminal-icon::after {
+    content: '>';
+    position: absolute;
+    top: 1px;
+    left: 4px;
+    font-size: 10px;
+    color: #0078d4;
+    font-weight: bold;
+  }
+  .title-text {
+    color: #cccccc;
+    font-size: 12px;
+    font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+  }
+  .tab-bar {
+    background: #2d2d2d;
+    height: 32px;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 8px;
+    border-bottom: 1px solid #3d3d3d;
+  }
+  .tab {
+    background: #1e1e1e;
+    color: #cccccc;
+    font-size: 12px;
+    font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+    padding: 6px 16px;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #3d3d3d;
+    border-bottom: none;
+    position: relative;
+    top: 1px;
+  }
+  .tab-ps-icon {
+    color: #0078d4;
+    font-size: 10px;
+    font-weight: bold;
+  }
+  .window-controls {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .window-controls .btn {
+    width: 46px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 10px;
+    cursor: default;
+  }
+  .btn-icon {
+    font-family: 'Segoe MDL2 Assets', 'Arial', sans-serif;
+    font-size: 10px;
+  }
+  .terminal-body {
+    background: #0c0c0c;
+    padding: 16px 20px;
+    min-height: 200px;
+  }
+  .terminal-body pre {
+    font-family: 'Cascadia Code', 'Consolas', 'Microsoft JhengHei', monospace;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #cccccc;
+    white-space: pre;
+  }
+  .prompt { color: #3b78ff; }
+  .command { color: #f9f1a5; }
+  .output { color: #cccccc; }
+  .green { color: #16c60c; }
+  .cyan { color: #3a96dd; }
+  .yellow { color: #f9f1a5; }
+  .dim { color: #767676; }
+  .white { color: #f2f2f2; }
+  .emoji { font-family: 'Segoe UI Emoji', 'Microsoft JhengHei', sans-serif; }
+  .pkg-name {
+    color: #3a96dd;
+    font-weight: bold;
+  }
+  .version { color: #767676; }
+  .star { color: #f9f1a5; }
+  .description { color: #cccccc; }
+  .author { color: #767676; }
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 17px;
+    background: #cccccc;
+    vertical-align: text-bottom;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  @media print {
+    body { background: white; padding: 0; }
+    .terminal-window { box-shadow: 1px 1px 4px rgba(0,0,0,0.3); }
+    .cursor { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="terminal-window">
+  <div class="title-bar">
+    <div class="title-bar-left">
+      <div class="terminal-icon"></div>
+      <span class="title-text">Windows PowerShell</span>
+    </div>
+    <div class="window-controls">
+      <div class="btn"><span class="btn-icon">&#x2500;</span></div>
+      <div class="btn"><span class="btn-icon">&#x25A1;</span></div>
+      <div class="btn btn-close"><span class="btn-icon">&#x2715;</span></div>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <div class="tab">
+      <span class="tab-ps-icon">PS</span>
+      <span>Windows PowerShell</span>
+    </div>
+  </div>
+  <div class="terminal-body">
+    <pre><span class="prompt">PS C:\Users\user&gt;</span> <span class="command">clawdhub search weather</span>
+
+<span class="emoji">&#x1F50D;</span> <span class="white">Search results for "<span class="yellow">weather</span>":</span>
+
+  <span class="pkg-name">weather</span> <span class="version">(v2.1.0)</span> <span class="star">&#x2B50; 4.8</span>
+  <span class="description">查詢全球各城市的即時天氣和預報</span>
+  <span class="author">By: @openclaw-official</span>
+
+  <span class="pkg-name">weather-advanced</span> <span class="version">(v1.0.3)</span> <span class="star">&#x2B50; 4.2</span>
+  <span class="description">進階天氣：含空氣品質、花粉指數</span>
+  <span class="author">By: @community-dev</span>
+
+<span class="prompt">PS C:\Users\user&gt;</span> <span class="cursor"></span></pre>
+  </div>
+</div>
+</body>
+</html>

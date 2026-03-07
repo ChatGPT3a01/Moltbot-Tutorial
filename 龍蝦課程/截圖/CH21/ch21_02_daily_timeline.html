@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CH21 - 全自動龍蝦一天時序圖</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #ffffff;
+            font-family: 'Microsoft JhengHei', 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 40px 0;
+        }
+        .container {
+            width: 1200px;
+            background: #ffffff;
+            padding: 50px;
+        }
+        .title {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .title h1 {
+            font-size: 36px;
+            color: #1a1a2e;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 50px;
+        }
+
+        /* === 垂直時間線 === */
+        .timeline {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        /* 中央垂直線 */
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 120px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #f59e0b, #3b82f6, #22c55e, #8b5cf6, #ef4444, #a855f7);
+            border-radius: 2px;
+        }
+
+        /* 時間卡片 */
+        .timeline-item {
+            position: relative;
+            margin-bottom: 36px;
+            padding-left: 160px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        /* 時間標籤 */
+        .time-badge {
+            position: absolute;
+            left: 0;
+            top: 12px;
+            width: 96px;
+            text-align: right;
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* 圓點 */
+        .timeline-dot {
+            position: absolute;
+            left: 110px;
+            top: 16px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            box-shadow: 0 0 0 3px currentColor, 0 3px 10px rgba(0,0,0,0.15);
+            z-index: 2;
+            background: currentColor;
+        }
+
+        /* 卡片 */
+        .timeline-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px 28px;
+            flex: 1;
+            border: 2px solid;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            position: relative;
+        }
+
+        /* 卡片左邊箭頭 */
+        .timeline-card::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 18px;
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 10px solid;
+            border-right-color: inherit;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .card-emoji {
+            font-size: 32px;
+        }
+        .card-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .card-content {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 12px;
+        }
+        .card-content ul {
+            list-style: none;
+            padding: 0;
+        }
+        .card-content ul li {
+            padding: 2px 0;
+        }
+        .card-content ul li::before {
+            content: '\25B8';
+            margin-right: 8px;
+            color: #999;
+        }
+
+        /* 通道標籤 */
+        .channel-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .channel-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        .channel-line {
+            background: #e8fce8;
+            color: #06c755;
+            border: 1px solid #06c755;
+        }
+        .channel-telegram {
+            background: #e8f4fd;
+            color: #0088cc;
+            border: 1px solid #0088cc;
+        }
+
+        /* 顏色方案 */
+        .item-morning .timeline-dot { color: #f59e0b; }
+        .item-morning .timeline-card { border-color: #f59e0b; }
+        .item-morning .timeline-card::before { border-right-color: #f59e0b; }
+        .item-morning .card-title { color: #b45309; }
+        .item-morning .timeline-card { background: #fffdf5; }
+
+        .item-news .timeline-dot { color: #3b82f6; }
+        .item-news .timeline-card { border-color: #3b82f6; }
+        .item-news .timeline-card::before { border-right-color: #3b82f6; }
+        .item-news .card-title { color: #1d4ed8; }
+        .item-news .timeline-card { background: #f8fbff; }
+
+        .item-lunch .timeline-dot { color: #22c55e; }
+        .item-lunch .timeline-card { border-color: #22c55e; }
+        .item-lunch .timeline-card::before { border-right-color: #22c55e; }
+        .item-lunch .card-title { color: #15803d; }
+        .item-lunch .timeline-card { background: #f5fdf8; }
+
+        .item-meeting .timeline-dot { color: #8b5cf6; }
+        .item-meeting .timeline-card { border-color: #8b5cf6; }
+        .item-meeting .timeline-card::before { border-right-color: #8b5cf6; }
+        .item-meeting .card-title { color: #6d28d9; }
+        .item-meeting .timeline-card { background: #faf8ff; }
+
+        .item-stock .timeline-dot { color: #ef4444; }
+        .item-stock .timeline-card { border-color: #ef4444; }
+        .item-stock .timeline-card::before { border-right-color: #ef4444; }
+        .item-stock .card-title { color: #b91c1c; }
+        .item-stock .timeline-card { background: #fff8f8; }
+
+        .item-night .timeline-dot { color: #a855f7; }
+        .item-night .timeline-card { border-color: #a855f7; }
+        .item-night .timeline-card::before { border-right-color: #a855f7; }
+        .item-night .card-title { color: #7e22ce; }
+        .item-night .timeline-card { background: #fdf8ff; }
+
+        /* 底部說明 */
+        .footer-note {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: #f8f9fc;
+            border-radius: 12px;
+            color: #888;
+            font-size: 14px;
+            border: 1px solid #e8eaf0;
+        }
+        .footer-note strong {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 標題 -->
+        <div class="title">
+            <h1>&#129438; 全自動龍蝦一天時序圖</h1>
+        </div>
+        <div class="subtitle">龍蝦 24 小時不間斷，自動幫你打理一切</div>
+
+        <!-- 垂直時間線 -->
+        <div class="timeline">
+
+            <!-- 06:30 早安報告 -->
+            <div class="timeline-item item-morning">
+                <div class="time-badge">06:30</div>
+                <div class="timeline-dot"></div>
+                <div class="timeline-card">
+                    <div class="card-header">
+                        <span class="card-emoji">&#127749;</span>
+                        <span class="card-title">早安報告</span>
+                    </div>
+                    <div class="card-content">
+                        <ul>
+                            <li>今日天氣概況與穿搭建議</li>
+                            <li>今日行程提醒（Google 日曆同步）</li>
+                            <li>精選新聞 3 則摘要</li>
+                            <li>每日一句勵志金句</li>
+                        </ul>
+                    </div>
+                    <div class="channel-tags">
+                        <span class="channel-tag channel-line">&#128994; LINE</span>
+                        <span class="channel-tag channel-telegram">&#128309; Telegram</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 06:45 新聞摘要 -->
+            <div class="timeline-item item-news">
+                <div class="time-badge">06:45</div>
+                <div class="timeline-dot"></div>
+                <div class="timeline-card">
+                    <div class="card-header">
+                        <span class="card-emoji">&#128240;</span>
+                        <span class="card-title">新聞摘要推播</span>
+                    </div>
+                    <div class="card-content">
+                        <ul>
+                            <li>國內外重大新聞 AI 摘要</li>
+                            <li>科技產業動態</li>
+                            <li>自訂關注主題追蹤</li>
+                        </ul>
+                    </div>
+                    <div class="channel-tags">
+                        <span class="channel-tag channel-line">&#128994; LINE</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 12:00 午餐提醒 -->
+            <div class="timeline-item item-lunch">
+                <div class="time-badge">12:00</div>
+                <div class="timeline-dot"></div>
+                <div class="timeline-card">
+                    <div class="card-header">
+                        <span class="card-emoji">&#127857;</span>
+                        <span class="card-title">午餐提醒 + 下午行程</span>
+                    </div>
+                    <div class="card-content">
+                        <ul>
+                            <li>午餐時間到！該休息囉</li>
+                            <li>下午行程預覽</li>
+                            <li>待辦事項進度檢查</li>
+                        </ul>
+                    </div>
+                    <div class="channel-tags">
+                        <span class="channel-tag channel-line">&#128994; LINE</span>
+                        <span class="channel-tag channel-telegram">&#128309; Telegram</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 14:00 會議提醒 -->
+            <div class="timeline-item item-meeting">
+                <div class="time-badge">14:00</div>
+                <div class="timeline-dot"></div>
+                <div class="timeline-card">
+                    <div class="card-header">
+                        <span class="card-emoji">&#128197;</span>
+                        <span class="card-title">會議提醒</span>
+                    </div>
+                    <div class="card-content">
+                        <ul>
+                            <li>即將開始的會議通知</li>
+                            <li>會議主題與參與人員</li>
+                            <li>相關文件連結準備</li>
+                        </ul>
+                    </div>
+                    <div class="channel-tags">
+                        <span class="channel-tag channel-line">&#128994; LINE</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 16:30 股票/財經 -->
+            <div class="timeline-item item-stock">
+                <div class="time-badge">16:30</div>
+                <div class="timeline-dot"></div>
+                <div class="timeline-card">
+                    <div class="card-header">
+                        <span class="card-emoji">&#128202;</span>
+                        <span class="card-title">股票 / 財經摘要</span>
+                    </div>
+                    <div class="card-content">
+                        <ul>
+                            <li>台股收盤指數與漲跌</li>
+                            <li>自選股票漲跌幅追蹤</li>
+                            <li>重要財經新聞摘要</li>
+                        </ul>
+                    </div>
+                    <div class="channel-tags">
+                        <span class="channel-tag channel-line">&#128994; LINE</span>
+                        <span class="channel-tag channel-telegram">&#128309; Telegram</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 22:00 晚安報告 -->
+            <div class="timeline-item item-night">
+                <div class="time-badge">22:00</div>
+                <div class="timeline-dot"></div>
+                <div class="timeline-card">
+                    <div class="card-header">
+                        <span class="card-emoji">&#127769;</span>
+                        <span class="card-title">明日行程預告 + 晚安</span>
+                    </div>
+                    <div class="card-content">
+                        <ul>
+                            <li>今日完成事項回顧</li>
+                            <li>明日行程預告與提醒</li>
+                            <li>明日天氣預報</li>
+                            <li>一句溫馨晚安語</li>
+                        </ul>
+                    </div>
+                    <div class="channel-tags">
+                        <span class="channel-tag channel-line">&#128994; LINE</span>
+                        <span class="channel-tag channel-telegram">&#128309; Telegram</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 底部說明 -->
+        <div class="footer-note">
+            <strong>&#128161; 提示：</strong>以上排程都透過 HEARTBEAT.md 設定 Cron 表達式，龍蝦會自動在指定時間發送訊息，完全不需要人工操作！
+        </div>
+    </div>
+</body>
+</html>

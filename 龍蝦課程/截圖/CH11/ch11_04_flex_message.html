@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>ch11_04_flex_message</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    font-family: 'Microsoft JhengHei', 'Segoe UI', sans-serif;
+  }
+
+  .container {
+    width: 900px;
+  }
+
+  /* -- 上方標題 -- */
+  .top-title {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .top-title h1 {
+    font-size: 22px;
+    color: #1f2937;
+    font-weight: 700;
+  }
+  .top-title h1 .accent { color: #06c755; }
+  .top-title p {
+    font-size: 14px;
+    color: #6b7280;
+    margin-top: 6px;
+  }
+
+  /* -- 對比區 -- */
+  .comparison {
+    display: flex;
+    gap: 32px;
+    align-items: stretch;
+  }
+
+  .side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .side-label {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    padding: 6px 20px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .side-label.plain {
+    background: #e5e7eb;
+    color: #4b5563;
+  }
+  .side-label.flex {
+    background: linear-gradient(135deg, #06c755, #00b900);
+    color: #ffffff;
+  }
+
+  /* -- VS 分隔 -- */
+  .vs-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding-top: 40px;
+  }
+  .vs-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+  }
+
+  /* -- LINE 聊天背景 -- */
+  .chat-bg {
+    background: #8cabd9;
+    border-radius: 16px;
+    padding: 24px 20px;
+    width: 100%;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+
+  /* -- 純文字氣泡 -- */
+  .plain-bubble {
+    background: #ffffff;
+    border-radius: 18px 18px 18px 4px;
+    padding: 14px 18px;
+    max-width: 85%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .plain-bubble p {
+    font-size: 15px;
+    color: #1f2937;
+    line-height: 1.6;
+  }
+  .plain-time {
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 6px;
+    margin-left: 4px;
+  }
+
+  /* -- Flex Message 卡片 -- */
+  .flex-card {
+    width: 100%;
+    max-width: 85%;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    background: #ffffff;
+  }
+
+  .flex-card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .flex-card-header::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+  }
+  .flex-card-header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .flex-weather-icon {
+    font-size: 40px;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  }
+  .flex-city {
+    color: rgba(255,255,255,0.85);
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+  .flex-temp {
+    color: #ffffff;
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-top: 4px;
+  }
+  .flex-temp .unit {
+    font-size: 20px;
+    font-weight: 400;
+    vertical-align: super;
+    margin-left: 2px;
+  }
+  .flex-condition {
+    color: rgba(255,255,255,0.9);
+    font-size: 15px;
+    margin-top: 4px;
+  }
+
+  .flex-card-body {
+    padding: 16px 20px;
+  }
+  .flex-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .flex-detail-row:last-child { border-bottom: none; }
+  .flex-detail-label {
+    font-size: 13px;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .flex-detail-value {
+    font-size: 14px;
+    color: #1f2937;
+    font-weight: 600;
+  }
+
+  .flex-card-footer {
+    padding: 0 16px 16px;
+  }
+  .flex-btn {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Microsoft JhengHei', sans-serif;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .flex-time {
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 6px;
+    margin-left: 4px;
+  }
+
+  /* -- 底部說明 -- */
+  .bottom-note {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 13px;
+    color: #9ca3af;
+    line-height: 1.6;
+  }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .chat-bg { box-shadow: none; border: 1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- 標題 -->
+  <div class="top-title">
+    <h1><span class="accent">Flex Message</span> vs 純文字 &mdash; 同樣的內容，不同的體驗</h1>
+    <p>LINE 的 Flex Message 讓訊息不再只是文字，而是一張精心設計的卡片</p>
+  </div>
+
+  <!-- 對比區 -->
+  <div class="comparison">
+    <!-- 左邊：純文字 -->
+    <div class="side">
+      <span class="side-label plain">&#x1F4DD; 純文字訊息</span>
+      <div class="chat-bg">
+        <div class="plain-bubble">
+          <p>今天台北 26&#xB0;C，多雲</p>
+        </div>
+        <div class="plain-time">下午 2:30</div>
+      </div>
+    </div>
+
+    <!-- VS -->
+    <div class="vs-divider">
+      <div class="vs-circle">VS</div>
+    </div>
+
+    <!-- 右邊：Flex Message -->
+    <div class="side">
+      <span class="side-label flex">&#x2728; Flex Message 卡片</span>
+      <div class="chat-bg">
+        <div class="flex-card">
+          <div class="flex-card-header">
+            <div class="flex-weather-icon">&#x26C5;</div>
+            <div class="flex-city">&#x1F4CD; 台北市</div>
+            <div class="flex-temp">26<span class="unit">&#xB0;C</span></div>
+            <div class="flex-condition">多雲</div>
+          </div>
+          <div class="flex-card-body">
+            <div class="flex-detail-row">
+              <span class="flex-detail-label">&#x1F4A7; 濕度</span>
+              <span class="flex-detail-value">72%</span>
+            </div>
+            <div class="flex-detail-row">
+              <span class="flex-detail-label">&#x1F32C;&#xFE0F; 風速</span>
+              <span class="flex-detail-value">12 km/h</span>
+            </div>
+            <div class="flex-detail-row">
+              <span class="flex-detail-label">&#x2602;&#xFE0F; 降雨機率</span>
+              <span class="flex-detail-value">30%</span>
+            </div>
+            <div class="flex-detail-row">
+              <span class="flex-detail-label">&#x1F321;&#xFE0F; 體感溫度</span>
+              <span class="flex-detail-value">28&#xB0;C</span>
+            </div>
+          </div>
+          <div class="flex-card-footer">
+            <div class="flex-btn">&#x1F50D; 查看完整預報</div>
+          </div>
+        </div>
+        <div class="flex-time">下午 2:30</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部 -->
+  <div class="bottom-note">
+    &#x1F4A1; Flex Message 支援自訂排版、按鈕互動、圖片嵌入等豐富功能，讓 LINE Bot 的回覆更加專業美觀
+  </div>
+</div>
+</body>
+</html>

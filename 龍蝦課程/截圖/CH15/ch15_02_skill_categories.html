@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenClaw 60+ 官方技能 — 八大分類</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #ffffff;
+      font-family: 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 40px 0;
+    }
+
+    .container {
+      width: 1200px;
+    }
+
+    /* 標題區域 */
+    .header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 900;
+      color: #1a1a2e;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .header .subtitle {
+      font-size: 15px;
+      color: #6b7280;
+      font-weight: 400;
+    }
+
+    .header .accent-line {
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, #6366f1, #8b5cf6, #a78bfa);
+      border-radius: 2px;
+      margin: 14px auto 0;
+    }
+
+    /* 卡片網格 */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(2, auto);
+      gap: 20px;
+    }
+
+    /* 卡片基本樣式 */
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 28px 22px 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+
+    /* 各分類的頂部色條與配色 */
+    .card-life::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .card-productivity::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .card-entertainment::before { background: linear-gradient(90deg, #ec4899, #f472b6); }
+    .card-system::before { background: linear-gradient(90deg, #6b7280, #9ca3af); }
+    .card-developer::before { background: linear-gradient(90deg, #10b981, #34d399); }
+    .card-cloud::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+    .card-finance::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+    .card-smarthome::before { background: linear-gradient(90deg, #14b8a6, #5eead4); }
+
+    /* 圖標 */
+    .card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+
+    .card-life .card-icon { background: #fef3c7; }
+    .card-productivity .card-icon { background: #dbeafe; }
+    .card-entertainment .card-icon { background: #fce7f3; }
+    .card-system .card-icon { background: #f3f4f6; }
+    .card-developer .card-icon { background: #d1fae5; }
+    .card-cloud .card-icon { background: #ede9fe; }
+    .card-finance .card-icon { background: #fee2e2; }
+    .card-smarthome .card-icon { background: #ccfbf1; }
+
+    /* 分類名稱 */
+    .card-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .card-life .card-title { color: #b45309; }
+    .card-productivity .card-title { color: #1d4ed8; }
+    .card-entertainment .card-title { color: #be185d; }
+    .card-system .card-title { color: #374151; }
+    .card-developer .card-title { color: #047857; }
+    .card-cloud .card-title { color: #6d28d9; }
+    .card-finance .card-title { color: #b91c1c; }
+    .card-smarthome .card-title { color: #0f766e; }
+
+    /* 技能數量標籤 */
+    .card-count {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+
+    .card-life .card-count { background: #fef3c7; color: #92400e; }
+    .card-productivity .card-count { background: #dbeafe; color: #1e40af; }
+    .card-entertainment .card-count { background: #fce7f3; color: #9d174d; }
+    .card-system .card-count { background: #f3f4f6; color: #374151; }
+    .card-developer .card-count { background: #d1fae5; color: #065f46; }
+    .card-cloud .card-count { background: #ede9fe; color: #5b21b6; }
+    .card-finance .card-count { background: #fee2e2; color: #991b1b; }
+    .card-smarthome .card-count { background: #ccfbf1; color: #115e59; }
+
+    /* 技能列表 */
+    .skill-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .skill-list li {
+      font-size: 13.5px;
+      color: #4b5563;
+      padding: 5px 0;
+      border-bottom: 1px solid #f3f4f6;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      line-height: 1.5;
+    }
+
+    .skill-list li:last-child {
+      border-bottom: none;
+    }
+
+    .skill-list li .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .card-life .skill-list .dot { background: #f59e0b; }
+    .card-productivity .skill-list .dot { background: #3b82f6; }
+    .card-entertainment .skill-list .dot { background: #ec4899; }
+    .card-system .skill-list .dot { background: #6b7280; }
+    .card-developer .skill-list .dot { background: #10b981; }
+    .card-cloud .skill-list .dot { background: #8b5cf6; }
+    .card-finance .skill-list .dot { background: #ef4444; }
+    .card-smarthome .skill-list .dot { background: #14b8a6; }
+
+    /* 頁尾 */
+    .footer {
+      text-align: center;
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .footer p {
+      font-size: 13px;
+      color: #9ca3af;
+    }
+
+    .footer .highlight {
+      color: #6366f1;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- 標題 -->
+    <div class="header">
+      <h1>OpenClaw 60+ 官方技能 — 八大分類</h1>
+      <p class="subtitle">依功能屬性分門別類，快速找到你需要的技能模組</p>
+      <div class="accent-line"></div>
+    </div>
+
+    <!-- 2x4 卡片網格 -->
+    <div class="grid">
+
+      <!-- 1. 生活實用類 -->
+      <div class="card card-life">
+        <div class="card-icon">🏠</div>
+        <div class="card-title">生活實用類</div>
+        <span class="card-count">5 項技能</span>
+        <ul class="skill-list">
+          <li><span class="dot"></span>天氣查詢</li>
+          <li><span class="dot"></span>即時新聞</li>
+          <li><span class="dot"></span>多語翻譯</li>
+          <li><span class="dot"></span>萬用計算機</li>
+          <li><span class="dot"></span>食譜推薦</li>
+        </ul>
+      </div>
+
+      <!-- 2. 生產力類 -->
+      <div class="card card-productivity">
+        <div class="card-icon">💼</div>
+        <div class="card-title">生產力類</div>
+        <span class="card-count">5 項技能</span>
+        <ul class="skill-list">
+          <li><span class="dot"></span>行事曆管理</li>
+          <li><span class="dot"></span>Notion 整合</li>
+          <li><span class="dot"></span>Email 寄送</li>
+          <li><span class="dot"></span>待辦清單</li>
+          <li><span class="dot"></span>網路搜尋</li>
+        </ul>
+      </div>
+
+      <!-- 3. 娛樂社交類 -->
+      <div class="card card-entertainment">
+        <div class="card-icon">🎮</div>
+        <div class="card-title">娛樂社交類</div>
+        <span class="card-count">4 項技能</span>
+        <ul class="skill-list">
+          <li><span class="dot"></span>自拍 Clawra</li>
+          <li><span class="dot"></span>音樂播放</li>
+          <li><span class="dot"></span>笑話產生器</li>
+          <li><span class="dot"></span>每日金句</li>
+        </ul>
+      </div>
+
+      <!-- 4. 系統工具類 -->
+      <div class="card card-system">
+        <div class="card-icon">🔧</div>
+        <div class="card-title">系統工具類</div>
+        <span class="card-count">4 項技能</span>
+        <ul class="skill-list">
+          <li><span class="dot"></span>磁碟盤點</li>
+          <li><span class="dot"></span>TTS 語音合成</li>
+          <li><span class="dot"></span>螢幕截圖</li>
+          <li><span class="dot"></span>系統監控</li>
+        </ul>
+      </div>
+
+      <!-- 5. 開發者工具類 -->
+      <div class="card card-developer">
+        <div class="card-icon">👨‍💻</div>
+        <div class="card-title">開發者工具類</div>
+        <span class="card-count">4 項技能</span>
+        <ul class="skill-list">
+          <li><span class="dot"></span>Git 版控</li>
+          <li><span class="dot"></span>程式碼審查</li>
+          <li><span class="dot"></span>Docker 管理</li>
+          <li><span class="dot"></span>SSH 遠端連線</li>
+        </ul>
+      </div>
+
+      <!-- 6. 雲端儲存與文件類 -->
+      <div class="card card-cloud">
+        <div class="card-icon">📁</div>
+        <div class="card-title">雲端儲存與文件類</div>
+        <span class="card-count">5 項技能</span>
+        <ul class="skill-list">
+          <li><span class="dot"></span>Google Drive</li>
+          <li><span class="dot"></span>OneDrive</li>
+          <li><span class="dot"></span>PDF 生成</li>
+          <li><span class="dot"></span>簡報製作</li>
+          <li><span class="dot"></span>Excel 報表</li>
+        </ul>
+      </div>
+
+      <!-- 7. 財經資訊類 -->
+      <div class="card card-finance">
+        <div class="card-icon">📈</div>
+        <div class="card-title">財經資訊類</div>
+        <span class="card-count">4 項技能</span>
+        <ul class="skill-list">
+          <li><span class="dot"></span>股票行情</li>
+          <li><span class="dot"></span>加密貨幣</li>
+          <li><span class="dot"></span>財經新聞</li>
+          <li><span class="dot"></span>匯率換算</li>
+        </ul>
+      </div>
+
+      <!-- 8. 智慧家庭類 -->
+      <div class="card card-smarthome">
+        <div class="card-icon">🏡</div>
+        <div class="card-title">智慧家庭類</div>
+        <span class="card-count">3 項技能</span>
+        <ul class="skill-list">
+          <li><span class="dot"></span>Home Assistant</li>
+          <li><span class="dot"></span>IP 攝影機</li>
+          <li><span class="dot"></span>智慧燈具控制</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- 頁尾 -->
+    <div class="footer">
+      <p>技能模組皆可透過 <span class="highlight">SKILL.md</span> 自訂擴充 ── 打造專屬你的 AI 助理</p>
+    </div>
+
+  </div>
+</body>
+</html>

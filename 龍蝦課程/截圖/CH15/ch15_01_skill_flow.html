@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CH15 - Skill 運作流程圖</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
+    background: #f0f4f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  .container {
+    width: 1200px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+    padding: 50px 40px 40px;
+    overflow: hidden;
+  }
+
+  .title {
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .title h1 {
+    font-size: 28px;
+    color: #1a202c;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 15px;
+    color: #718096;
+    margin-bottom: 50px;
+  }
+
+  /* ── 流程區 ── */
+  .flow-wrapper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 44px;
+    padding: 0 10px;
+  }
+
+  .step-unit {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .step-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 150px;
+    flex-shrink: 0;
+  }
+
+  .step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .step-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.10);
+    transition: transform 0.2s;
+  }
+
+  .step-card:hover .step-icon {
+    transform: translateY(-4px);
+  }
+
+  .step-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #2d3748;
+    text-align: center;
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+
+  .step-desc {
+    font-size: 11.5px;
+    color: #718096;
+    text-align: center;
+    line-height: 1.55;
+    padding: 0 2px;
+  }
+
+  /* 箭頭 */
+  .arrow {
+    display: flex;
+    align-items: center;
+    padding-top: 52px;  /* 對齊 icon 中央 */
+    flex-shrink: 0;
+    margin: 0 4px;
+  }
+
+  .arrow svg {
+    width: 36px;
+    height: 20px;
+  }
+
+  /* 顏色方案 */
+  .color-1 .step-number { background: #4299e1; }
+  .color-1 .step-icon   { background: linear-gradient(135deg, #ebf8ff, #bee3f8); }
+
+  .color-2 .step-number { background: #805ad5; }
+  .color-2 .step-icon   { background: linear-gradient(135deg, #faf5ff, #e9d8fd); }
+
+  /* 關鍵步驟 — 步驟 3 */
+  .color-key .step-number { background: #e53e3e; }
+  .color-key .step-icon   {
+    background: linear-gradient(135deg, #fff5f5, #fed7d7);
+    box-shadow: 0 4px 20px rgba(229, 62, 62, 0.25);
+    border: 2px solid #fc8181;
+  }
+  .color-key .step-label { color: #c53030; }
+
+  .color-4 .step-number { background: #38a169; }
+  .color-4 .step-icon   { background: linear-gradient(135deg, #f0fff4, #c6f6d5); }
+
+  .color-5 .step-number { background: #d69e2e; }
+  .color-5 .step-icon   { background: linear-gradient(135deg, #fffff0, #fefcbf); }
+
+  .color-6 .step-number { background: #319795; }
+  .color-6 .step-icon   { background: linear-gradient(135deg, #e6fffa, #b2f5ea); }
+
+  /* 關鍵步驟徽章 */
+  .key-badge {
+    display: inline-block;
+    background: #e53e3e;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── 底部說明 ── */
+  .note-box {
+    background: linear-gradient(135deg, #fffaf0, #fefcbf);
+    border-left: 4px solid #ed8936;
+    border-radius: 0 12px 12px 0;
+    padding: 18px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .note-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .note-text {
+    font-size: 14.5px;
+    color: #744210;
+    line-height: 1.7;
+  }
+
+  .note-text strong {
+    color: #c05621;
+  }
+
+  /* ── 分隔線上方的場景示意 ── */
+  .scenario-bar {
+    background: #edf2f7;
+    border-radius: 12px;
+    padding: 14px 24px;
+    text-align: center;
+    margin-bottom: 36px;
+    font-size: 15px;
+    color: #4a5568;
+  }
+
+  .scenario-bar .user-msg {
+    display: inline-block;
+    background: #4299e1;
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 標題 -->
+  <div class="title"><h1>Skill 運作流程圖</h1></div>
+  <div class="subtitle">當用戶發送訊息後，龍蝦 AI 如何透過 Skill 技能來回應</div>
+
+  <!-- 場景示意 -->
+  <div class="scenario-bar">
+    情境範例：用戶在 LINE 傳送 <span class="user-msg">今天台北天氣如何？</span>
+  </div>
+
+  <!-- 六步驟流程 -->
+  <div class="flow-wrapper">
+
+    <!-- Step 1 -->
+    <div class="step-card color-1">
+      <div class="step-number">1</div>
+      <div class="step-icon">💬</div>
+      <div class="step-label">用戶傳訊息</div>
+      <div class="step-desc">「今天台北天氣如何？」</div>
+    </div>
+
+    <div class="arrow">
+      <svg viewBox="0 0 36 20"><polyline points="4,10 28,10" stroke="#a0aec0" stroke-width="2" fill="none"/><polyline points="22,4 28,10 22,16" stroke="#a0aec0" stroke-width="2" fill="none"/></svg>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-card color-2">
+      <div class="step-number">2</div>
+      <div class="step-icon">🧠</div>
+      <div class="step-label">AI 大腦判斷</div>
+      <div class="step-desc">理解語意：這是在問天氣</div>
+    </div>
+
+    <div class="arrow">
+      <svg viewBox="0 0 36 20"><polyline points="4,10 28,10" stroke="#a0aec0" stroke-width="2" fill="none"/><polyline points="22,4 28,10 22,16" stroke="#a0aec0" stroke-width="2" fill="none"/></svg>
+    </div>
+
+    <!-- Step 3 (關鍵) -->
+    <div class="step-card color-key">
+      <div class="step-number">3</div>
+      <div class="step-icon">🎯</div>
+      <span class="key-badge">關鍵步驟</span>
+      <div class="step-label">AI 選擇技能</div>
+      <div class="step-desc">自動匹配「天氣技能」</div>
+    </div>
+
+    <div class="arrow">
+      <svg viewBox="0 0 36 20"><polyline points="4,10 28,10" stroke="#a0aec0" stroke-width="2" fill="none"/><polyline points="22,4 28,10 22,16" stroke="#a0aec0" stroke-width="2" fill="none"/></svg>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step-card color-4">
+      <div class="step-number">4</div>
+      <div class="step-icon">🌐</div>
+      <div class="step-label">呼叫外部 API</div>
+      <div class="step-desc">天氣技能呼叫 OpenWeatherMap</div>
+    </div>
+
+    <div class="arrow">
+      <svg viewBox="0 0 36 20"><polyline points="4,10 28,10" stroke="#a0aec0" stroke-width="2" fill="none"/><polyline points="22,4 28,10 22,16" stroke="#a0aec0" stroke-width="2" fill="none"/></svg>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step-card color-5">
+      <div class="step-number">5</div>
+      <div class="step-icon">📊</div>
+      <div class="step-label">AI 彙整資料</div>
+      <div class="step-desc">將 API 數據轉為自然語言</div>
+    </div>
+
+    <div class="arrow">
+      <svg viewBox="0 0 36 20"><polyline points="4,10 28,10" stroke="#a0aec0" stroke-width="2" fill="none"/><polyline points="22,4 28,10 22,16" stroke="#a0aec0" stroke-width="2" fill="none"/></svg>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="step-card color-6">
+      <div class="step-number">6</div>
+      <div class="step-icon">📱</div>
+      <div class="step-label">龍蝦回覆</div>
+      <div class="step-desc">「今天台北 26°C，多雲偶陣雨…」</div>
+    </div>
+
+  </div>
+
+  <!-- 底部說明 -->
+  <div class="note-box">
+    <span class="note-icon">💡</span>
+    <div class="note-text">
+      <strong>關鍵在第 3 步</strong> — AI 會自動判斷應該使用哪個技能，你不需要打特殊指令。只要自然地說話，龍蝦就會聰明地選擇對應的 Skill 來幫你完成任務。
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenClaw Dashboard - Overview</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #f0f2f5;
+    font-family: 'Microsoft JhengHei', 'Segoe UI', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── 整體容器（模擬瀏覽器視窗） ── */
+  .browser-window {
+    width: 1200px;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+    border: 1px solid #d0d5dd;
+    margin: 30px auto;
+  }
+
+  /* ── 瀏覽器標題列 ── */
+  .browser-bar {
+    background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #d0d5dd;
+  }
+  .browser-dots {
+    display: flex;
+    gap: 6px;
+  }
+  .browser-dots span {
+    width: 12px; height: 12px; border-radius: 50%;
+  }
+  .browser-dots .r { background: #ff5f57; }
+  .browser-dots .y { background: #febc2e; }
+  .browser-dots .g { background: #28c840; }
+  .address-bar {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .address-bar .lock {
+    color: #28a745;
+    font-size: 12px;
+  }
+  .address-bar .url {
+    color: #6c757d;
+  }
+  .address-bar .url b {
+    color: #212529;
+  }
+
+  /* ── 頂部導航列 ── */
+  .top-nav {
+    background: linear-gradient(135deg, #1e3a5f 0%, #0f2439 100%);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    height: 56px;
+    gap: 0;
+  }
+  .nav-brand {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    margin-right: 40px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+  .nav-brand .lobster-icon {
+    font-size: 22px;
+  }
+  .nav-links {
+    display: flex;
+    gap: 0;
+    height: 100%;
+  }
+  .nav-links a {
+    color: rgba(255,255,255,0.65);
+    text-decoration: none;
+    font-size: 14px;
+    padding: 0 20px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+  }
+  .nav-links a:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.06);
+  }
+  .nav-links a.active {
+    color: #fff;
+    border-bottom-color: #60a5fa;
+    background: rgba(255,255,255,0.08);
+    font-weight: 600;
+  }
+  .nav-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .nav-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #68d391;
+    font-size: 13px;
+  }
+  .nav-status .pulse {
+    width: 8px; height: 8px;
+    background: #68d391;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(104, 211, 145, 0.5); }
+    50% { box-shadow: 0 0 0 6px rgba(104, 211, 145, 0); }
+  }
+
+  /* ── 主要版面 ── */
+  .main-layout {
+    display: flex;
+    min-height: 680px;
+  }
+
+  /* ── 側邊欄 ── */
+  .sidebar {
+    width: 220px;
+    background: linear-gradient(180deg, #0f2439 0%, #1a365d 100%);
+    padding: 20px 0;
+    flex-shrink: 0;
+  }
+  .sidebar-section {
+    margin-bottom: 24px;
+  }
+  .sidebar-section-title {
+    color: rgba(255,255,255,0.35);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 0 20px;
+    margin-bottom: 8px;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    color: rgba(255,255,255,0.6);
+    font-size: 14px;
+    cursor: default;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .sidebar-item:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.06);
+  }
+  .sidebar-item.active {
+    color: #fff;
+    background: rgba(96, 165, 250, 0.15);
+    border-left-color: #60a5fa;
+  }
+  .sidebar-item .si-icon {
+    width: 20px;
+    text-align: center;
+    font-size: 15px;
+  }
+  .sidebar-item .si-badge {
+    margin-left: auto;
+    background: #ef4444;
+    color: #fff;
+    font-size: 11px;
+    padding: 1px 7px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+
+  /* ── 內容區 ── */
+  .content-area {
+    flex: 1;
+    padding: 28px 32px;
+    background: #f7f8fc;
+    overflow: hidden;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .page-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a202c;
+  }
+  .page-subtitle {
+    font-size: 13px;
+    color: #718096;
+    margin-top: 2px;
+  }
+  .header-actions {
+    display: flex;
+    gap: 10px;
+  }
+  .btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+  }
+  .btn-outline {
+    background: #fff;
+    color: #4a5568;
+    border: 1px solid #cbd5e0;
+  }
+
+  /* ── 統計卡片 ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 22px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border: 1px solid #e2e8f0;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .stat-card.blue::after { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+  .stat-card.green::after { background: linear-gradient(90deg, #10b981, #34d399); }
+  .stat-card.purple::after { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+  .stat-card.orange::after { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+
+  .stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .stat-label {
+    font-size: 13px;
+    color: #718096;
+    font-weight: 500;
+  }
+  .stat-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .stat-icon.blue { background: rgba(59,130,246,0.1); }
+  .stat-icon.green { background: rgba(16,185,129,0.1); }
+  .stat-icon.purple { background: rgba(139,92,246,0.1); }
+  .stat-icon.orange { background: rgba(245,158,11,0.1); }
+
+  .stat-number {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1a202c;
+    line-height: 1.1;
+  }
+  .stat-detail {
+    font-size: 12px;
+    color: #a0aec0;
+    margin-top: 6px;
+  }
+  .stat-change {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+  .stat-change.up { color: #10b981; }
+  .stat-change.down { color: #ef4444; }
+
+  /* ── 中間區：圖表 + 最近對話 ── */
+  .middle-row {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 18px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 22px;
+    border-bottom: 1px solid #edf2f7;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-header h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #2d3748;
+  }
+  .card-header .tab-group {
+    display: flex;
+    gap: 0;
+    background: #edf2f7;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .card-header .tab-group span {
+    padding: 5px 14px;
+    font-size: 12px;
+    color: #718096;
+    cursor: pointer;
+  }
+  .card-header .tab-group span.active {
+    background: #fff;
+    color: #2d3748;
+    font-weight: 600;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  }
+
+  /* ── 折線圖（SVG 模擬） ── */
+  .chart-area {
+    padding: 20px 22px;
+    height: 280px;
+    position: relative;
+  }
+  .chart-svg {
+    width: 100%;
+    height: 100%;
+  }
+  .chart-grid-line {
+    stroke: #edf2f7;
+    stroke-width: 1;
+  }
+  .chart-line {
+    fill: none;
+    stroke: #3b82f6;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .chart-area-fill {
+    fill: url(#blueGrad);
+  }
+  .chart-dot {
+    fill: #3b82f6;
+    stroke: #fff;
+    stroke-width: 2.5;
+  }
+  .chart-label {
+    fill: #a0aec0;
+    font-size: 12px;
+    font-family: 'Microsoft JhengHei', sans-serif;
+  }
+  .chart-value-label {
+    fill: #4a5568;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'Microsoft JhengHei', sans-serif;
+  }
+  .y-label {
+    fill: #a0aec0;
+    font-size: 11px;
+    font-family: 'Microsoft JhengHei', sans-serif;
+    text-anchor: end;
+  }
+
+  /* ── 最近對話列表 ── */
+  .conversation-list {
+    list-style: none;
+  }
+  .conversation-list li {
+    padding: 14px 22px;
+    border-bottom: 1px solid #f7fafc;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    transition: background 0.15s;
+  }
+  .conversation-list li:hover {
+    background: #f7fafc;
+  }
+  .conversation-list li:last-child {
+    border-bottom: none;
+  }
+  .conv-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    color: #fff;
+    font-weight: 700;
+  }
+  .conv-avatar.line { background: #06c755; }
+  .conv-avatar.tg { background: #2aabee; }
+  .conv-avatar.dc { background: #5865f2; }
+
+  .conv-info { flex: 1; min-width: 0; }
+  .conv-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #2d3748;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .conv-name .conv-time {
+    font-size: 11px;
+    color: #a0aec0;
+    font-weight: 400;
+  }
+  .conv-msg {
+    font-size: 12.5px;
+    color: #718096;
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .conv-channel-tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    margin-right: 4px;
+  }
+  .conv-channel-tag.line { background: rgba(6,199,85,0.1); color: #06c755; }
+  .conv-channel-tag.tg { background: rgba(42,171,238,0.1); color: #2aabee; }
+  .conv-channel-tag.dc { background: rgba(88,101,242,0.1); color: #5865f2; }
+
+  /* ── 列印設定 ── */
+  @media print {
+    body { background: #fff; }
+    .browser-window {
+      box-shadow: none;
+      border: 2px solid #333;
+      width: 1200px;
+      margin: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="browser-window">
+
+  <!-- 瀏覽器標題列 -->
+  <div class="browser-bar">
+    <div class="browser-dots">
+      <span class="r"></span><span class="y"></span><span class="g"></span>
+    </div>
+    <div class="address-bar">
+      <span class="lock">&#x1F512;</span>
+      <span class="url"><b>localhost:18790</b>/dashboard</span>
+    </div>
+  </div>
+
+  <!-- 頂部導航 -->
+  <div class="top-nav">
+    <div class="nav-brand">
+      <span class="lobster-icon">&#x1F99E;</span> OpenClaw Dashboard
+    </div>
+    <div class="nav-links">
+      <a href="#" class="active">Overview</a>
+      <a href="#">Conversations</a>
+      <a href="#">Skills</a>
+      <a href="#">Settings</a>
+    </div>
+    <div class="nav-right">
+      <div class="nav-status">
+        <span class="pulse"></span> Gateway 運行中
+      </div>
+    </div>
+  </div>
+
+  <!-- 主要版面 -->
+  <div class="main-layout">
+
+    <!-- 側邊欄 -->
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">主要功能</div>
+        <div class="sidebar-item active">
+          <span class="si-icon">&#x1F4CA;</span> 總覽
+        </div>
+        <div class="sidebar-item">
+          <span class="si-icon">&#x1F4AC;</span> 對話紀錄
+          <span class="si-badge">3</span>
+        </div>
+        <div class="sidebar-item">
+          <span class="si-icon">&#x1F4E6;</span> 技能管理
+        </div>
+        <div class="sidebar-item">
+          <span class="si-icon">&#x1F310;</span> 通道管理
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">系統</div>
+        <div class="sidebar-item">
+          <span class="si-icon">&#x2699;&#xFE0F;</span> 設定
+        </div>
+        <div class="sidebar-item">
+          <span class="si-icon">&#x1F4CB;</span> 日誌
+        </div>
+        <div class="sidebar-item">
+          <span class="si-icon">&#x1F527;</span> 診斷工具
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">通道狀態</div>
+        <div class="sidebar-item">
+          <span class="si-icon" style="color:#06c755;">&#x25CF;</span> LINE
+        </div>
+        <div class="sidebar-item">
+          <span class="si-icon" style="color:#2aabee;">&#x25CF;</span> Telegram
+        </div>
+        <div class="sidebar-item">
+          <span class="si-icon" style="color:#5865f2;">&#x25CF;</span> Discord
+        </div>
+      </div>
+    </div>
+
+    <!-- 內容區 -->
+    <div class="content-area">
+
+      <!-- 頁面標頭 -->
+      <div class="page-header">
+        <div>
+          <div class="page-title">&#x1F4CA; 系統總覽</div>
+          <div class="page-subtitle">最後更新：2026-03-07 11:34:28</div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-outline">&#x1F4E5; 匯出報表</button>
+          <button class="btn btn-primary">&#x1F504; 重新整理</button>
+        </div>
+      </div>
+
+      <!-- 統計卡片 -->
+      <div class="stats-grid">
+        <!-- 今日對話數 -->
+        <div class="stat-card blue">
+          <div class="stat-header">
+            <div>
+              <div class="stat-label">今日對話數</div>
+            </div>
+            <div class="stat-icon blue">&#x1F4AC;</div>
+          </div>
+          <div class="stat-number">47</div>
+          <div class="stat-change up">&#x25B2; 12% 較昨日</div>
+        </div>
+
+        <!-- 活躍通道 -->
+        <div class="stat-card green">
+          <div class="stat-header">
+            <div>
+              <div class="stat-label">活躍通道</div>
+            </div>
+            <div class="stat-icon green">&#x1F310;</div>
+          </div>
+          <div class="stat-number">3</div>
+          <div class="stat-detail">LINE, Telegram, Discord</div>
+        </div>
+
+        <!-- 已安裝技能 -->
+        <div class="stat-card purple">
+          <div class="stat-header">
+            <div>
+              <div class="stat-label">已安裝技能</div>
+            </div>
+            <div class="stat-icon purple">&#x1F4E6;</div>
+          </div>
+          <div class="stat-number">5</div>
+          <div class="stat-detail">2 個自訂 / 3 個內建</div>
+        </div>
+
+        <!-- Gateway 運行時間 -->
+        <div class="stat-card orange">
+          <div class="stat-header">
+            <div>
+              <div class="stat-label">Gateway 運行時間</div>
+            </div>
+            <div class="stat-icon orange">&#x23F1;&#xFE0F;</div>
+          </div>
+          <div class="stat-number" style="font-size:26px;">7<span style="font-size:16px;font-weight:400;color:#718096;">天</span> 14<span style="font-size:16px;font-weight:400;color:#718096;">小時</span></div>
+          <div class="stat-change up">&#x2705; 穩定運行中</div>
+        </div>
+      </div>
+
+      <!-- 圖表 + 最近對話 -->
+      <div class="middle-row">
+
+        <!-- 折線圖 -->
+        <div class="card">
+          <div class="card-header">
+            <h3>&#x1F4C8; 過去 7 天對話數</h3>
+            <div class="tab-group">
+              <span class="active">7天</span>
+              <span>30天</span>
+              <span>全部</span>
+            </div>
+          </div>
+          <div class="chart-area">
+            <svg class="chart-svg" viewBox="0 0 580 240" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.25"/>
+                  <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.02"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Y 軸標籤 -->
+              <text class="y-label" x="30" y="22">60</text>
+              <text class="y-label" x="30" y="67">45</text>
+              <text class="y-label" x="30" y="112">30</text>
+              <text class="y-label" x="30" y="157">15</text>
+              <text class="y-label" x="30" y="202">0</text>
+
+              <!-- 網格線 -->
+              <line class="chart-grid-line" x1="40" y1="18" x2="560" y2="18"/>
+              <line class="chart-grid-line" x1="40" y1="63" x2="560" y2="63"/>
+              <line class="chart-grid-line" x1="40" y1="108" x2="560" y2="108"/>
+              <line class="chart-grid-line" x1="40" y1="153" x2="560" y2="153"/>
+              <line class="chart-grid-line" x1="40" y1="198" x2="560" y2="198"/>
+
+              <!-- 面積填充 -->
+              <!-- 資料點: 3/1=32, 3/2=28, 3/3=41, 3/4=38, 3/5=52, 3/6=45, 3/7=47 -->
+              <!-- Y 映射: val -> 198 - (val/60)*180 -->
+              <!-- 32->102, 28->114, 41->75, 38->84, 52->42, 45->63, 47->57 -->
+              <polygon class="chart-area-fill"
+                points="115,102 189,114 263,75 337,84 411,42 485,63 559,57 559,198 115,198"
+              />
+
+              <!-- 折線 -->
+              <polyline class="chart-line"
+                points="115,102 189,114 263,75 337,84 411,42 485,63 559,57"
+              />
+
+              <!-- 資料點 -->
+              <circle class="chart-dot" cx="115" cy="102" r="4.5"/>
+              <circle class="chart-dot" cx="189" cy="114" r="4.5"/>
+              <circle class="chart-dot" cx="263" cy="75" r="4.5"/>
+              <circle class="chart-dot" cx="337" cy="84" r="4.5"/>
+              <circle class="chart-dot" cx="411" cy="42" r="5.5"/>
+              <circle class="chart-dot" cx="485" cy="63" r="4.5"/>
+              <circle class="chart-dot" cx="559" cy="57" r="5.5" style="fill:#2563eb;stroke-width:3;"/>
+
+              <!-- 數值標籤 -->
+              <text class="chart-value-label" x="115" y="92" text-anchor="middle">32</text>
+              <text class="chart-value-label" x="189" y="128" text-anchor="middle">28</text>
+              <text class="chart-value-label" x="263" y="66" text-anchor="middle">41</text>
+              <text class="chart-value-label" x="337" y="98" text-anchor="middle">38</text>
+              <text class="chart-value-label" x="411" y="33" text-anchor="middle">52</text>
+              <text class="chart-value-label" x="485" y="77" text-anchor="middle">45</text>
+              <text class="chart-value-label" x="559" y="48" text-anchor="middle" style="font-weight:800;fill:#2563eb;">47</text>
+
+              <!-- X 軸日期標籤 -->
+              <text class="chart-label" x="115" y="218" text-anchor="middle">3/1</text>
+              <text class="chart-label" x="189" y="218" text-anchor="middle">3/2</text>
+              <text class="chart-label" x="263" y="218" text-anchor="middle">3/3</text>
+              <text class="chart-label" x="337" y="218" text-anchor="middle">3/4</text>
+              <text class="chart-label" x="411" y="218" text-anchor="middle">3/5</text>
+              <text class="chart-label" x="485" y="218" text-anchor="middle">3/6</text>
+              <text class="chart-label" x="559" y="218" text-anchor="middle" style="font-weight:700;fill:#2d3748;">3/7</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- 最近對話列表 -->
+        <div class="card">
+          <div class="card-header">
+            <h3>&#x1F4AC; 最近對話</h3>
+            <span style="font-size:12px;color:#3b82f6;cursor:pointer;font-weight:600;">查看全部 &rarr;</span>
+          </div>
+          <ul class="conversation-list">
+            <li>
+              <div class="conv-avatar line">L</div>
+              <div class="conv-info">
+                <div class="conv-name">
+                  <span><span class="conv-channel-tag line">LINE</span>王小明</span>
+                  <span class="conv-time">2 分鐘前</span>
+                </div>
+                <div class="conv-msg">請幫我查一下明天台北的天氣預報</div>
+              </div>
+            </li>
+            <li>
+              <div class="conv-avatar tg">T</div>
+              <div class="conv-info">
+                <div class="conv-name">
+                  <span><span class="conv-channel-tag tg">TG</span>陳老師</span>
+                  <span class="conv-time">15 分鐘前</span>
+                </div>
+                <div class="conv-msg">幫我整理這週的會議紀錄重點</div>
+              </div>
+            </li>
+            <li>
+              <div class="conv-avatar dc">D</div>
+              <div class="conv-info">
+                <div class="conv-name">
+                  <span><span class="conv-channel-tag dc">DC</span>林同學</span>
+                  <span class="conv-time">32 分鐘前</span>
+                </div>
+                <div class="conv-msg">Python 的 list comprehension 怎麼寫？</div>
+              </div>
+            </li>
+            <li>
+              <div class="conv-avatar line">L</div>
+              <div class="conv-info">
+                <div class="conv-name">
+                  <span><span class="conv-channel-tag line">LINE</span>張美玲</span>
+                  <span class="conv-time">1 小時前</span>
+                </div>
+                <div class="conv-msg">請幫我翻譯這段英文文章成中文</div>
+              </div>
+            </li>
+            <li>
+              <div class="conv-avatar tg">T</div>
+              <div class="conv-info">
+                <div class="conv-name">
+                  <span><span class="conv-channel-tag tg">TG</span>李助教</span>
+                  <span class="conv-time">2 小時前</span>
+                </div>
+                <div class="conv-msg">設定每天早上 8 點提醒我備課</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+      <!-- /middle-row -->
+
+    </div>
+    <!-- /content-area -->
+
+  </div>
+  <!-- /main-layout -->
+
+</div>
+<!-- /browser-window -->
+
+</body>
+</html>

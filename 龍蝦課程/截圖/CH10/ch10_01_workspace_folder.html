@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CH10 - 工作區資料夾結構</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
+    background: #f0f4f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  .container {
+    width: 1200px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.10);
+    overflow: hidden;
+  }
+
+  /* ── Windows 11 標題列 ── */
+  .win-titlebar {
+    background: #f3f3f3;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 0 16px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .win-titlebar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .win-titlebar-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .win-titlebar-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .win-titlebar-text {
+    font-size: 12px;
+    color: #1a1a1a;
+    font-weight: 400;
+  }
+
+  .win-buttons {
+    display: flex;
+    gap: 0;
+  }
+
+  .win-btn {
+    width: 46px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .win-btn:hover { background: #e5e5e5; }
+  .win-btn-close:hover { background: #e81123; }
+  .win-btn-close:hover svg path { stroke: #fff; }
+
+  .win-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* ── 網址列 / 路徑列 ── */
+  .win-pathbar {
+    background: #f9f9f9;
+    border-bottom: 1px solid #e8e8e8;
+    padding: 8px 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .path-segment {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: #444;
+  }
+
+  .path-segment .sep {
+    color: #999;
+    font-size: 11px;
+  }
+
+  .path-segment .folder-icon {
+    font-size: 14px;
+  }
+
+  /* ── 工具列 ── */
+  .win-toolbar {
+    background: #fafafa;
+    border-bottom: 1px solid #ececec;
+    padding: 6px 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 12px;
+    color: #666;
+  }
+
+  .toolbar-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: default;
+  }
+
+  /* ── 主體：左側導覽 + 右側檔案 ── */
+  .win-body {
+    display: flex;
+    min-height: 520px;
+  }
+
+  /* 左側樹狀導覽 */
+  .win-sidebar {
+    width: 240px;
+    background: #f7f7f7;
+    border-right: 1px solid #e8e8e8;
+    padding: 16px 0 16px 16px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-section {
+    margin-bottom: 18px;
+  }
+
+  .sidebar-header {
+    font-size: 11px;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    padding-left: 4px;
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px 5px 8px;
+    font-size: 13px;
+    color: #333;
+    border-radius: 6px;
+    cursor: default;
+    margin-bottom: 2px;
+  }
+
+  .sidebar-item.active {
+    background: #e3edf7;
+    color: #0066cc;
+    font-weight: 600;
+  }
+
+  .sidebar-item .si-icon {
+    font-size: 15px;
+    width: 20px;
+    text-align: center;
+  }
+
+  /* 右側檔案總管主區 */
+  .win-main {
+    flex: 1;
+    padding: 24px 32px;
+    background: #fff;
+  }
+
+  .main-title {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 16px;
+    font-weight: 400;
+  }
+
+  /* 樹狀結構 */
+  .tree {
+    list-style: none;
+    padding: 0;
+    font-size: 14px;
+  }
+
+  .tree li {
+    position: relative;
+  }
+
+  .tree-row {
+    display: flex;
+    align-items: center;
+    padding: 7px 12px;
+    border-radius: 8px;
+    cursor: default;
+    transition: background 0.15s;
+  }
+
+  .tree-row:hover {
+    background: #f0f5ff;
+  }
+
+  .tree-row .t-indent {
+    display: inline-block;
+    width: 24px;
+    flex-shrink: 0;
+  }
+
+  .tree-row .t-icon {
+    font-size: 18px;
+    margin-right: 8px;
+    flex-shrink: 0;
+    width: 22px;
+    text-align: center;
+  }
+
+  .tree-row .t-name {
+    font-weight: 600;
+    color: #1a202c;
+    margin-right: 6px;
+    white-space: nowrap;
+  }
+
+  .tree-row .t-arrow {
+    color: #aab4c4;
+    margin: 0 10px;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .tree-row .t-desc {
+    color: #8899aa;
+    font-size: 12.5px;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  /* 層級 0 — .openclaw/ */
+  .level-0 .t-name { font-size: 15px; }
+
+  /* 層級 1 — workspace/ 等 */
+  .level-1 .tree-row { padding-left: 36px; }
+
+  /* 層級 2 — IDENTITY.md 等 */
+  .level-2 .tree-row { padding-left: 68px; }
+
+  /* 展開三角形 */
+  .tree-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-right: 4px;
+    flex-shrink: 0;
+    font-size: 10px;
+    color: #666;
+  }
+
+  /* 連線 */
+  .level-1::before,
+  .level-2::before {
+    content: '';
+    position: absolute;
+    left: 34px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: #dce3ec;
+  }
+
+  .level-2::before {
+    left: 62px;
+  }
+
+  .level-1:last-child::before,
+  .level-2:last-child::before {
+    bottom: 50%;
+  }
+
+  /* 檔案類型顏色 */
+  .ft-md .t-name { color: #2b6cb0; }
+  .ft-json .t-name { color: #b7791f; }
+  .ft-folder .t-name { color: #2d3748; }
+
+  /* 底部資訊列 */
+  .win-statusbar {
+    background: #f3f3f3;
+    border-top: 1px solid #e0e0e0;
+    padding: 6px 20px;
+    font-size: 11px;
+    color: #888;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* 圖例 */
+  .legend {
+    display: flex;
+    gap: 24px;
+    margin-top: 18px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #666;
+  }
+
+  .legend-icon {
+    font-size: 16px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Windows 標題列 -->
+  <div class="win-titlebar">
+    <div class="win-titlebar-left">
+      <div class="win-titlebar-icon">
+        <svg viewBox="0 0 18 18" fill="none">
+          <rect x="1" y="1" width="7" height="7" rx="1" fill="#f9a825"/>
+          <rect x="10" y="1" width="7" height="7" rx="1" fill="#f9a825"/>
+          <rect x="1" y="10" width="7" height="7" rx="1" fill="#f9a825"/>
+          <rect x="10" y="10" width="7" height="7" rx="1" fill="#f9a825"/>
+        </svg>
+      </div>
+      <span class="win-titlebar-text">檔案總管</span>
+    </div>
+    <div class="win-buttons">
+      <button class="win-btn">
+        <svg viewBox="0 0 12 12"><line x1="1" y1="6" x2="11" y2="6" stroke="#333" stroke-width="1.2"/></svg>
+      </button>
+      <button class="win-btn">
+        <svg viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" rx="1" stroke="#333" stroke-width="1.2" fill="none"/></svg>
+      </button>
+      <button class="win-btn win-btn-close">
+        <svg viewBox="0 0 12 12"><line x1="1" y1="1" x2="11" y2="11" stroke="#333" stroke-width="1.2"/><line x1="11" y1="1" x2="1" y2="11" stroke="#333" stroke-width="1.2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- 路徑列 -->
+  <div class="win-pathbar">
+    <div class="path-segment">
+      <span class="folder-icon">🏠</span> 使用者目錄
+      <span class="sep">›</span>
+    </div>
+    <div class="path-segment">
+      <span class="folder-icon">📁</span> .openclaw
+      <span class="sep">›</span>
+    </div>
+    <div class="path-segment">
+      <span class="folder-icon">📁</span> workspace
+    </div>
+  </div>
+
+  <!-- 工具列 -->
+  <div class="win-toolbar">
+    <div class="toolbar-item">📋 複製</div>
+    <div class="toolbar-item">✂️ 剪下</div>
+    <div class="toolbar-item">📋 貼上</div>
+    <div class="toolbar-item">🗑️ 刪除</div>
+    <div class="toolbar-item" style="margin-left:auto;">📐 檢視</div>
+    <div class="toolbar-item">⋯ 更多</div>
+  </div>
+
+  <div class="win-body">
+    <!-- 左側導覽 -->
+    <div class="win-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-header">快速存取</div>
+        <div class="sidebar-item"><span class="si-icon">🖥️</span> 桌面</div>
+        <div class="sidebar-item"><span class="si-icon">📥</span> 下載</div>
+        <div class="sidebar-item"><span class="si-icon">📄</span> 文件</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-header">本機</div>
+        <div class="sidebar-item"><span class="si-icon">💻</span> 本機 (C:)</div>
+        <div class="sidebar-item"><span class="si-icon">💿</span> 資料 (D:)</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-header">使用者資料</div>
+        <div class="sidebar-item active"><span class="si-icon">🦞</span> .openclaw</div>
+      </div>
+    </div>
+
+    <!-- 右側主區域 -->
+    <div class="win-main">
+      <div class="main-title">📂 OpenClaw 工作區資料夾結構</div>
+
+      <ul class="tree">
+        <!-- .openclaw/ -->
+        <li class="level-0">
+          <div class="tree-row ft-folder">
+            <span class="tree-toggle">▼</span>
+            <span class="t-icon">📁</span>
+            <span class="t-name">.openclaw/</span>
+            <span class="t-arrow">←</span>
+            <span class="t-desc">龍蝦的家目錄（隱藏資料夾）</span>
+          </div>
+        </li>
+
+        <!-- workspace/ -->
+        <li class="level-1">
+          <div class="tree-row ft-folder">
+            <span class="tree-toggle">▼</span>
+            <span class="t-icon">📁</span>
+            <span class="t-name">workspace/</span>
+            <span class="t-arrow">←</span>
+            <span class="t-desc">工作區核心，所有設定都在這裡</span>
+          </div>
+        </li>
+
+        <!-- IDENTITY.md -->
+        <li class="level-2">
+          <div class="tree-row ft-md">
+            <span class="t-icon">📄</span>
+            <span class="t-name">IDENTITY.md</span>
+            <span class="t-arrow">←</span>
+            <span class="t-desc">龍蝦的身份與人格設定（名字、個性、說話風格）</span>
+          </div>
+        </li>
+
+        <!-- SOUL.md -->
+        <li class="level-2">
+          <div class="tree-row ft-md">
+            <span class="t-icon">📄</span>
+            <span class="t-name">SOUL.md</span>
+            <span class="t-arrow">←</span>
+            <span class="t-desc">龍蝦的行為準則（什麼該做、什麼不該做）</span>
+          </div>
+        </li>
+
+        <!-- USER.md -->
+        <li class="level-2">
+          <div class="tree-row ft-md">
+            <span class="t-icon">📄</span>
+            <span class="t-name">USER.md</span>
+            <span class="t-arrow">←</span>
+            <span class="t-desc">你的個人偏好（語言、稱呼、回覆風格）</span>
+          </div>
+        </li>
+
+        <!-- AGENTS.md -->
+        <li class="level-2">
+          <div class="tree-row ft-md">
+            <span class="t-icon">📄</span>
+            <span class="t-name">AGENTS.md</span>
+            <span class="t-arrow">←</span>
+            <span class="t-desc">分身代理設定（多角色切換）</span>
+          </div>
+        </li>
+
+        <!-- TOOLS.md -->
+        <li class="level-2">
+          <div class="tree-row ft-md">
+            <span class="t-icon">📄</span>
+            <span class="t-name">TOOLS.md</span>
+            <span class="t-arrow">←</span>
+            <span class="t-desc">環境與工具設定（系統資訊、路徑）</span>
+          </div>
+        </li>
+
+        <!-- HEARTBEAT.md -->
+        <li class="level-2">
+          <div class="tree-row ft-md">
+            <span class="t-icon">📄</span>
+            <span class="t-name">HEARTBEAT.md</span>
+            <span class="t-arrow">←</span>
+            <span class="t-desc">排程與自動化（定時提醒、排程任務）</span>
+          </div>
+        </li>
+
+        <!-- skills/ -->
+        <li class="level-2">
+          <div class="tree-row ft-folder">
+            <span class="t-icon">📁</span>
+            <span class="t-name">skills/</span>
+            <span class="t-arrow">←</span>
+            <span class="t-desc">已安裝的技能（每個技能一個資料夾）</span>
+          </div>
+        </li>
+
+        <!-- dashboard/ -->
+        <li class="level-2">
+          <div class="tree-row ft-folder">
+            <span class="t-icon">📁</span>
+            <span class="t-name">dashboard/</span>
+            <span class="t-arrow">←</span>
+            <span class="t-desc">Dashboard 網頁管理介面</span>
+          </div>
+        </li>
+
+        <!-- openclaw.json -->
+        <li class="level-1" style="margin-top: 4px;">
+          <div class="tree-row ft-json">
+            <span class="t-icon">⚙️</span>
+            <span class="t-name">openclaw.json</span>
+            <span class="t-arrow">←</span>
+            <span class="t-desc">主要設定檔（API Key、LINE 頻道、模型選擇）</span>
+          </div>
+        </li>
+      </ul>
+
+      <!-- 圖例 -->
+      <div class="legend">
+        <div class="legend-item"><span class="legend-icon">📁</span> 資料夾</div>
+        <div class="legend-item"><span class="legend-icon">📄</span> Markdown 設定檔（.md）</div>
+        <div class="legend-item"><span class="legend-icon">⚙️</span> JSON 設定檔</div>
+        <div class="legend-item" style="margin-left: auto; color: #999;">共 6 個設定檔 + 2 個子資料夾</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部狀態列 -->
+  <div class="win-statusbar">
+    <span>10 個項目</span>
+    <span>位置：C:\Users\你的帳號\.openclaw\workspace</span>
+  </div>
+
+</div>
+</body>
+</html>

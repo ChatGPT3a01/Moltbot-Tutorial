@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>Desktop Agent 四代演進圖</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    padding: 30px 0;
+  }
+  .container {
+    width: 1200px;
+    background: #fff;
+    padding: 40px 50px 50px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 32px;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 50px;
+  }
+  /* 階梯容器 */
+  .staircase {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 0;
+    height: 520px;
+    padding: 0 40px;
+    position: relative;
+  }
+  /* 底部時間軸線 */
+  .staircase::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 40px;
+    right: 40px;
+    height: 3px;
+    background: linear-gradient(90deg, #ccc, #e74c3c);
+  }
+  /* 每一階 */
+  .step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+  .step-block {
+    width: 100%;
+    border-radius: 16px 16px 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    position: relative;
+    transition: all 0.3s;
+    border: 3px solid transparent;
+  }
+  /* 各代高度與顏色 */
+  .step:nth-child(1) .step-block {
+    height: 140px;
+    background: linear-gradient(135deg, #74b9ff, #0984e3);
+    border-color: #0984e3;
+  }
+  .step:nth-child(2) .step-block {
+    height: 230px;
+    background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+    border-color: #6c5ce7;
+  }
+  .step:nth-child(3) .step-block {
+    height: 340px;
+    background: linear-gradient(135deg, #fdcb6e, #e17055);
+    border-color: #e17055;
+  }
+  .step:nth-child(4) .step-block {
+    height: 470px;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    border-color: #ee5a24;
+    box-shadow: 0 0 30px rgba(238, 90, 36, 0.35);
+  }
+  .gen-badge {
+    background: rgba(255,255,255,0.25);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+  .step-icon {
+    font-size: 48px;
+    margin-bottom: 8px;
+  }
+  .step:nth-child(4) .step-icon {
+    font-size: 60px;
+  }
+  .step-title {
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .step:nth-child(4) .step-title {
+    font-size: 26px;
+  }
+  .step-en {
+    color: rgba(255,255,255,0.85);
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 10px;
+  }
+  .step-tools {
+    color: #fff;
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.6;
+    opacity: 0.9;
+  }
+  .step-tools strong {
+    display: block;
+    margin-top: 4px;
+    font-size: 14px;
+    opacity: 1;
+  }
+  /* 年份標籤 */
+  .year-label {
+    margin-top: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #555;
+  }
+  /* 第四代特殊標記 */
+  .star-badge {
+    position: absolute;
+    top: -18px;
+    right: -10px;
+    background: #ffd32a;
+    color: #333;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 20px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    white-space: nowrap;
+  }
+  /* 飛躍箭頭 */
+  .leap-arrow {
+    position: absolute;
+    bottom: 355px;
+    left: 50%;
+    transform: translateX(-110%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 10;
+  }
+  .leap-arrow .arrow-line {
+    width: 3px;
+    height: 50px;
+    background: #e74c3c;
+    position: relative;
+  }
+  .leap-arrow .arrow-line::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 12px solid #e74c3c;
+  }
+  .leap-text {
+    background: #e74c3c;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 12px;
+    white-space: nowrap;
+    margin-bottom: 4px;
+  }
+  /* 說明區 */
+  .desc-section {
+    margin-top: 45px;
+    padding: 28px 32px;
+    background: #f8f9fa;
+    border-radius: 16px;
+    border: 2px solid #e9ecef;
+  }
+  .desc-section h2 {
+    font-size: 20px;
+    color: #1a1a2e;
+    margin-bottom: 16px;
+  }
+  .desc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .desc-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 18px;
+    background: #fff;
+    border-radius: 12px;
+    border-left: 4px solid #ccc;
+  }
+  .desc-item:nth-child(1) { border-left-color: #0984e3; }
+  .desc-item:nth-child(2) { border-left-color: #6c5ce7; }
+  .desc-item:nth-child(3) { border-left-color: #e17055; }
+  .desc-item:nth-child(4) { border-left-color: #ee5a24; }
+  .desc-item .di-icon { font-size: 28px; flex-shrink: 0; }
+  .desc-item .di-text { font-size: 14px; color: #333; line-height: 1.7; }
+  .desc-item .di-text strong { color: #1a1a2e; }
+  .footer-note {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 13px;
+    color: #999;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Desktop Agent 四代演進</h1>
+  <p class="subtitle">從寫程式到全能桌面代理 — AI 自主代理的進化之路</p>
+
+  <div class="staircase">
+    <!-- 第一代 -->
+    <div class="step">
+      <div class="step-block">
+        <span class="gen-badge">第一代</span>
+        <div class="step-icon">&#x1F4BB;</div>
+        <div class="step-title">Coding</div>
+        <div class="step-en">寫程式</div>
+        <div class="step-tools">
+          Cursor / GitHub Copilot<br>Windsurf / Claude Code
+          <strong>2023~2024</strong>
+        </div>
+      </div>
+      <div class="year-label">2023</div>
+    </div>
+
+    <!-- 第二代 -->
+    <div class="step">
+      <div class="step-block">
+        <span class="gen-badge">第二代</span>
+        <div class="step-icon">&#x1F310;</div>
+        <div class="step-title">Browser</div>
+        <div class="step-en">操作瀏覽器</div>
+        <div class="step-tools">
+          Manus / Fellou<br>Browser Use / Operator
+          <strong>2024~2025</strong>
+        </div>
+      </div>
+      <div class="year-label">2024</div>
+    </div>
+
+    <!-- 第三代 -->
+    <div class="step">
+      <div class="step-block">
+        <span class="gen-badge">第三代</span>
+        <div class="step-icon">&#x1F5A5;&#xFE0F;</div>
+        <div class="step-title">Desktop</div>
+        <div class="step-en">操作桌面</div>
+        <div class="step-tools">
+          Claude Computer Use<br>UI-TARS / OS-Atlas
+          <strong>2025</strong>
+        </div>
+      </div>
+      <div class="year-label">2025</div>
+    </div>
+
+    <!-- 飛躍箭頭 -->
+    <div class="leap-arrow">
+      <span class="leap-text">飛躍式進化!</span>
+      <div class="arrow-line"></div>
+    </div>
+
+    <!-- 第四代 -->
+    <div class="step">
+      <div class="step-block">
+        <span class="star-badge">&#x2B50; 我們在這裡！</span>
+        <span class="gen-badge">第四代</span>
+        <div class="step-icon">&#x1F99E;</div>
+        <div class="step-title">Computer Agent</div>
+        <div class="step-en">全能代理</div>
+        <div class="step-tools">
+          寫程式 + 瀏覽器 + 桌面<br>
+          全部整合、自主決策<br>
+          可與你的帳號互動
+          <strong>OpenClaw / 龍蝦 AI</strong>
+          <strong>2025~2026</strong>
+        </div>
+      </div>
+      <div class="year-label">2026</div>
+    </div>
+  </div>
+
+  <!-- 說明區 -->
+  <div class="desc-section">
+    <h2>各代能力說明</h2>
+    <div class="desc-grid">
+      <div class="desc-item">
+        <span class="di-icon">&#x1F4BB;</span>
+        <div class="di-text">
+          <strong>第一代 Coding Agent</strong><br>
+          只能在編輯器裡幫你寫程式、修 bug。無法跳出程式碼的世界。
+        </div>
+      </div>
+      <div class="desc-item">
+        <span class="di-icon">&#x1F310;</span>
+        <div class="di-text">
+          <strong>第二代 Browser Agent</strong><br>
+          可以打開瀏覽器、點選網頁、填表單，但僅限於瀏覽器內操作。
+        </div>
+      </div>
+      <div class="desc-item">
+        <span class="di-icon">&#x1F5A5;&#xFE0F;</span>
+        <div class="di-text">
+          <strong>第三代 Desktop Agent</strong><br>
+          可以操作桌面應用程式（如 Word、Excel），但各功能是分開的。
+        </div>
+      </div>
+      <div class="desc-item">
+        <span class="di-icon">&#x1F99E;</span>
+        <div class="di-text">
+          <strong>第四代 Computer Agent（OpenClaw）</strong><br>
+          融合前三代所有能力！能寫程式、開瀏覽器、操作桌面，還能用你的真實帳號登入服務、自主規劃工作流程。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="footer-note">CH18 Desktop Agent 教學 | 阿亮老師 教學講義</p>
+</div>
+</body>
+</html>

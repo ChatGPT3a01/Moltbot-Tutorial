@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>龍蝦多通道中心輻射圖</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+    padding: 40px 0;
+  }
+
+  .container {
+    width: 1200px;
+    position: relative;
+  }
+
+  .diagram-area {
+    width: 1200px;
+    height: 900px;
+    position: relative;
+  }
+
+  /* SVG 連接線層 */
+  .lines-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .connect-line {
+    stroke-width: 3;
+    stroke-linecap: round;
+    fill: none;
+  }
+
+  /* 中心核心 */
+  .core {
+    position: absolute;
+    width: 240px;
+    height: 240px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+  }
+
+  .core-circle {
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b35 0%, #d62828 50%, #c1121f 100%);
+    box-shadow: 0 8px 32px rgba(214, 40, 40, 0.35), 0 0 0 6px rgba(255, 107, 53, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    text-align: center;
+  }
+
+  .core-icon {
+    font-size: 56px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .core-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .core-subtitle {
+    font-size: 14px;
+    font-weight: 400;
+    opacity: 0.9;
+    margin-top: 2px;
+  }
+
+  /* 通道節點 */
+  .channel-node {
+    position: absolute;
+    width: 200px;
+    text-align: center;
+    z-index: 10;
+  }
+
+  .channel-circle {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s;
+  }
+
+  .channel-icon {
+    font-size: 36px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .channel-name {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .channel-desc {
+    font-size: 13px;
+    color: #444444;
+    line-height: 1.5;
+    margin-top: 2px;
+  }
+
+  /* 各通道顏色 */
+  .channel-line .channel-circle {
+    background: linear-gradient(135deg, #06c755 0%, #00b140 100%);
+    box-shadow: 0 4px 16px rgba(6, 199, 85, 0.3);
+  }
+
+  .channel-telegram .channel-circle {
+    background: linear-gradient(135deg, #2aabee 0%, #229ed9 100%);
+    box-shadow: 0 4px 16px rgba(42, 171, 238, 0.3);
+  }
+
+  .channel-whatsapp .channel-circle {
+    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    box-shadow: 0 4px 16px rgba(37, 211, 102, 0.3);
+  }
+
+  .channel-discord .channel-circle {
+    background: linear-gradient(135deg, #7289da 0%, #5865f2 100%);
+    box-shadow: 0 4px 16px rgba(88, 101, 242, 0.3);
+  }
+
+  .channel-email .channel-circle {
+    background: linear-gradient(135deg, #8e8e93 0%, #636366 100%);
+    box-shadow: 0 4px 16px rgba(142, 142, 147, 0.3);
+  }
+
+  .channel-webchat .channel-circle {
+    background: linear-gradient(135deg, #ff9500 0%, #ff6b00 100%);
+    box-shadow: 0 4px 16px rgba(255, 149, 0, 0.3);
+  }
+
+  /* 六個通道的定位（以圓心為基準，半徑 320px 環繞） */
+  /* 順序：上、右上、右下、下、左下、左上 */
+
+  /* 1. LINE - 正上方 (270deg) */
+  .channel-pos-0 {
+    top: 72px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* 2. Telegram - 右上 (330deg) */
+  .channel-pos-1 {
+    top: 175px;
+    right: 80px;
+  }
+
+  /* 3. WhatsApp - 右下 (30deg) */
+  .channel-pos-2 {
+    bottom: 175px;
+    right: 80px;
+  }
+
+  /* 4. Discord - 正下方 (90deg) */
+  .channel-pos-3 {
+    bottom: 72px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* 5. Email - 左下 (150deg) */
+  .channel-pos-4 {
+    bottom: 175px;
+    left: 80px;
+  }
+
+  /* 6. Web Chat - 左上 (210deg) */
+  .channel-pos-5 {
+    top: 175px;
+    left: 80px;
+  }
+
+  /* 底部說明文字 */
+  .footer-text {
+    text-align: center;
+    padding: 30px 60px 20px;
+    border-top: 2px solid #e0e0e0;
+    margin-top: 10px;
+  }
+
+  .footer-text p {
+    font-size: 20px;
+    color: #333333;
+    line-height: 1.8;
+    font-weight: 500;
+  }
+
+  .footer-highlight {
+    color: #d62828;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="diagram-area">
+
+    <!-- SVG 連接線 -->
+    <svg class="lines-layer" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- 各通道漸層 -->
+        <linearGradient id="grad-line" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#d62828; stop-opacity:0.6" />
+          <stop offset="100%" style="stop-color:#06c755; stop-opacity:0.8" />
+        </linearGradient>
+        <linearGradient id="grad-telegram" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#d62828; stop-opacity:0.6" />
+          <stop offset="100%" style="stop-color:#2aabee; stop-opacity:0.8" />
+        </linearGradient>
+        <linearGradient id="grad-whatsapp" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#d62828; stop-opacity:0.6" />
+          <stop offset="100%" style="stop-color:#25d366; stop-opacity:0.8" />
+        </linearGradient>
+        <linearGradient id="grad-discord" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#d62828; stop-opacity:0.6" />
+          <stop offset="100%" style="stop-color:#5865f2; stop-opacity:0.8" />
+        </linearGradient>
+        <linearGradient id="grad-email" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#d62828; stop-opacity:0.6" />
+          <stop offset="100%" style="stop-color:#8e8e93; stop-opacity:0.8" />
+        </linearGradient>
+        <linearGradient id="grad-webchat" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#d62828; stop-opacity:0.6" />
+          <stop offset="100%" style="stop-color:#ff9500; stop-opacity:0.8" />
+        </linearGradient>
+      </defs>
+
+      <!-- 中心點: (600, 450) -->
+      <!-- 1. LINE - 正上方 -->
+      <line x1="600" y1="330" x2="600" y2="182" class="connect-line" stroke="url(#grad-line)" />
+      <!-- 2. Telegram - 右上 -->
+      <line x1="704" y1="368" x2="897" y2="248" class="connect-line" stroke="url(#grad-telegram)" />
+      <!-- 3. WhatsApp - 右下 -->
+      <line x1="704" y1="532" x2="897" y2="652" class="connect-line" stroke="url(#grad-whatsapp)" />
+      <!-- 4. Discord - 正下方 -->
+      <line x1="600" y1="570" x2="600" y2="718" class="connect-line" stroke="url(#grad-discord)" />
+      <!-- 5. Email - 左下 -->
+      <line x1="496" y1="532" x2="303" y2="652" class="connect-line" stroke="url(#grad-email)" />
+      <!-- 6. Web Chat - 左上 -->
+      <line x1="496" y1="368" x2="303" y2="248" class="connect-line" stroke="url(#grad-webchat)" />
+
+      <!-- 連接線上的小圓點裝飾（中間位置） -->
+      <circle cx="600" cy="256" r="5" fill="#06c755" opacity="0.6" />
+      <circle cx="800" cy="308" r="5" fill="#2aabee" opacity="0.6" />
+      <circle cx="800" cy="592" r="5" fill="#25d366" opacity="0.6" />
+      <circle cx="600" cy="644" r="5" fill="#5865f2" opacity="0.6" />
+      <circle cx="400" cy="592" r="5" fill="#8e8e93" opacity="0.6" />
+      <circle cx="400" cy="308" r="5" fill="#ff9500" opacity="0.6" />
+    </svg>
+
+    <!-- 中心核心 -->
+    <div class="core">
+      <div class="core-circle">
+        <div class="core-icon">&#x1F99E;</div>
+        <div class="core-title">OpenClaw</div>
+        <div class="core-subtitle">龍蝦核心</div>
+      </div>
+    </div>
+
+    <!-- 1. LINE - 正上方 -->
+    <div class="channel-node channel-line channel-pos-0">
+      <div class="channel-circle">
+        <div class="channel-icon">&#x1F4AC;</div>
+        <div class="channel-name">LINE</div>
+      </div>
+      <div class="channel-desc">台灣最普及的通訊平台</div>
+    </div>
+
+    <!-- 2. Telegram - 右上 -->
+    <div class="channel-node channel-telegram channel-pos-1">
+      <div class="channel-circle">
+        <div class="channel-icon">&#x2708;&#xFE0F;</div>
+        <div class="channel-name">Telegram</div>
+      </div>
+      <div class="channel-desc">全球開發者愛用的通訊軟體</div>
+    </div>
+
+    <!-- 3. WhatsApp - 右下 -->
+    <div class="channel-node channel-whatsapp channel-pos-2">
+      <div class="channel-circle">
+        <div class="channel-icon">&#x1F4F1;</div>
+        <div class="channel-name">WhatsApp</div>
+      </div>
+      <div class="channel-desc">全球用戶最多的即時通訊</div>
+    </div>
+
+    <!-- 4. Discord - 正下方 -->
+    <div class="channel-node channel-discord channel-pos-3">
+      <div class="channel-circle">
+        <div class="channel-icon">&#x1F3AE;</div>
+        <div class="channel-name">Discord</div>
+      </div>
+      <div class="channel-desc">社群與團隊協作平台</div>
+    </div>
+
+    <!-- 5. Email - 左下 -->
+    <div class="channel-node channel-email channel-pos-4">
+      <div class="channel-circle">
+        <div class="channel-icon">&#x2709;&#xFE0F;</div>
+        <div class="channel-name">Email</div>
+      </div>
+      <div class="channel-desc">傳統電子郵件自動回覆</div>
+    </div>
+
+    <!-- 6. Web Chat - 左上 -->
+    <div class="channel-node channel-webchat channel-pos-5">
+      <div class="channel-circle">
+        <div class="channel-icon">&#x1F310;</div>
+        <div class="channel-name">Web Chat</div>
+      </div>
+      <div class="channel-desc">嵌入網站的即時聊天視窗</div>
+    </div>
+
+  </div>
+
+  <!-- 底部說明 -->
+  <div class="footer-text">
+    <p>
+      <span class="footer-highlight">一個龍蝦核心，同時服務所有通道。</span><br>
+      設定一次人格，所有通道共用。
+    </p>
+  </div>
+</div>
+
+</body>
+</html>

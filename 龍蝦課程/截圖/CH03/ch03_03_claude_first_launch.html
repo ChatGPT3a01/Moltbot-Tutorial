@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>ch03_03_claude_first_launch</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+  }
+  .terminal-window {
+    width: 800px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2);
+  }
+  /* Title bar */
+  .title-bar {
+    background: #2d2d2d;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    user-select: none;
+  }
+  .title-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .terminal-icon {
+    width: 16px;
+    height: 16px;
+    position: relative;
+  }
+  .terminal-icon::before {
+    content: '';
+    display: block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #0078d4;
+    border-radius: 2px;
+    background: transparent;
+  }
+  .terminal-icon::after {
+    content: '>';
+    position: absolute;
+    top: 1px;
+    left: 4px;
+    font-size: 10px;
+    color: #0078d4;
+    font-weight: bold;
+  }
+  .title-text {
+    color: #cccccc;
+    font-size: 12px;
+    font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+  }
+  /* Tab bar */
+  .tab-bar {
+    background: #2d2d2d;
+    height: 32px;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 8px;
+    border-bottom: 1px solid #3d3d3d;
+  }
+  .tab {
+    background: #1e1e1e;
+    color: #cccccc;
+    font-size: 12px;
+    font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+    padding: 6px 16px;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #3d3d3d;
+    border-bottom: none;
+    position: relative;
+    top: 1px;
+  }
+  .tab-ps-icon {
+    color: #0078d4;
+    font-size: 10px;
+    font-weight: bold;
+  }
+  /* Window controls */
+  .window-controls {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .window-controls .btn {
+    width: 46px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 10px;
+    cursor: default;
+  }
+  .window-controls .btn-close {
+    color: #999;
+  }
+  .btn-icon {
+    font-family: 'Segoe MDL2 Assets', 'Arial', sans-serif;
+    font-size: 10px;
+  }
+  /* Terminal body */
+  .terminal-body {
+    background: #0c0c0c;
+    padding: 20px 24px;
+    min-height: 200px;
+  }
+  .terminal-body pre {
+    font-family: 'Cascadia Code', 'Consolas', 'Microsoft JhengHei', monospace;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #cccccc;
+    white-space: pre;
+  }
+  /* Claude Code 特殊顏色 */
+  .claude-border {
+    color: #d4a574;
+  }
+  .claude-logo {
+    color: #e8a455;
+    font-weight: bold;
+  }
+  .claude-version {
+    color: #7ec8e3;
+  }
+  .claude-text {
+    color: #cccccc;
+  }
+  .claude-highlight {
+    color: #58d68d;
+  }
+  .claude-bullet {
+    color: #f0c040;
+  }
+  .claude-accent {
+    color: #a78bfa;
+  }
+  .prompt-sign {
+    color: #58d68d;
+    font-weight: bold;
+  }
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 17px;
+    background: #cccccc;
+    vertical-align: text-bottom;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+  @media print {
+    body { background: white; padding: 0; }
+    .terminal-window { box-shadow: 1px 1px 4px rgba(0,0,0,0.3); }
+    .cursor { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="terminal-window">
+  <!-- Title bar -->
+  <div class="title-bar">
+    <div class="title-bar-left">
+      <div class="terminal-icon"></div>
+      <span class="title-text">Windows PowerShell</span>
+    </div>
+    <div class="window-controls">
+      <div class="btn"><span class="btn-icon">&#x2500;</span></div>
+      <div class="btn"><span class="btn-icon">&#x25A1;</span></div>
+      <div class="btn btn-close"><span class="btn-icon">&#x2715;</span></div>
+    </div>
+  </div>
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <div class="tab">
+      <span class="tab-ps-icon">PS</span>
+      <span>Windows PowerShell</span>
+    </div>
+  </div>
+  <!-- Terminal body -->
+  <div class="terminal-body">
+    <pre>
+<span class="claude-border">&#x256D;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x256E;</span>
+<span class="claude-border">&#x2502;</span>                                             <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>   <span class="claude-logo">&#x2554;&#x2550;&#x2557;&#x2566;  &#x2554;&#x2550;&#x2557;&#x2566; &#x2566;&#x2554;&#x2566;&#x2557;&#x2554;&#x2550;&#x2557;</span>                  <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>   <span class="claude-logo">&#x2551;  &#x2551;  &#x2560;&#x2550;&#x2563;&#x2551; &#x2551; &#x2551;&#x2551;&#x2551;&#x2551;&#x2551;&#x2563;</span>                    <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>   <span class="claude-logo">&#x255A;&#x2550;&#x255D;&#x2569;&#x2550;&#x255D;&#x2569; &#x2569;&#x255A;&#x2550;&#x255D;&#x2550;&#x2569;&#x255D;&#x255A;&#x2550;&#x255D;</span>                  <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>                                             <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>   <span class="claude-version">Claude Code v1.0.31</span>                   <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>   <span class="claude-accent">Powered by Claude Opus 4.6</span>            <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>                                             <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>   <span class="claude-text">Welcome! I'm Claude Code.</span>              <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>   <span class="claude-text">I can help you with:</span>                  <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>                                             <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>   <span class="claude-bullet">&#x2022;</span> <span class="claude-highlight">Reading and editing files</span>           <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>   <span class="claude-bullet">&#x2022;</span> <span class="claude-highlight">Running terminal commands</span>           <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>   <span class="claude-bullet">&#x2022;</span> <span class="claude-highlight">Searching your codebase</span>             <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>   <span class="claude-bullet">&#x2022;</span> <span class="claude-highlight">Git operations</span>                      <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>   <span class="claude-bullet">&#x2022;</span> <span class="claude-highlight">And much more...</span>                    <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>                                             <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>   <span class="claude-text">Type your request in natural</span>           <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>   <span class="claude-text">language, or</span> <span class="claude-accent">/help</span> <span class="claude-text">for commands.</span>       <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2502;</span>                                             <span class="claude-border">&#x2502;</span>
+<span class="claude-border">&#x2570;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x256F;</span>
+
+<span class="prompt-sign">&gt;</span>  <span class="cursor"></span></pre>
+  </div>
+</div>
+</body>
+</html>
