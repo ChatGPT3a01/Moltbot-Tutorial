@@ -1,4 +1,4 @@
-# 附錄 A | 常用指令速查表
+# 附錄 A | 一張表打天下——常用指令速查
 
 ---
 
@@ -31,10 +31,12 @@
 
 ### Skills 管理
 
+> 💡 安裝技能有兩種方式：`openclaw skills install`（內建指令）和 `clawdhub install`（ClawdHub 商店，見 A.2 節），**二擇一即可**，效果相同。
+
 | 指令 | 功能 | 出處 |
 |------|------|------|
 | `openclaw skills list` | 列出已安裝技能 | CH15 |
-| `openclaw skills install <name>` | 安裝技能 | CH15 |
+| `openclaw skills install <name>` | 安裝技能（同 `clawdhub install`） | CH15 |
 | `openclaw skills remove <name>` | 移除技能 | CH15 |
 | `openclaw skills enable <name>` | 啟用技能 | CH15 |
 | `openclaw skills disable <name>` | 停用技能 | CH15 |
@@ -63,7 +65,7 @@
 | `openclaw doctor` | 全面健康檢查 | CH5 |
 | `openclaw onboard --install-daemon` | 初始設定精靈 | CH5 |
 | `openclaw dashboard` | 啟動網頁儀表板（Port 18790） | CH9 |
-| `openclaw` | 啟動 TUI 互動介面 | CH9 |
+| `openclaw tui` | 啟動 TUI 互動介面 | CH9 |
 
 ### Nodes 管理
 
@@ -84,10 +86,12 @@
 
 ## A.2 ClawdHub 指令
 
+> 💡 `clawdhub install` 和上面的 `openclaw skills install` 效果相同，**二擇一即可**。ClawdHub 額外提供搜尋和發布功能。
+
 | 指令 | 功能 | 出處 |
 |------|------|------|
 | `clawdhub search <keyword>` | 搜尋技能 | CH15 |
-| `clawdhub install <name>` | 安裝技能 | CH15 |
+| `clawdhub install <name>` | 安裝技能（同 `openclaw skills install`） | CH15 |
 | `clawdhub update <name>` | 更新技能 | CH15 |
 | `clawdhub update --all` | 更新所有技能 | CH15 |
 | `clawdhub publish <name>` | 發布技能到 ClawdHub | CH17 |

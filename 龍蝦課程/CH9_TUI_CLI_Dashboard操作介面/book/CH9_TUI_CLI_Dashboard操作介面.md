@@ -1,4 +1,4 @@
-# CH9 | TUI / CLI / Dashboard 操作介面
+# CH9 | 三種介面，任你操控
 
 ---
 
@@ -65,33 +65,30 @@
 
 TUI 是龍蝦提供的一個「半圖形化」的終端機介面。它不像 CLI 那樣要你背指令，而是用選單和按鈕引導你操作。對於不想記指令、但又需要快速做事的人來說，TUI 是最好的選擇。
 
+![OpenClaw TUI 主畫面](../截圖/ch09_01_tui_main.png)
+
+
 ### 9.2.1 啟動 TUI
 
 打開終端機（PowerShell 或 Terminal），輸入：
 
 ```powershell
-openclaw
+openclaw tui
 ```
 
-沒錯，就是單獨一個 `openclaw`，不加任何參數。龍蝦就會進入 TUI 模式，顯示一個互動式的操作介面。
+沒錯，就是 `openclaw tui` 這個指令。龍蝦就會進入 TUI 模式，顯示一個互動式的操作介面。
 
 你會看到類似這樣的畫面：
 
-```
-╔══════════════════════════════════════════╗
-║           🦞 OpenClaw TUI               ║
-╠══════════════════════════════════════════╣
-║                                          ║
-║   > Gateway 管理                         ║
-║     設定                                 ║
-║     外掛管理                             ║
-║     技能管理                             ║
-║     配對管理                             ║
-║     診斷工具                             ║
-║     離開                                 ║
-║                                          ║
-╚══════════════════════════════════════════╝
-```
+**OpenClaw TUI 主選單**
+
+- **> Gateway 管理**（目前選取）
+- 設定
+- 外掛管理
+- 技能管理
+- 配對管理
+- 診斷工具
+- 離開
 
 用**上下方向鍵**移動選取項目，按 **Enter** 進入該功能。想回上一層就按 **Esc** 或選「返回」。
 
@@ -141,7 +138,7 @@ TUI 會用表單的方式讓你填寫，比手動編輯 JSON 檔案方便很多�
 
 修改了 IDENTITY.md 之後，想讓新人設生效：
 
-1. 開啟 TUI：`openclaw`
+1. 開啟 TUI：`openclaw tui`
 2. 選「Gateway 管理」→ Enter
 3. 選「重啟 Gateway」→ Enter
 4. 等龍蝦顯示「Gateway restarted successfully」
@@ -151,7 +148,7 @@ TUI 會用表單的方式讓你填寫，比手動編輯 JSON 檔案方便很多�
 
 龍蝦在 LINE 上突然不回了：
 
-1. 開啟 TUI：`openclaw`
+1. 開啟 TUI：`openclaw tui`
 2. 選「Gateway 管理」→ Enter
 3. 選「查看狀態」→ Enter
 4. 看輸出訊息：如果顯示 `running` 表示龍蝦還活著，問題可能在其他地方；如果顯示 `stopped` 就選「啟動 Gateway」
@@ -160,7 +157,7 @@ TUI 會用表單的方式讓你填寫，比手動編輯 JSON 檔案方便很多�
 
 朋友加了你的 LINE Bot，傳了訊息拿到配對碼：
 
-1. 開啟 TUI：`openclaw`
+1. 開啟 TUI：`openclaw tui`
 2. 選「配對管理」→ Enter
 3. 選「新增配對」
 4. 選擇通道（LINE）
@@ -179,11 +176,14 @@ TUI 會用表單的方式讓你填寫，比手動編輯 JSON 檔案方便很多�
 
 CLI 是龍蝦最「硬派」的操作方式。你直接在終端機裡打指令，龍蝦照做。雖然需要記一些指令，但它是功能最完整的介面，而且可以寫進腳本裡實現自動化。
 
+![openclaw gateway status 指令輸出](../截圖/ch09_02_cli_gateway_status.png)
+
+
 ### 9.3.1 指令的基本格式
 
 所有 CLI 指令都以 `openclaw` 開頭，後面接「子指令」和「參數」：
 
-```
+```powershell
 openclaw <子指令> <動作> [參數]
 ```
 
@@ -221,7 +221,7 @@ openclaw gateway start
 
 成功的話會看到：
 
-```
+```powershell
 🦞 OpenClaw Gateway starting...
 ✅ Gateway is running on port 18789
 ✅ LINE channel connected
@@ -238,7 +238,7 @@ openclaw gateway status
 
 輸出範例：
 
-```
+```text
 Gateway Status: running
 Port: 18789
 Uptime: 2h 35m
@@ -268,7 +268,7 @@ openclaw gateway restart
 
 ### 9.3.3 設定管理指令
 
-龍蝦的設定檔是 `openclaw.json`，位在 `~/.openclaw/` 目錄下。你可以直接用文字編輯器打開它修改，但 CLI 提供了更方便的方式。
+龍蝦的設定檔是 `openclaw.json`，位在 `~/.openclaw/` 目錄下（Windows 為 `C:\Users\你的名稱\.openclaw\`）。你可以直接用文字編輯器打開它修改，但 CLI 提供了更方便的方式。
 
 **查看目前設定：**
 
@@ -319,7 +319,7 @@ openclaw plugins list
 
 輸出範例：
 
-```
+```text
 Installed Plugins:
   ✅ @anthropic/line-channel (v2.1.0) - LINE Messaging Channel
   ✅ @anthropic/telegram-channel (v1.3.0) - Telegram Bot Channel
@@ -404,7 +404,7 @@ openclaw doctor
 
 它會自動檢查一系列項目，輸出大概長這樣：
 
-```
+```text
 🩺 OpenClaw Doctor - 健康檢查報告
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -431,7 +431,7 @@ openclaw doctor
 
 如果有 ❌ 失敗的項目，`doctor` 通常會附上修復建議。例如：
 
-```
+```powershell
 ❌ AI 模型: API Key 未設定
    → 請執行: openclaw config set ai.apiKey 你的API金鑰
 ```
@@ -501,6 +501,15 @@ npm update -g openclaw
 ## 9.4 Dashboard——網頁儀表板
 
 如果你覺得終端機太「工程師」了，Dashboard 會讓你耳目一新。它是一個用瀏覽器就能操作的網頁介面，長得像一般的網站後台，用滑鼠點就能管理龍蝦。
+
+![Dashboard 首頁 Overview 儀表板](../截圖/ch09_03_dashboard_overview.png)
+
+![Dashboard 對話紀錄頁面](../截圖/ch09_04_dashboard_conversations.png)
+
+![Dashboard 技能管理頁面](../截圖/ch09_05_dashboard_skills.png)
+
+![Dashboard 設定頁面](../截圖/ch09_06_dashboard_settings.png)
+
 
 ### 9.4.1 啟動 Dashboard
 
