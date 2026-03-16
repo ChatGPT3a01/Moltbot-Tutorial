@@ -1,4 +1,4 @@
-# CH15 | 60+ 技能——讓龍蝦無所不能
+# CH15 | 500+ 技能——讓龍蝦無所不能
 
 ---
 
@@ -19,7 +19,7 @@ Skills 就像手機上的 App——你的手機本身可以打電話、拍照，
 > **本章學習目標**
 >
 > 1. 理解 Skills 的概念和運作原理
-> 2. 認識官方 60+ Skills 的分類和功能
+> 2. 認識 ClawHub 商店 500+ Skills 的分類和功能
 > 3. 學會安裝、管理、設定技能
 > 4. 知道哪些技能最值得裝
 
@@ -93,7 +93,7 @@ description: 查詢全球各城市的即時天氣、未來預報和氣象資訊�
 
 ## 15.2 官方 Skills 總覽與分類
 
-OpenClaw 官方和社群提供了超過 60 個技能。以下按九大分類介紹：
+ClawHub 技能商店（clawhub.ai/skills）目前已有超過 **500 個**技能，由官方和全球社群共同貢獻，數量持續成長中。以下精選十大分類介紹：
 
 ![九大分類技能視覺化呈現](../截圖/ch15_02_skill_categories.png)
 
@@ -131,8 +131,9 @@ OpenClaw 官方和社群提供了超過 60 個技能。以下按九大分類介�
 | **email** | 寄送和讀取 Email | ✅ Gmail App Password | 下方說明 |
 | **todo** | 待辦事項管理 | ❌ 本地儲存 | 下方說明 |
 | **notes** | 筆記和備忘錄 | ❌ 本地儲存 | 下方說明 |
-| **summary** | 長文摘要 | ❌ 用 AI 模型 | 下方說明 |
-| **web-search** | 網頁搜尋 | ✅ Google/Bing API | 下方說明 |
+| **summarize** | 內容總結與資訊降噪 | ❌ 用 AI 模型 | 下方說明 |
+| **tavily-search** | 聯網即時搜尋 | ✅ Tavily API | 下方說明 |
+| **gog** | Google 全家桶（Gmail/行事曆/Drive/Docs） | ✅ Google OAuth | 下方說明 |
 
 **📋 各技能說明：**
 
@@ -147,15 +148,81 @@ OpenClaw 官方和社群提供了超過 60 個技能。以下按九大分類介�
   > ⚠️ **安全提醒**：App Password 等同於你的 Gmail 密碼，請勿將 TOOLS.md 上傳到 GitHub 或其他公開場所。如果你的工作區有做版本控制，務必把 TOOLS.md 加入 `.gitignore`。
 - **todo**（待辦事項）：把待辦清單存在本地——不需要任何 API Key 或帳號。「幫我記住明天要繳報告」「我的待辦清單有什麼」「把買牛奶從清單移除」。資料存在工作區的本地檔案裡，簡單但實用。
 - **notes**（筆記）：隨手記錄想法和備忘。和 todo 類似是本地儲存，但更適合記錄較長的內容。「幫我記一下會議重點：...」「我之前記的那個食譜找給我看」。
-- **summary**（摘要）：把長文濃縮成重點。直接靠 AI 模型處理，零設定。「幫我把這篇文章摘要成三個重點」「這份報告太長了，幫我抓重點」。你可以直接貼文字或丟網址給龍蝦。
-**web-search**（網頁搜尋）
+- **summarize**（內容總結）：資訊降噪神器，快速提煉核心價值。支援網頁、文件（Word/PDF）、郵件、長文等多種格式。直接靠 AI 模型處理，零設定。安裝指令：
 
-讓龍蝦上網搜尋資料。需要 Google Custom Search API 或 Bing Search API：
+  ```powershell
+  npx clawhub@latest install summarize
+  ```
 
-- **Google Custom Search**：到 https://programmablesearchengine.google.com/ 建立搜尋引擎，再到 Google Cloud Console 啟用 Custom Search API 取得 API Key。免費額度每天 100 次。
-- **Bing Search**：到 https://www.microsoft.com/en-us/bing/apis/bing-web-search-api 申請，免費額度每月 1,000 次。
-- **TOOLS.md 設定**：`Web Search API Key: 你的Key` 和 `Search Engine: google`（或 `bing`）
-- **使用方式**：「幫我搜尋 Python 最新版本」「查一下明天有什麼活動」
+  使用示範：
+
+  ```text
+  你：這份 PDF 好長，幫我抓重點就好
+  龍蝦：📋 這份 30 頁報告的核心重點有三個：
+        1. 第一季營收成長 23%，主要來自海外市場
+        2. 新產品線預計 Q3 上線，目標客群是中小企業
+        3. 人力擴編計畫暫緩，改以 AI 自動化提升效率
+
+  你：幫我把剛才那篇新聞摘要成一段話
+  龍蝦：台灣半導體產業在 2026 年持續領先全球，台積電宣布...
+  ```
+
+- **tavily-search**（聯網即時搜尋）：OpenClaw 的「實時資訊大腦」，讓龍蝦能上網搜尋最新資訊，避免 AI「閉眼亂編」過時資料。幾乎所有用戶都說「沒裝這個跟瞎子一樣」。需要 Tavily API Key：
+
+  1. 到 https://tavily.com/ 註冊免費帳號
+  2. 免費方案每月 1,000 次搜尋，個人用足夠
+  3. 在 TOOLS.md 設定：`Tavily API Key: 你的Key`
+
+  安裝指令：
+
+  ```powershell
+  npx clawhub@latest install tavily-search
+  ```
+
+  使用示範：
+
+  ```text
+  你：今天台灣有什麼重要新聞？
+  龍蝦：🔍 根據即時搜尋結果，今天的重要新聞有：
+        1. 行政院通過 AI 基本法草案，預計下週送立法院...
+        2. 台股今日收盤 22,456 點，上漲 156 點...
+
+  你：iPhone 17 什麼時候發售？價格多少？
+  龍蝦：🔍 根據最新資訊，Apple 預計在 2026 年 9 月發表 iPhone 17...
+  ```
+
+- **gog**（Google 全家桶）：一站式操控 Gmail、Google 行事曆、Google Drive 和 Google Docs，辦公自動化神器。如果你原本分別安裝了 google-calendar、google-drive、email 等技能，gog 可以一次取代它們全部。需要 Google OAuth 認證：
+
+  1. 安裝時會引導你登入 Google 帳號完成 OAuth 授權
+  2. 一次授權就能存取 Gmail、行事曆、Drive、Docs
+
+  安裝指令：
+
+  ```powershell
+  npx clawhub@latest install gog
+  ```
+
+  使用示範：
+
+  ```text
+  你：今天有什麼信件和行程？
+  龍蝦：📧 Gmail 有 3 封未讀：
+        1. 老闆寄的「Q2 預算審核」——需要你在週五前回覆
+        2. Amazon 的出貨通知
+        3. 電子報（可忽略）
+        📅 今天的行程：
+        - 10:00 部門週會（線上）
+        - 14:30 客戶提案簡報
+
+  你：幫我回覆老闆，說預算表明天會交
+  龍蝦：✅ 已草擬回信：「主管好，Q2 預算表明天中午前會完成並寄出...」
+        要直接寄出還是你想先看一下？
+
+  你：把桌面的報告上傳到 Drive 的「工作」資料夾
+  龍蝦：✅ 已將 report.pdf 上傳到 Google Drive / 工作 /
+  ```
+
+  > 💡 如果你已經用 §16.4 的方式設定了 google-calendar，裝 gog 後兩者可以並存，不用移除。但建議統一用 gog 比較省事。
 
 ### 15.2.3 娛樂與社交類
 
@@ -323,14 +390,136 @@ OpenClaw 官方和社群提供了超過 60 個技能。以下按九大分類介�
 | 技能名稱 | 功能 | 需要 API Key | 詳細教學 |
 |---------|------|------------|---------|
 | **twilio-voice** | 語音通話（打電話/接電話） | ✅ Twilio | CH20 完整教學 |
-| **browser-sandbox** | 瀏覽器自動操控 | ❌ 需安裝 Playwright | CH18 §18.2 |
+| **agent-browser** | 人類等級瀏覽器操控 | ❌ 自帶引擎 | 下方說明 |
 
 **📋 各技能說明：**
 
 - **twilio-voice**（語音通話）：讓龍蝦可以打電話給你、接聽電話、語音對話。這是最「科幻」的技能之一——你可以打電話問龍蝦問題，它會用語音回答你。完整教學在 CH20，包含 Twilio 帳號申請、電話號碼購買（約 US$1/月）、Webhook 設定、語音引擎選擇。
-- **browser-sandbox**（瀏覽器操控）：讓龍蝦像人一樣使用瀏覽器——開網頁、點按鈕、填表單、擷取資訊。不需要 API Key，但需要安裝 Playwright（自動化瀏覽器工具）。完整教學在 CH18 §18.2，包含安裝設定和三個實用場景。
+- **agent-browser**（智慧瀏覽器）：讓龍蝦擁有人類等級的瀏覽器操控能力，解決了傳統 AI 只能透過 API 取得靜態資料、無法直接操控瀏覽器的核心痛點。底層基於 Rust 開發，搭配 Playwright/Puppeteer，支援語義定位（理解「登入按鈕」等人類化指令，而非死板匹配 HTML 標籤），不需要額外安裝 Playwright。安裝指令：
+
+  ```powershell
+  npx clawhub@latest install agent-browser
+  ```
+
+  核心能力涵蓋：網頁導航、表單互動（填寫/勾選/提交）、元素操作（點選/拖曳/上傳）、全頁截圖和 PDF 匯出、在頁面執行 JavaScript、Cookie 管理實現免密登入。
+
+  使用示範：
+
+  ```text
+  你：幫我去高鐵網站查 3/15 台北到高雄的班次
+  龍蝦：🌐 正在開啟台灣高鐵時刻表頁面...
+        已填入：出發站 台北、到達站 左營、日期 3/15
+        📋 查詢結果（前 5 班）：
+        - 06:26 出發 → 08:00 抵達（標準車廂 $1,490）
+        - 07:01 出發 → 08:35 抵達
+        ...
+
+  你：幫我截圖目前畫面
+  龍蝦：📸 已截圖並儲存到桌面 hsr_timetable.png
+  ```
+
+  > 💡 agent-browser 是 browser-sandbox 的進階升級版。如果你之前裝了 browser-sandbox（CH18 §18.2 教的），可以改裝 agent-browser 取代它，操控能力更強、設定更簡單。
 
 > 💡 **不用全部都裝**：技能太多反而會讓龍蝦「不知道該用哪個」。建議先裝你最需要的 3-5 個，用熟了再慢慢擴充。
+
+### 15.2.10 Agent 智慧進化類
+
+| 技能名稱 | 功能 | 需要 API Key | 詳細教學 |
+|---------|------|------------|---------|
+| **find-skills** | 自動搜尋並安裝所需技能 | ❌ | 下方說明 |
+| **skill-vetter** | 技能安全審計 | ❌ | 下方說明 |
+| **self-improving-agent** | 自我學習與記憶進化 | ❌ | 下方說明 |
+| **proactive-agent** | 主動思考與規劃 | ❌ | 下方說明 |
+
+**📋 各技能說明：**
+
+> 💡 這四個技能不是讓龍蝦「多做一件事」，而是讓龍蝦「變得更聰明」。它們不跟外部服務互動，而是增強龍蝦本身的行為模式——自己找工具、自己學習、自己檢查安全、自己主動想事情。
+
+- **find-skills**（技能搜尋器）：讓龍蝦自己去 ClawHub 搜尋並安裝所需的技能。你不需要記住技能名稱，只要告訴龍蝦你想做什麼，它會自動搜尋、推薦、甚至幫你安裝。零設定，強烈建議所有人安裝。安裝指令：
+
+  ```powershell
+  npx clawhub@latest install find-skills
+  ```
+
+  使用示範：
+
+  ```text
+  你：我想讓龍蝦幫我管理 Google 日曆
+  龍蝦：🔍 正在 ClawHub 搜尋相關技能...
+        找到以下符合的技能：
+        1. gog (v2.0.1) ⭐4.9 — Google 全家桶（含行事曆）
+        2. google-calendar (v1.8.0) ⭐4.7 — 專門管理 Google Calendar
+        建議安裝 gog，功能更完整。要幫你安裝嗎？
+
+  你：好，幫我裝
+  龍蝦：✅ 已安裝 gog (v2.0.1)，請重啟 Gateway 後生效。
+  ```
+
+- **skill-vetter**（技能安全審計）：在安裝社群技能前，幫你做安全檢查——識別潛在的惡意指令和風險。如果你打算經常安裝社群開發的技能，這個應該是你**最優先安裝的技能**，優先於所有其他技能。零設定。安裝指令：
+
+  ```powershell
+  npx clawhub@latest install skill-vetter
+  ```
+
+  使用示範：
+
+  ```text
+  你：我想安裝一個叫 super-helper 的社群技能，安全嗎？
+  龍蝦：🔒 正在審計 super-helper 技能...
+        ⚠️ 安全報告：
+        - SKILL.md 中包含「讀取 ~/.ssh/ 資料夾」的指令 → 高風險
+        - 有一段指令會把系統資訊傳送到外部 URL → 可疑
+        🚫 建議：不要安裝此技能，它可能會竊取你的 SSH 金鑰。
+
+  你：那 weather-advanced 呢？
+  龍蝦：🔒 正在審計 weather-advanced 技能...
+        ✅ 安全報告：
+        - 只存取天氣 API，無可疑行為
+        - 不讀取本地檔案、不傳送個人資料
+        ✅ 此技能安全，可以放心安裝。
+  ```
+
+- **self-improving-agent**（自我進化引擎）：內建記憶系統與自我優化機制，讓龍蝦越用越聰明。龍蝦會記住你的使用偏好、常用指令、常犯錯誤，互動越多能力越強。區別於傳統的固定流程，這是真正的動態智慧升級。零設定。安裝指令：
+
+  ```powershell
+  npx clawhub@latest install self-improving-agent
+  ```
+
+  使用示範：
+
+  ```text
+  （第一次問）
+  你：幫我查天氣
+  龍蝦：請問要查哪個城市的天氣？
+
+  （一週後再問）
+  你：幫我查天氣
+  龍蝦：☀️ 台北目前 28°C，多雲。（我記得你通常問的都是台北的天氣！）
+
+  （龍蝦自動學習）
+  龍蝦：💡 我注意到你每天早上 8 點都會問天氣，要不要我設定自動排程，
+        每天主動報告給你？
+  ```
+
+- **proactive-agent**（主動代理）：從「被動執行」升級為「主動規劃」。龍蝦不再只是等你下指令，它會根據上下文主動思考、提出建議、規劃下一步。搭配 self-improving-agent 一起用效果更好，長期使用會越來越貼心。零設定。安裝指令：
+
+  ```powershell
+  npx clawhub@latest install proactive-agent
+  ```
+
+  使用示範：
+
+  ```text
+  你：明天要去台中出差
+  龍蝦：收到！我幫你準備了出差清單：
+        🌤️ 台中明天 32°C 晴天，記得帶防曬
+        🚄 高鐵早班 06:26 從台北出發，要幫你查票嗎？
+        📅 你明天下午 2 點有個線上會議，需要改時間嗎？
+        📧 你還有一封客戶的信沒回，要在出發前處理嗎？
+
+  你：查票就好，其他不用
+  龍蝦：🚄 正在查詢 3/15 台北→台中高鐵班次...
+  ```
 
 ---
 
@@ -433,39 +622,61 @@ openclaw gateway restart
 
 ## 15.4 推薦必裝 Skills
 
-如果你不知道從哪裡開始，以下是根據不同使用場景的推薦：
+### 15.4.1 九大必裝技能
 
-### 15.4.1 新手必裝（3 個）
+如果你不知道從哪裡開始，以下是社群公認最值得安裝的九大技能。建議按照**優先順序**依序安裝：
+
+| 順序 | 技能 | 分類 | 為什麼必裝 |
+|:---:|------|------|-----------|
+| 0 | **skill-vetter** | Agent 智慧 | 隱形第一裝——安裝其他社群技能前先用它做安全審計 |
+| 1 | **tavily-search** | 生產力 | 聯網搜尋，沒這個龍蝦等於瞎子，避免 AI 閉眼編 |
+| 2 | **weather** | 生活實用 | 最實用的日常技能，免 API Key、開箱即用 |
+| 3 | **find-skills** | Agent 智慧 | 讓龍蝦自己找工具，再也不用記技能名稱 |
+| 4 | **summarize** | 生產力 | 長文、PDF、郵件一鍵抓重點，資訊降噪 |
+| 5 | **agent-browser** | 通訊與語音 | 讓龍蝦操控瀏覽器，填表單、查資料、截圖全搞定 |
+| 6 | **gog** | 生產力 | Google 全家桶一站搞定——Gmail、行事曆、Drive、Docs |
+| 7 | **self-improving-agent** | Agent 智慧 | 越用越聰明，記住你的偏好和習慣 |
+| 8 | **proactive-agent** | Agent 智慧 | 從被動執行變主動規劃，搭配上一個效果加倍 |
+
+一鍵安裝全部九個：
+
+```powershell
+npx clawhub@latest install skill-vetter tavily-search weather find-skills summarize agent-browser gog self-improving-agent proactive-agent
+```
+
+安裝完記得重啟：
+
+```powershell
+openclaw gateway restart
+```
+
+### 15.4.2 依場景加裝建議
+
+九大必裝之外，依你的使用場景再加裝：
+
+**生活玩家：**
 
 | 技能 | 為什麼推薦 |
 |------|-----------|
-| **weather** | 最實用，每天都用得到 |
-| **todo** | 待辦事項管理，不需要 API Key |
-| **translate** | 翻譯功能，用 AI 模型本身，零設定 |
-
-### 15.4.2 生活玩家（加裝 3 個）
-
-| 技能 | 為什麼推薦 |
-|------|-----------|
+| **clawra** | 龍蝦自拍，好玩又有趣 |
 | **news** | 每天看新聞摘要 |
-| **clawra** | 龍蝦自拍，好玩 |
 | **recipe** | 不知道吃什麼的時候超好用 |
 
-### 15.4.3 工作族群（加裝 3 個）
+**工作族群：**
 
 | 技能 | 為什麼推薦 |
 |------|-----------|
-| **google-calendar** | 行程管理，主動提醒 |
-| **email** | 幫你讀信、回信 |
 | **notion** | 如果你用 Notion 管理工作 |
+| **todo** | 輕量待辦管理，零設定 |
+| **email** | 沒用 gog 的話，單獨裝這個也能讀信回信 |
 
-### 15.4.4 開發者（加裝 3 個）
+**開發者：**
 
 | 技能 | 為什麼推薦 |
 |------|-----------|
 | **git** | 在聊天室裡操作 Git |
-| **web-search** | 搜尋技術文件 |
 | **code-review** | 丟程式碼讓龍蝦幫你看 |
+| **docker** | 管理 Docker 容器 |
 
 ---
 
@@ -511,7 +722,8 @@ openclaw config set skills.weather.defaultCity 台北
 | google-calendar / google-drive | Google Cloud API | 各 API 不同 | https://console.cloud.google.com/ |
 | notion | Notion Integration | 無限制 | https://www.notion.so/my-integrations |
 | email | Gmail App Password | 無限制 | Google 帳號安全性設定 |
-| web-search | Google Custom Search 或 Bing | 100 次/天（Google） | https://programmablesearchengine.google.com/ |
+| tavily-search | Tavily | 1,000 次/月 | https://tavily.com/ |
+| gog | Google OAuth | 依 Google API 額度 | 安裝時自動引導授權 |
 | clawra | fal.ai | 依方案 | https://fal.ai/（CH8 有教） |
 | music | Spotify Developer | 無限制 | https://developer.spotify.com/dashboard |
 | sag | ElevenLabs | 10,000 字/月 | https://elevenlabs.io/ |
@@ -615,7 +827,8 @@ openclaw config set skills.weather.defaultCity 台北
 這一章帶你認識了 OpenClaw 強大的技能生態系：
 
 - **Skills 的概念**——就像手機上的 App，給龍蝦擴充新能力
-- **60+ 官方技能**——涵蓋生活、工作、娛樂、開發、雲端儲存、財經、智慧家庭、通訊語音等九大類
+- **500+ 技能商店**——ClawHub 商店涵蓋生活、工作、娛樂、開發、雲端儲存、財經、智慧家庭、通訊語音、Agent 智慧進化等十大類，完整列表請至 clawhub.ai/skills 瀏覽
+- **九大必裝技能**——skill-vetter、tavily-search、weather、find-skills、summarize、agent-browser、gog、self-improving-agent、proactive-agent
 - **安裝與管理**——用 `clawdhub` 或 `openclaw skills` 指令一鍵搞定
 - **設定與客製化**——API Key 寫在 TOOLS.md、行為調整改 SKILL.md
 

@@ -1,6 +1,8 @@
-# OpenClaw Skills 完整清單（九大分類 60+）
+# OpenClaw Skills 精選清單（十大分類，ClawHub 商店 500+）
 
 > 本清單對應書中 CH15 的技能總覽。各技能的詳細設定步驟請參考「附錄E_Skills設定速查表.md」。
+>
+> ⭐ = 九大必裝技能 ｜ 🆕 = 自媒體實戰 Skills
 
 ---
 
@@ -8,7 +10,7 @@
 
 | 技能名稱 | 功能 | API Key | 教學位置 |
 |---------|------|---------|---------|
-| weather | 查詢天氣和預報 | OpenWeatherMap | CH16 §16.2 |
+| ⭐ weather | 查詢天氣和預報 | OpenWeatherMap | CH16 §16.2 |
 | news | 新聞摘要和即時新聞 | NewsAPI | CH16 §16.3 |
 | rss-reader | RSS 新聞訂閱 | 不需要 | CH15 §15.2.1 |
 | translate | 多國語言翻譯 | 不需要 | CH15 §15.2.1 |
@@ -17,7 +19,7 @@
 | recipe | 食譜搜尋和推薦 | 不需要 | CH15 §15.2.1 |
 | currency | 匯率查詢和換算 | ExchangeRate API | CH15 §15.2.1 |
 
-## 二、生產力類（7 個）
+## 二、生產力類（10 個）
 
 | 技能名稱 | 功能 | API Key | 教學位置 |
 |---------|------|---------|---------|
@@ -26,8 +28,9 @@
 | email | Email 管理（搜尋、讀取、寄送、下載附件） | Gmail App Password | CH15 §15.2.2 / 附錄E |
 | todo | 待辦事項管理 | 不需要 | CH15 §15.2.2 |
 | notes | 筆記和備忘錄 | 不需要 | CH15 §15.2.2 |
-| summary | 長文摘要 | 不需要 | CH15 §15.2.2 |
-| web-search | 網頁搜尋 | Google/Bing API | CH15 §15.2.2 / 附錄E |
+| ⭐ summarize | 內容總結與資訊降噪 | 不需要 | CH15 §15.2.2 |
+| ⭐ tavily-search | 聯網即時搜尋 | Tavily API | CH15 §15.2.2 / 附錄E |
+| ⭐ gog | Google 全家桶（Gmail/行事曆/Drive/Docs） | Google OAuth | CH15 §15.2.2 / 附錄E |
 
 ## 三、娛樂與社交類（5 個）
 
@@ -92,4 +95,23 @@
 | 技能名稱 | 功能 | API Key | 教學位置 |
 |---------|------|---------|---------|
 | twilio-voice | 語音通話（打電話/接電話） | Twilio | CH20 完整教學 |
-| browser-sandbox | 瀏覽器自動操控 | 不需要（需安裝 Playwright） | CH18 §18.2 |
+| ⭐ agent-browser | 人類等級瀏覽器操控 | 不需要（自帶引擎） | CH15 §15.2.9 |
+
+## 十、Agent 智慧進化類（4 個）
+
+| 技能名稱 | 功能 | API Key | 教學位置 |
+|---------|------|---------|---------|
+| ⭐ find-skills | 自動搜尋並安裝所需技能 | 不需要 | CH15 §15.2.10 |
+| ⭐ skill-vetter | 技能安全審計 | 不需要 | CH15 §15.2.10 |
+| ⭐ self-improving-agent | 自我學習與記憶進化 | 不需要 | CH15 §15.2.10 |
+| ⭐ proactive-agent | 主動思考與規劃 | 不需要 | CH15 §15.2.10 |
+
+## 十一、自媒體與創作類（5 個）🆕
+
+| 技能名稱 | 功能 | API Key | 教學位置 |
+|---------|------|---------|---------|
+| 🆕 content-creator | AI 內容創作：SEO 文章、社群貼文、Hook 金句、電子書、多平台轉換 | 不需要 | CH15 §15.5 |
+| 🆕 video-script | 影片腳本生成：短影音、YouTube 長片、分鏡表、SRT 字幕、直播腳本 | 不需要 | CH15 §15.5 |
+| 🆕 course-creator | 線上課程設計：TA 分析、課程大綱、教學腳本、測驗題、銷售頁文案 | 不需要 | CH15 §15.5 |
+| 🆕 brand-builder | 個人品牌策略：品牌定位、SWOT、競品分析、內容策略、變現計畫 | tavily-search（選配） | CH15 §15.5 |
+| 🆕 community-manager | 社群經營管家：歡迎流程、FAQ 回覆、私訊分流、互動追蹤、輿情監控 | tavily-search（選配） | CH15 §15.5 |
