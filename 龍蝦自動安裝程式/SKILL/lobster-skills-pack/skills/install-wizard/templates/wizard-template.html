@@ -1,0 +1,88 @@
+<!-- ============================================================
+     安裝精靈 HTML 片段 — 貼入教學網站的 index.html
+     ============================================================ -->
+
+<!-- [1] 側邊欄入口按鈕：貼在 <nav class="sidebar"> 裡的 sidebar-header 下方 -->
+<div class="wizard-entry">
+  <button class="wizard-entry-btn" id="wizardEntryBtn">
+    <span class="wizard-entry-icon">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+    </span>
+    <span class="wizard-entry-text">
+      <!-- TODO: 修改精靈名稱 -->
+      <strong>安裝精靈</strong>
+      <small>一步一步帶你完成安裝</small>
+    </span>
+    <span class="wizard-entry-arrow">&#9654;</span>
+  </button>
+</div>
+
+<!-- [2] 設定面板 API Key 輸入：貼在設定面板的 settings-panel-body 裡 -->
+<div class="settings-group">
+  <label class="settings-label">Gemini API Key（AI 助教用）</label>
+  <div class="settings-apikey-wrap">
+    <input type="password" class="settings-apikey-input" id="geminiApiKeyInput" placeholder="貼上你的 API Key..." autocomplete="off">
+    <button class="settings-apikey-save" id="geminiApiKeySave">儲存</button>
+  </div>
+  <p class="settings-apikey-note">
+    <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">到 Google AI Studio 免費取得</a>，Key 只存在你的瀏覽器中。
+  </p>
+</div>
+
+<!-- [3] 精靈面板：貼在 </footer> 之後、<script> 之前 -->
+<div class="wizard-overlay" id="wizardOverlay">
+  <div class="wizard-panel">
+    <div class="wizard-header">
+      <div class="wizard-header-left">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        <!-- TODO: 修改精靈標題 -->
+        <h2>安裝精靈</h2>
+      </div>
+      <button class="wizard-close" id="wizardClose" aria-label="關閉精靈">&times;</button>
+    </div>
+    <div class="wizard-progress">
+      <div class="wizard-progress-bar" id="wizardProgressBar"></div>
+      <div class="wizard-progress-steps" id="wizardProgressSteps"></div>
+    </div>
+    <div class="wizard-body">
+      <div class="wizard-step-content" id="wizardStepContent"></div>
+      <div class="wizard-chat" id="wizardChat">
+        <div class="wizard-chat-header">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/><path d="M12 10c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1zm-4 0c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1zm8 0c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1z"/></svg>
+          <!-- TODO: 修改 AI 助教名稱 -->
+          <span>遇到問題？問 AI 助教</span>
+          <button class="wizard-chat-toggle" id="wizardChatToggle" aria-label="展開/收合聊天">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+          </button>
+        </div>
+        <div class="wizard-chat-body" id="wizardChatBody">
+          <div class="wizard-chat-messages" id="wizardChatMessages">
+            <div class="chat-msg chat-ai">
+              <div class="chat-bubble">你好！有任何問題都可以問我喔！</div>
+            </div>
+          </div>
+          <div class="wizard-chat-input-wrap">
+            <input type="text" class="wizard-chat-input" id="wizardChatInput" placeholder="輸入你的問題..." autocomplete="off">
+            <button class="wizard-chat-send" id="wizardChatSend" aria-label="送出">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <div class="wizard-chat-apikey-hint" id="wizardApiKeyHint">
+            <span>請先在設定中填入 Gemini API Key 才能使用 AI 問答</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wizard-footer">
+      <button class="wizard-btn wizard-btn-secondary" id="wizardPrev">上一步</button>
+      <div class="wizard-step-indicator" id="wizardStepIndicator">Step 1 / ?</div>
+      <button class="wizard-btn wizard-btn-primary" id="wizardNext">
+        <span id="wizardNextLabel">完成，下一步</span>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- [4] 載入精靈 JS：貼在 script.js 之後 -->
+<script src="wizard.js"></script>

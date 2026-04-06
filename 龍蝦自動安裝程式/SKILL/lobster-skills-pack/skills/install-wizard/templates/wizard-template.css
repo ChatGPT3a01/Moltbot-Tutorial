@@ -1,0 +1,156 @@
+/* ============================================================
+   安裝精靈 CSS 模板
+   複製此段 CSS 貼到教學網站的 style.css 尾端即可
+   使用 CSS Variables（--color-*），自動適配教學網站的主題配色
+   ============================================================ */
+
+/* --- 側邊欄入口按鈕 --- */
+.wizard-entry { padding: 12px 16px 4px; }
+.wizard-entry-btn {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 12px 14px; background: linear-gradient(135deg, var(--color-accent), var(--color-primary-dark));
+  color: #fff; border: none; border-radius: var(--radius-lg);
+  cursor: pointer; transition: all 0.25s ease; text-align: left;
+  font-family: inherit; box-shadow: var(--shadow-sm);
+}
+.wizard-entry-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); filter: brightness(1.08); }
+.wizard-entry-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; background: rgba(255,255,255,0.2); border-radius: 50%; flex-shrink: 0;
+}
+.wizard-entry-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.wizard-entry-text strong { font-size: 14px; font-weight: 700; line-height: 1.3; }
+.wizard-entry-text small { font-size: 11px; opacity: 0.85; line-height: 1.3; }
+.wizard-entry-arrow { font-size: 12px; opacity: 0.7; flex-shrink: 0; }
+
+/* --- 全頁覆蓋面板 --- */
+.wizard-overlay {
+  display: none; position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+  justify-content: center; align-items: center; padding: 20px;
+}
+.wizard-overlay.open { display: flex; }
+.wizard-panel {
+  width: 100%; max-width: 780px; max-height: 92vh; background: var(--color-bg);
+  border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
+/* --- 標題列 --- */
+.wizard-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px; background: linear-gradient(135deg, var(--color-accent), var(--color-primary-dark)); color: #fff;
+}
+.wizard-header-left { display: flex; align-items: center; gap: 10px; }
+.wizard-header h2 { font-size: 18px; font-weight: 700; margin: 0; }
+.wizard-close {
+  background: rgba(255,255,255,0.2); border: none; color: #fff;
+  font-size: 24px; width: 36px; height: 36px; border-radius: 50%;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s; line-height: 1;
+}
+.wizard-close:hover { background: rgba(255,255,255,0.35); }
+
+/* --- 進度條 --- */
+.wizard-progress { position: relative; padding: 16px 24px; background: var(--color-white); border-bottom: 1px solid var(--color-border); }
+.wizard-progress-bar { position: absolute; top: 0; left: 0; height: 3px; background: var(--color-accent); transition: width 0.4s ease; }
+.wizard-progress-steps { display: flex; justify-content: space-between; gap: 4px; }
+.wizard-progress-dot { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; min-width: 0; }
+.wizard-progress-dot .dot-circle {
+  width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--color-border);
+  background: var(--color-white); display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: var(--color-text-muted); transition: all 0.3s ease;
+}
+.wizard-progress-dot.active .dot-circle { border-color: var(--color-accent); background: var(--color-accent); color: #fff; }
+.wizard-progress-dot.done .dot-circle { border-color: #5a8a5a; background: #5a8a5a; color: #fff; }
+.wizard-progress-dot .dot-label { font-size: 11px; color: var(--color-text-muted); text-align: center; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.wizard-progress-dot.active .dot-label { color: var(--color-accent); font-weight: 600; }
+.wizard-progress-dot.done .dot-label { color: #5a8a5a; }
+
+/* --- 步驟內容 --- */
+.wizard-body { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+.wizard-step-content { padding: 24px; flex: 1; overflow-y: auto; line-height: 1.8; font-size: 15px; }
+.wizard-step-content h2 { font-size: 22px; margin-bottom: 12px; }
+.wizard-step-content h3 { font-size: 17px; margin: 20px 0 8px; }
+.wizard-step-content p { margin-bottom: 12px; }
+.wizard-step-content code { background: var(--color-code-bg); border: 1px solid var(--color-code-border); padding: 2px 6px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.9em; }
+.wizard-step-content pre { background: var(--color-code-bg); border: 1px solid var(--color-code-border); border-radius: var(--radius-md); padding: 16px; overflow-x: auto; margin: 12px 0; }
+.wizard-step-content pre code { background: none; border: none; padding: 0; }
+
+/* 完成清單 */
+.wizard-step-content .step-checklist { list-style: none; padding: 0; margin: 16px 0; }
+.wizard-step-content .step-checklist li {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; margin-bottom: 6px;
+  background: var(--color-white); border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s ease;
+}
+.wizard-step-content .step-checklist li:hover { border-color: var(--color-primary); }
+.wizard-step-content .step-checklist li.checked { background: #f0f9f0; border-color: #5a8a5a; }
+.wizard-step-content .step-checklist li .check-icon {
+  width: 22px; height: 22px; border: 2px solid var(--color-border); border-radius: 50%;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: all 0.2s;
+}
+.wizard-step-content .step-checklist li.checked .check-icon { background: #5a8a5a; border-color: #5a8a5a; color: #fff; }
+
+/* 完成畫面 */
+.wizard-success-card { text-align: center; padding: 40px 24px; }
+.wizard-success-card .success-icon { font-size: 64px; margin-bottom: 16px; }
+.wizard-success-card h2 { font-size: 24px; margin-bottom: 8px; }
+.wizard-success-card p { color: var(--color-text-light); }
+
+/* --- AI 聊天區 --- */
+.wizard-chat { border-top: 1px solid var(--color-border); background: var(--color-white); }
+.wizard-chat-header { display: flex; align-items: center; gap: 8px; padding: 10px 24px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--color-text-light); user-select: none; transition: background 0.2s; }
+.wizard-chat-header:hover { background: var(--color-code-bg); }
+.wizard-chat-header span { flex: 1; }
+.wizard-chat-toggle { background: none; border: none; cursor: pointer; color: var(--color-text-muted); transition: transform 0.3s; padding: 4px; display: flex; }
+.wizard-chat.expanded .wizard-chat-toggle { transform: rotate(180deg); }
+.wizard-chat-body { display: none; flex-direction: column; max-height: 280px; }
+.wizard-chat.expanded .wizard-chat-body { display: flex; }
+.wizard-chat-messages { flex: 1; overflow-y: auto; padding: 12px 24px; display: flex; flex-direction: column; gap: 10px; max-height: 200px; }
+.chat-msg { display: flex; }
+.chat-msg.chat-user { justify-content: flex-end; }
+.chat-bubble { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.6; word-break: break-word; }
+.chat-ai .chat-bubble { background: var(--color-code-bg); color: var(--color-text); border-bottom-left-radius: 4px; }
+.chat-user .chat-bubble { background: var(--color-accent); color: #fff; border-bottom-right-radius: 4px; }
+.chat-bubble.typing::after { content: '...'; animation: typingDots 1s infinite; }
+@keyframes typingDots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; } }
+.wizard-chat-input-wrap { display: flex; gap: 8px; padding: 10px 24px 14px; border-top: 1px solid var(--color-border); }
+.wizard-chat-input { flex: 1; padding: 10px 14px; border: 1px solid var(--color-border); border-radius: 20px; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; background: var(--color-bg); color: var(--color-text); }
+.wizard-chat-input:focus { border-color: var(--color-accent); }
+.wizard-chat-send { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--color-accent); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+.wizard-chat-send:hover { filter: brightness(1.1); transform: scale(1.05); }
+.wizard-chat-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.wizard-chat-apikey-hint { display: none; padding: 8px 24px 12px; font-size: 12px; color: var(--color-text-muted); text-align: center; }
+.wizard-chat-apikey-hint.show { display: block; }
+
+/* --- 底部按鈕列 --- */
+.wizard-footer { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-top: 1px solid var(--color-border); background: var(--color-white); }
+.wizard-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 24px; border-radius: 8px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s ease; border: none; }
+.wizard-btn-primary { background: var(--color-accent); color: #fff; box-shadow: 0 2px 8px rgba(232,151,107,0.3); }
+.wizard-btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.wizard-btn-secondary { background: var(--color-sidebar); color: var(--color-text); border: 1px solid var(--color-border); }
+.wizard-btn-secondary:hover { background: var(--color-sidebar-hover); }
+.wizard-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; filter: none; }
+.wizard-step-indicator { font-size: 13px; color: var(--color-text-muted); font-weight: 600; }
+
+/* --- 設定面板 API Key --- */
+.settings-apikey-wrap { display: flex; gap: 8px; }
+.settings-apikey-input { flex: 1; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 13px; font-family: var(--font-mono); background: var(--color-bg); color: var(--color-text); outline: none; }
+.settings-apikey-input:focus { border-color: var(--color-accent); }
+.settings-apikey-save { padding: 8px 16px; background: var(--color-accent); color: #fff; border: none; border-radius: var(--radius-md); font-size: 13px; font-family: inherit; cursor: pointer; transition: filter 0.2s; white-space: nowrap; }
+.settings-apikey-save:hover { filter: brightness(1.1); }
+.settings-apikey-note { margin-top: 6px; font-size: 12px; color: var(--color-text-muted); line-height: 1.5; }
+.settings-apikey-note a { color: var(--color-accent); text-decoration: underline; }
+
+/* --- RWD --- */
+@media (max-width: 768px) {
+  .wizard-panel { max-height: 100vh; border-radius: 0; height: 100%; }
+  .wizard-overlay { padding: 0; }
+  .wizard-progress-dot .dot-label { font-size: 10px; }
+  .wizard-step-content { padding: 16px; }
+  .wizard-chat-messages { padding: 10px 16px; }
+  .wizard-chat-input-wrap { padding: 10px 16px 12px; }
+  .wizard-footer { padding: 12px 16px; }
+  .wizard-btn { padding: 10px 16px; font-size: 14px; }
+}
