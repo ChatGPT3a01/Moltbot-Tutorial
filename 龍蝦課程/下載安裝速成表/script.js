@@ -545,6 +545,7 @@
       html += (ICONS[u.icon] || '') + '<span>' + u.shortTitle + '</span></button>';
     });
     html += '</div></div>';
+    html += buildSectionFooter();
     contentEl.innerHTML = html;
     addCopyButtons();
 
